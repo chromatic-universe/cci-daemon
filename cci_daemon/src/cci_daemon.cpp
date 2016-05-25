@@ -1,4 +1,4 @@
-#include <chromatic_daemon.h>
+#include <cci_daemon.h>
 
 //namespace
 using namespace cdi;
@@ -9,7 +9,7 @@ const unsigned long daemon_facade::bd_no_close_files = 02;
 const unsigned long daemon_facade::bd_no_reopen_std_fds = 04;
 const unsigned long daemon_facade::bd_no_umask_0 = 010;
 const unsigned long daemon_facade::bd_max_handles = 8192;
-const std::string daemon_facade::log_path = "/var/log/chromatic-daemon/chromatic-daemon.log";
+const std::string daemon_facade::log_path = "/var/log/cci-daemon/cci-daemon.log";
 
 
 //--------------------------------------------------------------------------------------
@@ -224,12 +224,21 @@ bool daemon_facade::read_config_file( const std::string& config_path )
         return b_ret;
 
 }
+
+//---------------------------------------------------------------------------------------------------
+bool daemon_facade::write_pid( const std::string& moniker ,
+                               const std::string& pid_file ,
+                               int flags  )
+{
+    return true;
+}
+
 //---------------------------------------------------------------------------------------------------
 int daemon_facade::daemon_default_exec( const std::string& params , const unsigned long dw_flags )
  {
       int options = 0;
       options |= LOG_PID;
-      const char* identity = "chromatic-daemon";
+      const char* identity = "cci-daemon";
 
       //daemonize has closed all file handles , reopen log file if closed
       if( m_b_opened == false )
@@ -239,9 +248,9 @@ int daemon_facade::daemon_default_exec( const std::string& params , const unsign
           {
             std::string msg( "chromatic_daemon.....using default module.....william k. johnson 2015" );
             log_message( msg );
-            read_config_file( "/dev_src/config/chromatic_daemon.conf" );
+            read_config_file( "/cci/dev_t/config/cci-daemon.conf" );
 
-           // syslog ( LOG_USER | LOG_INFO , "%s", "Activating chromatic-daemon...." );
+            syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "activating default cci-daemon procedure...." );
 
           }
 
@@ -269,13 +278,13 @@ int daemon_facade::daemon_default_exec( const std::string& params , const unsign
               {
                   //sighup
                   openlog( identity , options , LOG_USER );
-                  syslog ( LOG_USER | LOG_INFO , "%s", "chromatic-daemon received sighup....reading config....continuing" );
+                  syslog ( LOG_USER | LOG_INFO , "%s", "cci-daemon received sighup....reading config....continuing" );
                   closelog();
                   //next sighup
                   cdi::hup_received = 0;
                   close_log();
                   open_log();
-                  read_config_file( "/dev_src/config/chromatic_daemon.conf" );
+                  read_config_file( "/cci/dev_t/config/cci-daemon.conf" );
               }
               if( unslept == 0 )
               {

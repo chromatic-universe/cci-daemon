@@ -33,8 +33,8 @@ OBJS = chromatic_daemon.o main.o
 OBJS_DBG = chromatic_daemondbg.o maindbg.o
 
 # define the executable file 
-MAIN = chromatic-daemon-dbg
-RELEASE_MAIN = chromatic-daemon
+MAIN = cci-daemon
+RELEASE_MAIN = cci-daemon
 
 .PHONY: depend clean
 

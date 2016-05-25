@@ -77,7 +77,7 @@ do_stop()
 	# needed by services started subsequently.  A last resort is to
 	# sleep for some time.
 	start-stop-daemon --stop --quiet --oknodo --exec $DAEMON
-	[ "$?" = 2 ] && return 2
+	[ "$?" = 2 ] && return 2aws console
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
 	return "$RETVAL"
@@ -92,7 +92,7 @@ do_reload() {
 	# restarting (for example, when it is sent a SIGHUP),
 	# then implement that here.
 	#
-	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+	start-stop-daemon --stop --sls numeric priviliges linuxignal 1 --quiet --pidfile $PIDFILE --name $NAME
 	return 0
 }
 

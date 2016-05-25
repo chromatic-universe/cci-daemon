@@ -25,7 +25,7 @@
 #include <exception>
 //user space filesystem
 
-namespace chromatic_daemon_impl
+namespace cci_daemon_impl
 {
     //forward
     class daemon_facade;
@@ -74,6 +74,9 @@ namespace chromatic_daemon_impl
             virtual bool log_message( const std::string& msg );
             virtual void close_log();
             virtual bool read_config_file( const std::string& config_path );
+            virtual bool write_pid( const std::string& moniker ,
+                                    const std::string& pid_file ,
+                                    int flags  );
 
         private :
 
@@ -148,8 +151,8 @@ namespace chromatic_daemon_impl
     }
     static void sigterm_handler( int signal )
     {
-        openlog( "chromatic-daemon" , 0  , LOG_USER );
-        syslog ( LOG_USER | LOG_INFO , "%s", "chromatic-daemon deactivated by sigterm...." );
+        openlog( "cci-daemon" , 0  , LOG_USER );
+        syslog ( LOG_USER | LOG_INFO , "%s", "cci-daemon deactivated by sigterm...." );
         closelog();
 
         exit( EXIT_SUCCESS );
@@ -176,4 +179,4 @@ namespace chromatic_daemon_impl
     }
 
 }
-namespace cdi = chromatic_daemon_impl;
+namespace cdi = cci_daemon_impl;

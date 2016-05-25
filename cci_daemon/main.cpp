@@ -13,7 +13,7 @@ int main( int argc , char* argv[] )
     std::string str( "foo" );
     int options = 0;
     options |= LOG_PID;
-    const char* identity = "chromatic-daemon";
+    const char* identity = "cci-daemon";
 
 
     //daemonize
