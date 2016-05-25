@@ -1,0 +1,244 @@
+# chromatic-daemon make william k. Johnson 2015
+
+#
+# 'make depend' uses makedepend to automatically generate dependencies 
+#               (dependencies are added to end of Makefile)
+# 'make'        build executable file 'mycc'
+# 'make clean'  removes all .o and executable files
+#
+
+# define the c++ compiler to use
+CC = clang++
+
+# define any compile-time flags
+CPPFLAGS = -Wall -O0 -g -std=c++11 -pg 
+CPPFLAGS_RELEASE = -Wall -O3 -std=c++11  
+
+# define any directories containing header files other than /usr/include
+#
+INCLUDES = -I../include -I/usr/include/c++/4.8 -I/usr/include/i386-linux-gnu/c++/4.8
+
+# define library paths in addition to /usr/lib
+LFLAGS = 
+
+# define any libraries to link into executable:
+LIBS = -lstdc++
+
+# define the C++ source files
+SRCS = chromatic_daemon.cpp main.cpp
+
+# define the C++ object files 
+OBJS = chromatic_daemon.o main.o
+OBJS_DBG = chromatic_daemondbg.o maindbg.o
+
+# define the executable file 
+MAIN = chromatic-daemon-dbg
+RELEASE_MAIN = chromatic-daemon
+
+.PHONY: depend clean
+
+.DEFAULT: debug
+
+debug:   $(MAIN)
+        chromatic_daemondbg.o: chromatic_daemon.cpp
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c  chromatic_daemon.cpp -o chromatic_daemondbg.o
+
+        maindbg.o: main.cpp
+
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c  main.cpp -o maindbg.o
+
+	@echo  debug chromatic-daemon has been compiled
+release:  $(RELEASE_MAIN)
+        chromatic_daemon.o: chromatic_daemon.cpp
+	$(CC) $(CPPFLAGS_RELEASE) $(INCLUDES) -c  chromatic_daemon.cpp -o chromatic_daemon.o
+
+        main.o: main.cpp
+
+	$(CC) $(CPPFLAGS_RELEASE) $(INCLUDES) -c  main.cpp -o main.o
+
+	@echo  release chromatic-daemon has been compiled
+
+$(MAIN): $(OBJS_DBG)
+	 $(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS_DBG) $(LFLAGS) $(LIBS)
+
+$(RELEASE_MAIN): $(OBJS) 
+	$(CC) $(CPPFLAGS_RELEASE) $(INCLUDES) -o $(RELEASE_MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	
+
+# this is a suffix replacement rule for building .o's from .c's
+# it uses automatic variables $<: the name of the prerequisite of
+# the rule(a .c file) and $@: the name of the target of the rule (a .o file) 
+# (see the gnu make manual section about automatic variables)
+.c.o:
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c $<  -o $@
+
+clean:
+	$(RM) *.o *~ $(MAIN)
+	$(RM) *.o *~ $(RELEASE_MAIN)
+
+depend: $(SRCS)
+	makedepend $(INCLUDES) $^ 
+
+# DO NOT DELETE THIS LINE -- make depend needs it
+
+chromatic_daemon.o: ../include/chromatic_daemon.h
+chromatic_daemon.o: /usr/include/c++/4.8/cstdlib
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h
+chromatic_daemon.o: /usr/include/features.h /usr/include/stdc-predef.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/cpu_defines.h
+chromatic_daemon.o: /usr/include/c++/4.8/cstdio /usr/include/stdio.h
+chromatic_daemon.o: /usr/include/libio.h /usr/include/_G_config.h
+chromatic_daemon.o: /usr/include/wchar.h /usr/include/fcntl.h
+chromatic_daemon.o: /usr/include/time.h /usr/include/signal.h
+chromatic_daemon.o: /usr/include/string.h /usr/include/xlocale.h
+chromatic_daemon.o: /usr/include/unistd.h /usr/include/getopt.h
+chromatic_daemon.o: /usr/include/ctype.h /usr/include/endian.h
+chromatic_daemon.o: /usr/include/c++/4.8/iostream
+chromatic_daemon.o: /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios
+chromatic_daemon.o: /usr/include/c++/4.8/iosfwd
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stringfwd.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/memoryfwd.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/postypes.h
+chromatic_daemon.o: /usr/include/c++/4.8/cwchar
+chromatic_daemon.o: /usr/include/c++/4.8/exception
+chromatic_daemon.o: /usr/include/c++/4.8/bits/atomic_lockfree_defines.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/char_traits.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_algobase.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/functexcept.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/exception_defines.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/cpp_type_traits.h
+chromatic_daemon.o: /usr/include/c++/4.8/ext/type_traits.h
+chromatic_daemon.o: /usr/include/c++/4.8/ext/numeric_traits.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_pair.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/move.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/concept_check.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_iterator_base_types.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h
+chromatic_daemon.o: /usr/include/c++/4.8/debug/debug.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_iterator.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/localefwd.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++locale.h
+chromatic_daemon.o: /usr/include/c++/4.8/clocale /usr/include/locale.h
+chromatic_daemon.o: /usr/include/c++/4.8/cctype
+chromatic_daemon.o: /usr/include/c++/4.8/bits/ios_base.h
+chromatic_daemon.o: /usr/include/c++/4.8/ext/atomicity.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/gthr.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/gthr-default.h
+chromatic_daemon.o: /usr/include/pthread.h /usr/include/sched.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/atomic_word.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/locale_classes.h
+chromatic_daemon.o: /usr/include/c++/4.8/string
+chromatic_daemon.o: /usr/include/c++/4.8/bits/allocator.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++allocator.h
+chromatic_daemon.o: /usr/include/c++/4.8/ext/new_allocator.h
+chromatic_daemon.o: /usr/include/c++/4.8/new
+chromatic_daemon.o: /usr/include/c++/4.8/bits/ostream_insert.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/cxxabi_forced.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_function.h
+chromatic_daemon.o: /usr/include/c++/4.8/backward/binders.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/range_access.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/basic_string.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/basic_string.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/bits/locale_classes.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/streambuf
+chromatic_daemon.o: /usr/include/c++/4.8/bits/streambuf.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/bits/basic_ios.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/locale_facets.h
+chromatic_daemon.o: /usr/include/c++/4.8/cwctype /usr/include/wctype.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/ctype_base.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/streambuf_iterator.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/ctype_inline.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/locale_facets.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/bits/basic_ios.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/bits/ostream.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/istream
+chromatic_daemon.o: /usr/include/c++/4.8/bits/istream.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/sstream
+chromatic_daemon.o: /usr/include/c++/4.8/bits/sstream.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/fstream
+chromatic_daemon.o: /usr/include/c++/4.8/bits/codecvt.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/basic_file.h
+chromatic_daemon.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++io.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/fstream.tcc
+chromatic_daemon.o: /usr/include/c++/4.8/memory
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_construct.h
+chromatic_daemon.o: /usr/include/c++/4.8/ext/alloc_traits.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_uninitialized.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_tempbuf.h
+chromatic_daemon.o: /usr/include/c++/4.8/bits/stl_raw_storage_iter.h
+chromatic_daemon.o: /usr/include/c++/4.8/backward/auto_ptr.h
+main.o: ../include/chromatic_daemon.h /usr/include/c++/4.8/cstdlib
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++config.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/os_defines.h
+main.o: /usr/include/features.h /usr/include/stdc-predef.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/cpu_defines.h
+main.o: /usr/include/c++/4.8/cstdio /usr/include/stdio.h /usr/include/libio.h
+main.o: /usr/include/_G_config.h /usr/include/wchar.h /usr/include/fcntl.h
+main.o: /usr/include/time.h /usr/include/signal.h /usr/include/string.h
+main.o: /usr/include/xlocale.h /usr/include/unistd.h /usr/include/getopt.h
+main.o: /usr/include/ctype.h /usr/include/endian.h
+main.o: /usr/include/c++/4.8/iostream /usr/include/c++/4.8/ostream
+main.o: /usr/include/c++/4.8/ios /usr/include/c++/4.8/iosfwd
+main.o: /usr/include/c++/4.8/bits/stringfwd.h
+main.o: /usr/include/c++/4.8/bits/memoryfwd.h
+main.o: /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar
+main.o: /usr/include/c++/4.8/exception
+main.o: /usr/include/c++/4.8/bits/atomic_lockfree_defines.h
+main.o: /usr/include/c++/4.8/bits/char_traits.h
+main.o: /usr/include/c++/4.8/bits/stl_algobase.h
+main.o: /usr/include/c++/4.8/bits/functexcept.h
+main.o: /usr/include/c++/4.8/bits/exception_defines.h
+main.o: /usr/include/c++/4.8/bits/cpp_type_traits.h
+main.o: /usr/include/c++/4.8/ext/type_traits.h
+main.o: /usr/include/c++/4.8/ext/numeric_traits.h
+main.o: /usr/include/c++/4.8/bits/stl_pair.h /usr/include/c++/4.8/bits/move.h
+main.o: /usr/include/c++/4.8/bits/concept_check.h
+main.o: /usr/include/c++/4.8/bits/stl_iterator_base_types.h
+main.o: /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h
+main.o: /usr/include/c++/4.8/debug/debug.h
+main.o: /usr/include/c++/4.8/bits/stl_iterator.h
+main.o: /usr/include/c++/4.8/bits/localefwd.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++locale.h
+main.o: /usr/include/c++/4.8/clocale /usr/include/locale.h
+main.o: /usr/include/c++/4.8/cctype /usr/include/c++/4.8/bits/ios_base.h
+main.o: /usr/include/c++/4.8/ext/atomicity.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/gthr.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/gthr-default.h
+main.o: /usr/include/pthread.h /usr/include/sched.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/atomic_word.h
+main.o: /usr/include/c++/4.8/bits/locale_classes.h
+main.o: /usr/include/c++/4.8/string /usr/include/c++/4.8/bits/allocator.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++allocator.h
+main.o: /usr/include/c++/4.8/ext/new_allocator.h /usr/include/c++/4.8/new
+main.o: /usr/include/c++/4.8/bits/ostream_insert.h
+main.o: /usr/include/c++/4.8/bits/cxxabi_forced.h
+main.o: /usr/include/c++/4.8/bits/stl_function.h
+main.o: /usr/include/c++/4.8/backward/binders.h
+main.o: /usr/include/c++/4.8/bits/range_access.h
+main.o: /usr/include/c++/4.8/bits/basic_string.h
+main.o: /usr/include/c++/4.8/bits/basic_string.tcc
+main.o: /usr/include/c++/4.8/bits/locale_classes.tcc
+main.o: /usr/include/c++/4.8/streambuf
+main.o: /usr/include/c++/4.8/bits/streambuf.tcc
+main.o: /usr/include/c++/4.8/bits/basic_ios.h
+main.o: /usr/include/c++/4.8/bits/locale_facets.h
+main.o: /usr/include/c++/4.8/cwctype /usr/include/wctype.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/ctype_base.h
+main.o: /usr/include/c++/4.8/bits/streambuf_iterator.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/ctype_inline.h
+main.o: /usr/include/c++/4.8/bits/locale_facets.tcc
+main.o: /usr/include/c++/4.8/bits/basic_ios.tcc
+main.o: /usr/include/c++/4.8/bits/ostream.tcc /usr/include/c++/4.8/istream
+main.o: /usr/include/c++/4.8/bits/istream.tcc /usr/include/c++/4.8/sstream
+main.o: /usr/include/c++/4.8/bits/sstream.tcc /usr/include/c++/4.8/fstream
+main.o: /usr/include/c++/4.8/bits/codecvt.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/basic_file.h
+main.o: /usr/include/i386-linux-gnu/c++/4.8/bits/c++io.h
+main.o: /usr/include/c++/4.8/bits/fstream.tcc /usr/include/c++/4.8/memory
+main.o: /usr/include/c++/4.8/bits/stl_construct.h
+main.o: /usr/include/c++/4.8/ext/alloc_traits.h
+main.o: /usr/include/c++/4.8/bits/stl_uninitialized.h
+main.o: /usr/include/c++/4.8/bits/stl_tempbuf.h
+main.o: /usr/include/c++/4.8/bits/stl_raw_storage_iter.h
+main.o: /usr/include/c++/4.8/backward/auto_ptr.h
