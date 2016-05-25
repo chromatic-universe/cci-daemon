@@ -1,6 +1,6 @@
 #pragma GCC diagnostic ignored "-Wunused-function"
 
-#include <chromatic_daemon.h>
+#include <cci_daemon.h>
 
 using namespace cdi;
 
