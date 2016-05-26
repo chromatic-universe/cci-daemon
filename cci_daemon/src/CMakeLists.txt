@@ -15,12 +15,12 @@ include_directories(../../include)
 link_directories(${CCIDAEMON_SOURCE_DIR})
 
 #executable
-add_executable(cci_daemon  cci_daemon.cpp 
+add_executable(cci-daemon  cci_daemon.cpp 
                            cci_daemon_main.cpp )
 
 #link libs
-target_link_libraries(cci_daemon -lstdc++ -lpthread)
+target_link_libraries(cci-daemon -lstdc++ -lpthread)
 
 #install
-install_targets( /bin cci_daemon)
+install_targets( /bin cci-daemon)
 

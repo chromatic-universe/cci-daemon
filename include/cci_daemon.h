@@ -16,6 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <syslog.h>
+#include <sys/stat.h>
 //c++ standard
 #include <iostream>
 #include <sstream>
@@ -28,11 +29,11 @@
 namespace cci_daemon_impl
 {
     //forward
-    class daemon_facade;
+    class cci_daemon_facade;
 
-    //types
-    typedef daemon_facade* daemon_facade_ptr;
-    typedef FILE* file_ptr;
+    //aliases
+    using  cci_daemon_facade_ptr = cci_daemon_facade*;
+    using  file_ptr = FILE*;
 
     //enumerations
     enum class daemon_proc : unsigned long
@@ -55,17 +56,20 @@ namespace cci_daemon_impl
     };
 
     //services
-    class daemon_facade
+    class cci_daemon_facade
     {
         public :
 
             //types
 
             //ctors
-            explicit daemon_facade() ;//explicit
+            explicit cci_daemon_facade() ;//explicit
 
             //dtor
-            virtual ~daemon_facade();
+            virtual ~cci_daemon_facade();
+
+            //no copy
+
 
         protected :
 
@@ -74,33 +78,46 @@ namespace cci_daemon_impl
             virtual bool log_message( const std::string& msg );
             virtual void close_log();
             virtual bool read_config_file( const std::string& config_path );
-            virtual bool write_pid( const std::string& moniker ,
-                                    const std::string& pid_file ,
+            virtual bool write_pid( const std::string& pid_file ,
                                     int flags  );
+            virtual bool remove_pid( const std::string& pid_file );
+            virtual int lock_region( int fd ,
+                                     int type ,
+                                     int whence ,
+                                     int start ,
+                                     int len );
+
 
         private :
 
             //no copy
-            daemon_facade( const daemon_facade& dfa );    //copy
+            cci_daemon_facade( const cci_daemon_facade& dfa );    //copy
             //no assign
-            const daemon_facade& operator= ( const daemon_facade& dfa );
+            const cci_daemon_facade& operator= ( const cci_daemon_facade& dfa );
 
             //attributes
-            unsigned long m_dw_flags;
-            file_ptr m_log_fp;
-            bool m_b_opened;
-            service_proc m_service_proc;
+            unsigned long       m_dw_flags;
+            file_ptr            m_log_fp;
+            bool                m_b_opened;
+            service_proc        m_service_proc;
+            std::string         m_str_conf;
+            std::string         m_str_pid_path;
 
         public  :
 
             //accessors-inspectors
             unsigned long flags() const noexcept { return m_dw_flags; }
             service_proc proc() const noexcept { return m_service_proc; }
+            std::string config_path() const noexcept { return m_str_conf; }
+            std::string pid_path() const noexcept { return m_str_pid_path; }
+
             //mutators
             void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }
+            void config_path( const std::string& path ) { m_str_conf = path; }
+            void pid_path( const std::string& path ) { m_str_pid_path = path; }
 
             //stream
-			friend std::ostream& operator<< ( std::ostream& o , const daemon_facade& df );
+			friend std::ostream& operator<< ( std::ostream& o , const cci_daemon_facade& df );
 
 			//daemon execute procs
 			virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
@@ -111,26 +128,38 @@ namespace cci_daemon_impl
 			//immutable
 			///< constant bitmask arguments for daemonize call
             ///don't change directory to root("/")
-            static const unsigned long bd_no_chdir;
+            static const unsigned bd_no_chdir;
             ///< don't close all open files
-            static const unsigned long bd_no_close_files;
+            static const unsigned bd_no_close_files;
             ///< don;t reopen stdin , stderr and std:out to to /dev_null
-            static const unsigned long bd_no_reopen_std_fds;
+            static const unsigned bd_no_reopen_std_fds;
             ///< don't do a umask( 0 )
-            static const unsigned long bd_no_umask_0;
+            static const unsigned bd_no_umask_0;
             ///< maximum file descriptors to close if sysconf is indeterminate
-            static const unsigned long bd_max_handles;
+            static const unsigned bd_max_handles;
             ///< log
+            //
+            //
             static const std::string log_path;
+            ///buffer isze
+            static const unsigned buffer_size;
+            ///default config
+            static const std::string path_config;
+            ///pid
+            static const std::string path_pid;
+            ///close exec
+            static const unsigned cpf_cloexec;
+
     };
-    inline std::ostream& operator<< ( std::ostream& ostr, const daemon_facade& df )
+    inline std::ostream& operator<< ( std::ostream& ostr, const cci_daemon_facade& df )
     {
         //todo
         return ostr << "daemon facade "
-                    << "log=>" << daemon_facade::log_path;
+                    << "log=>" << cci_daemon_impl::cci_daemon_facade::log_path;
     }
 
     //immutable
+
     static void chromatic_terminate() noexcept
     {
         //core dump if environment set , else use exit
