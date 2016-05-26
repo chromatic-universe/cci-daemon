@@ -266,6 +266,7 @@ bool cci_daemon_facade::write_pid( const std::string& pid_file ,
 
         if ( flags & cci_daemon_facade::cpf_cloexec )
         {
+
             //close-on-exec file descriptor flag
             flags = fcntl( fd , F_GETFD );
             //fetch flags
@@ -352,10 +353,11 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
 
 
           if ( ! write_pid( pid_path() , 0 ) )
-          { log_message( "pid write failed" ); }
+          { log_message( "pid write failed"  ); }
 
           for( ;; )
           {
+
               //returns 0 if interrupted
               unslept = sleep( unslept );
 

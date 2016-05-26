@@ -69,6 +69,9 @@ namespace cci_daemon_impl
             virtual ~cci_daemon_facade();
 
             //no copy
+            cci_daemon_facade( const cci_daemon_facade& cdf ) = delete;
+            //no assing
+            cci_daemon_facade& operator= ( const cci_daemon_facade& cdf ) = delete;
 
 
         protected :
@@ -90,11 +93,6 @@ namespace cci_daemon_impl
 
         private :
 
-            //no copy
-            cci_daemon_facade( const cci_daemon_facade& dfa );    //copy
-            //no assign
-            const cci_daemon_facade& operator= ( const cci_daemon_facade& dfa );
-
             //attributes
             unsigned long       m_dw_flags;
             file_ptr            m_log_fp;
@@ -106,7 +104,7 @@ namespace cci_daemon_impl
         public  :
 
             //accessors-inspectors
-            unsigned long flags() const noexcept { return m_dw_flags; }
+            constexpr unsigned long flags() const noexcept { return m_dw_flags; }
             service_proc proc() const noexcept { return m_service_proc; }
             std::string config_path() const noexcept { return m_str_conf; }
             std::string pid_path() const noexcept { return m_str_pid_path; }
