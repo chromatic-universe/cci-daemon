@@ -143,6 +143,7 @@ int cci_daemon_facade::daemonize()
        if ( dp == daemon_proc::dp_daemonized ) { break; }
     }
 
+
     return ( dp != daemon_proc::dp_error ? 0 : -1 );
 }
 
@@ -173,8 +174,11 @@ bool cci_daemon_facade::log_message( const std::string& msg )
             b_ret = true;
      }
 
+     print_stacktrace( m_log_fp );
+
      return b_ret;
 }
+
 
 //---------------------------------------------------------------------------------------------------
 bool cci_daemon_facade::open_log()
@@ -213,6 +217,7 @@ bool cci_daemon_facade::read_config_file( const std::string& config_path )
         fp = fopen( (char*) config_path.c_str() , "r" );
         if ( fp != NULL )
         {
+
             //ignore nonexistent file
             if ( fgets( str, cci_daemon_facade::buffer_size , fp) == NULL )
             {
@@ -229,6 +234,8 @@ bool cci_daemon_facade::read_config_file( const std::string& config_path )
 
             fclose( fp );
         }
+
+        print_stacktrace( m_log_fp );
 
         return b_ret;
 
@@ -307,7 +314,7 @@ bool cci_daemon_facade::write_pid( const std::string& pid_file ,
             }
         }
 
-
+        print_stacktrace( m_log_fp );
 
         return b_ret;
 }
@@ -315,6 +322,8 @@ bool cci_daemon_facade::write_pid( const std::string& pid_file ,
 //---------------------------------------------------------------------------------------------------
 bool cci_daemon_facade::remove_pid( const std::string& pid_file )
 {
+        print_stacktrace( m_log_fp );
+
         return std::remove( pid_file.c_str() ) ? true : false;
 }
 
@@ -387,6 +396,8 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
           }
 
           remove_pid( pid_path() );
+
+
 
           return ( 0 );
 }

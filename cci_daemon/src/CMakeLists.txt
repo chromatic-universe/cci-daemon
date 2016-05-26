@@ -7,8 +7,8 @@ project(CCIDAEMON)
 
 
 #cpp flags
-set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -Qunused-arguments  -DDEBUG -std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -Qunused-arguments  -DNDEBUG -std=c++14")
+set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")
+set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DNDEBUG -std=c++14")
 
 #includes
 include_directories(../../include
@@ -16,11 +16,12 @@ include_directories(../../include
 link_directories(${CCIDAEMON_SOURCE_DIR})
 
 #executable
-add_executable(cci-daemon  cci_daemon.cpp 
+add_executable(cci-daemon  cci_stack_trace.cpp 
+                           cci_daemon.cpp 
                            cci_daemon_main.cpp )
 
 #link libs
-target_link_libraries(cci-daemon -lstdc++ -lpthread)
+target_link_libraries(cci-daemon -lstdc++ -lpthread -ldl)
 
 #install
 install_targets( /bin cci-daemon)

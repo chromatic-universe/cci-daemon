@@ -24,7 +24,9 @@
 #include <string>
 #include <memory>
 #include <exception>
-//user space filesystem
+
+//cci
+#include <cci_stack_trace.h>
 
 namespace cci_daemon_impl
 {
