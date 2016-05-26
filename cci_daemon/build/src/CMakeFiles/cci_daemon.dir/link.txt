@@ -1,1 +1,0 @@
-/cci/dev_t/bin/clang++   -fPIC -Wall -g -O0  -Qunused-arguments  -DDEBUG -std=c++14   CMakeFiles/cci_daemon.dir/cci_daemon.cpp.o CMakeFiles/cci_daemon.dir/cci_daemon_main.cpp.o  -o cci_daemon  -L/home/wiljoh/cci_git_4/cci-daemon/cci_daemon/src -rdynamic -lstdc++ -lpthread -Wl,-rpath,/home/wiljoh/cci_git_4/cci-daemon/cci_daemon/src: 
