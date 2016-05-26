@@ -27,6 +27,7 @@
 
 //cci
 #include <cci_stack_trace.h>
+#include <cci_shared_lib.h>
 
 namespace cci_daemon_impl
 {
