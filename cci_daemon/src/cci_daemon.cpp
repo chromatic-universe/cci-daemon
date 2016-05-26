@@ -21,7 +21,8 @@ cci_daemon_facade::cci_daemon_facade()  : m_dw_flags { 0L } ,
                                           m_b_opened { false } ,
                                           m_service_proc { service_proc::sp_default_service } ,
                                           m_str_conf { cci_daemon_facade::path_config } ,
-                                          m_str_pid_path { cci_daemon_facade::path_pid }
+                                          m_str_pid_path { cci_daemon_facade::path_pid } ,
+                                          m_backtrace { false }
 {
       //
 }
@@ -29,7 +30,7 @@ cci_daemon_facade::cci_daemon_facade()  : m_dw_flags { 0L } ,
 //---------------------------------------------------------------------------------------------------
 cci_daemon_facade::~cci_daemon_facade()
 {
-
+    _bt();
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -174,7 +175,7 @@ bool cci_daemon_facade::log_message( const std::string& msg )
             b_ret = true;
      }
 
-     print_stacktrace( m_log_fp );
+     _bt();
 
      return b_ret;
 }
@@ -235,7 +236,7 @@ bool cci_daemon_facade::read_config_file( const std::string& config_path )
             fclose( fp );
         }
 
-        print_stacktrace( m_log_fp );
+        _bt();
 
         return b_ret;
 
@@ -314,7 +315,7 @@ bool cci_daemon_facade::write_pid( const std::string& pid_file ,
             }
         }
 
-        print_stacktrace( m_log_fp );
+        _bt();
 
         return b_ret;
 }
@@ -322,10 +323,12 @@ bool cci_daemon_facade::write_pid( const std::string& pid_file ,
 //---------------------------------------------------------------------------------------------------
 bool cci_daemon_facade::remove_pid( const std::string& pid_file )
 {
-        print_stacktrace( m_log_fp );
+
+        _bt();
 
         return std::remove( pid_file.c_str() ) ? true : false;
 }
+
 
 //---------------------------------------------------------------------------------------------------
 int cci_daemon_facade::daemon_default_exec( const std::string& params , const unsigned long dw_flags )
@@ -396,8 +399,6 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
           }
 
           remove_pid( pid_path() );
-
-
 
           return ( 0 );
 }

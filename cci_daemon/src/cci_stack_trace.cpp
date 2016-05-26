@@ -5,10 +5,9 @@
 
 using namespace cci_daemon_impl;
 
-using void_ptr = void*;
 
 //demangled stack backtrace of the caller function to out stream
-void cci_daemon_impl::print_stacktrace( FILE *out , unsigned int max_frames )
+void cci_daemon_impl::print_stacktrace( FILE *out , unsigned max_frames )
 {
         fprintf(out, "stack trace:\n");
 
@@ -35,57 +34,96 @@ void cci_daemon_impl::print_stacktrace( FILE *out , unsigned int max_frames )
         // address of this function.
         for (int i = 1; i < addrlen; i++)
         {
-        char *begin_name = 0, *begin_offset = 0, *end_offset = 0;
+            char *begin_name = 0, *begin_offset = 0, *end_offset = 0;
 
-        // find parentheses and +address offset surrounding the mangled name:
-        // ./module(function+0x15c) [0x8048a6d]
-        for (char *p = symbollist[i]; *p; ++p)
-        {
-            if (*p == '(')
-            begin_name = p;
-            else if (*p == '+')
-            begin_offset = p;
-            else if (*p == ')' && begin_offset) {
-            end_offset = p;
-            break;
+            // find parentheses and +address offset surrounding the mangled name:
+            // ./module(function+0x15c) [0x8048a6d]
+            for (char *p = symbollist[i]; *p; ++p)
+            {
+                if (*p == '(')
+                begin_name = p;
+                else if (*p == '+')
+                begin_offset = p;
+                else if (*p == ')' && begin_offset) {
+                end_offset = p;
+                break;
+                }
             }
-        }
 
-        if (begin_name && begin_offset && end_offset
-            && begin_name < begin_offset)
-        {
-            *begin_name++ = '\0';
-            *begin_offset++ = '\0';
-            *end_offset = '\0';
+            if (begin_name && begin_offset && end_offset
+                && begin_name < begin_offset)
+            {
+                *begin_name++ = '\0';
+                *begin_offset++ = '\0';
+                *end_offset = '\0';
 
-            // mangled name is now in [begin_name, begin_offset) and caller
-            // offset in [begin_offset, end_offset). now apply
-            // __cxa_demangle():
+                // mangled name is now in [begin_name, begin_offset) and caller
+                // offset in [begin_offset, end_offset). now apply
+                // __cxa_demangle():
 
-            int status;
-            char* ret = abi::__cxa_demangle(begin_name,
-                            funcname, &funcnamesize, &status);
-            if (status == 0) {
-            funcname = ret; // use possibly realloc()-ed string
-            fprintf(out, "  %s : %s+%s\n",
-                symbollist[i], funcname, begin_offset);
+                int status;
+                char* ret = abi::__cxa_demangle(begin_name,
+                                funcname, &funcnamesize, &status);
+                if (status == 0) {
+                funcname = ret; // use possibly realloc()-ed string
+                fprintf(out, "  %s : %s+%s\n",
+                    symbollist[i], funcname, begin_offset);
+                }
+                else {
+                // demangling failed. Output function name as a C function with
+                // no arguments.
+                fprintf(out, "  %s : %s()+%s\n",
+
+                    symbollist[i], begin_name, begin_offset);
+                }
             }
-            else {
-            // demangling failed. Output function name as a C function with
-            // no arguments.
-            fprintf(out, "  %s : %s()+%s\n",
-                symbollist[i], begin_name, begin_offset);
+            else
+            {
+                // couldn't parse the line? print the whole line.
+                fprintf(out, "  %s\n", symbollist[i]);
             }
-        }
-        else
-        {
-            // couldn't parse the line? print the whole line.
-            fprintf(out, "  %s\n", symbollist[i]);
-        }
         }
 
         free(funcname);
         free(symbollist);
 }
 
+//--------------------------------------------------------------------------------------
+//shift ptr
+void** cci_daemon_impl::get_ebp( int dummy )
+{
+    void** ebp = (void** )&dummy - 2;
+
+    return( ebp );
+}
+
+//--------------------------------------------------------------------------------------
+//print trace back
+void cci_daemon_impl::print_walk_backtrace( FILE *out )
+{
+        int dummy  = 0;
+        int frame = 0;
+        Dl_info dlip;
+
+        void** ebp = get_ebp( dummy );
+        void** ret = NULL;
+
+        //instruction pointer
+        fprintf( out , "stack backtrace walk: \n" );
+
+        while( *ebp )
+        {
+            ret = ebp + 1;
+            dladdr( *ret, &dlip );
+            fprintf(  out ,
+                     "frame %d: [ebp=0x%08x] [ret=0x%08x] %s\n" ,
+                     frame++ ,
+                     *ebp ,
+                     *ret ,
+                     dlip.dli_sname );
+            //next frame pointer
+            ebp = (void**)(*ebp);
+        }
+
+}
 

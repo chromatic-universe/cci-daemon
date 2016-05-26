@@ -11,6 +11,7 @@ using namespace cdi;
 int main( int argc , char* argv[] )
 {
     auto df( std::make_unique<cci_daemon_facade>() );
+    df->backtrace( true );
 
     std::string str( "cci-daemon-default" );
     int options = 0;

@@ -91,7 +91,8 @@ namespace cci_daemon_impl
                                      int whence ,
                                      int start ,
                                      int len );
-
+            void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
+            void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
 
         private :
 
@@ -102,17 +103,20 @@ namespace cci_daemon_impl
             service_proc        m_service_proc;
             std::string         m_str_conf;
             std::string         m_str_pid_path;
+            bool                m_backtrace;
 
         public  :
 
             //accessors-inspectors
             constexpr unsigned long flags() const noexcept { return m_dw_flags; }
+            constexpr unsigned long backtrace() const noexcept { return m_backtrace; }
             service_proc proc() const noexcept { return m_service_proc; }
             std::string config_path() const noexcept { return m_str_conf; }
             std::string pid_path() const noexcept { return m_str_pid_path; }
 
             //mutators
             void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }
+            void backtrace( const unsigned long trace ) noexcept { m_backtrace = trace; }
             void config_path( const std::string& path ) { m_str_conf = path; }
             void pid_path( const std::string& path ) { m_str_pid_path = path; }
 
