@@ -34,7 +34,9 @@ namespace MyEngine {
       /// <summary>Checks whether the reader can open an archive</summary>
       /// <param name="filename">Name of the file that will be checked</param>
       public: virtual bool canOpenArchive(const std::string &filename) = 0;
-
+                    {
+                            throw std::runtime_error( "could not unload shared object" );
+                          }
       /// <summary>Opens an archive for reading</summary>
       /// <param name="filename">Filename of the archive to open</param>
       public: virtual std::auto_ptr<Archive> openArchive(
@@ -63,7 +65,7 @@ namespace MyEngine {
     ) {
       this->archiveReaders.push_back(archiveReader.release());
     }
-    
+
     /// <summry>
     ///   Opens an archive by searching for a matching archive reader
     /// </summary>

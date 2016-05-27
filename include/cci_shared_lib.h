@@ -28,7 +28,7 @@ namespace cci_daemon_impl
                 public :
 
                     //ctor
-                    explicit cci_shared_lib( const std::string& lib_path ) : m_str_libpath { lib_path }
+                    explicit cci_shared_lib() : m_str_libpath { "" }
                     {}
                     //ctor
                     virtual ~cci_shared_lib() = default;
@@ -51,11 +51,14 @@ namespace cci_daemon_impl
 
                     //services
                     ////shared object with the specified handle
-                    static cci_handle_t load( const std::string& lib_path )
+                    static cci_handle_t load( const std::string& lib )
                     {
-                        std::string path_with_extension = std::string( "./lib" ) +
-                                                          lib_path + ".so";
-
+                        std::ostringstream ostr;
+                        ostr << "lib"
+                             << lib
+                             << ".so"
+                             << std::ends;
+                        std::string path_with_extension = ostr.str();
                         cci_handle_t shared_object = ::dlopen( path_with_extension.c_str() ,
                                                                RTLD_NOW) ;
                         if( shared_object == nullptr )

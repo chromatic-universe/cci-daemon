@@ -1,68 +1,61 @@
-///////////////////////////////////////////////////////////////////////////////
-// Plugin architecture example                                               //
-//                                                                           //
-// This code serves as an example to the plugin architecture discussed in    //
-// the article and can be freely used                                        //
-///////////////////////////////////////////////////////////////////////////////
-#ifndef MYENGINE_PLUGIN_H
-#define MYENGINE_PLUGIN_H
+//cci_daemon_plugin.h    william k. johnson  2016
 
-#include "Config.h"
-#include "SharedLibrary.h"
 
-#include <string>
+#include  <string>
+#include  <map>
 
-namespace MyEngine {
+//cci
+#include <cci_shared_lib.h>
 
-  // ----------------------------------------------------------------------- //
 
-  class Kernel;
+namespace cci_daemon_impl
+{
 
-  // ----------------------------------------------------------------------- //
+          //forward decalrations
+          class cci_daemon_kernel;
 
-  /// Representation of a plugin
-  class Plugin {
+          //aliases
+          using size_ptr_t = size*;
 
-    /// <summary>Signature for the version query function</summary>
-    private: typedef int GetEngineVersionFunction();
-    /// <summary>Signature for the plugin's registration function</summary>
-    private: typedef void RegisterPluginFunction(Kernel &);
+          //representation of a plugin
+          class cci_daemon_plugin
+          {
 
-    /// <summary>Initializes and loads a plugin</summary>
-    /// <param name="filename">Filename of the plugin to load</summary>
-    public: MYENGINE_API Plugin(const std::string &filename);
-    /// <summary>Copies an existing plugin instance</summary>
-    public: MYENGINE_API Plugin(const Plugin &other);
-    /// <summary>Unloads the plugin</summary>
-    public: MYENGINE_API ~Plugin();
+              public :
 
-    /// <summary>Queries the plugin for its expected engine version</summary>
-    public: MYENGINE_API int getEngineVersion() const {
-      return this->getEngineVersionAddress();
-    }
+                  //ctor
+                  explicit cci_daemon_plugin( const std::string& filename );
+                  //dtor
+                  virtual ~cci_daemon_plugin();
+                  //copy
+                  cci_daemon_plugin( const cci_daemon_plugin& cdp );
+                  //assign
+                  cci_daemon_plugin& operator= ( const cci_daemon_plugin& cdp );
 
-    /// <summary>Register the plugin to a kernel</summary>
-    /// <param name="kernel">Kernel the plugin should register to</param>
-    public: MYENGINE_API void registerPlugin(Kernel &kernel) {
-      this->registerPluginAddress(kernel);
-    }
+              private :
 
-    /// <summary>Creates a copy of the plugin instance</summary>
-    public: Plugin &operator =(const Plugin &other);
+                  //attributes
+                  cci_handle_t      m_shared_lib;
+                  size_ptr_t        m_ref_count;
+                  std::string       m_str_filename;
 
-    /// <summary>Handle of the loaded shared library</summary>
-    private: SharedLibrary::HandleType sharedLibraryHandle;
-    /// <summary>Number of references that exist to the shared library</summary>
-    private: size_t *referenceCount;
-    /// <summary>Function to query for the expected engine version</summary>
-    private: GetEngineVersionFunction *getEngineVersionAddress;
-    /// <summary>Registers the plugin with the kernel</summary>
-    private: RegisterPluginFunction *registerPluginAddress;
+                  //prototypes
+                  typedef int   get_engine_version_function();
+                  typedef void  register_plugin_function( cci_daemon_kernel& cdk );
+                  //helpers
+                  get_engine_version_function* get_engine_version_address;
+                  register_plugin_function*    regiser_plugin_address;
 
-  };
+             public :
 
-  // ----------------------------------------------------------------------- //
+                  //accessors-inspectors
+                  int get_engine_version() const noexcept
+                  { return this->get_engine_version_address(); }
+                  //services
+                  void register_plugin( cci_daemon_kernel& kernel )
+                  { this->register_plugin_address( kernel ); }
 
-} // namespace MyEngine
 
-#endif // MYENGINE_PLUGIN_H
+
+          };
+}

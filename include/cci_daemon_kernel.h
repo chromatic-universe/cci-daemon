@@ -5,6 +5,11 @@
 #include <string>
 #include <map>
 
+//cci
+#include <cci_daemon_generic.h>
+#include <cci_daemon_plugin.h>
+
+
 namespace cci_daemon_impl
 {
 

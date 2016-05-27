@@ -15,8 +15,10 @@ include_directories(../../include
 
 #executable
 add_executable(cci_daemon_test_run  test_cci_daemon.cpp)
+add_executable(cci_shared_test_run  test_shared_lib.cpp)
 
 #link libs
 target_link_libraries(cci_daemon_test_run  -lpthread -lgtest -lgtest_main)
+target_link_libraries(cci_shared_test_run  -lpthread -ldl)
 
 
