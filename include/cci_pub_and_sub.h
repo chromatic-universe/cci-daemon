@@ -1,96 +1,71 @@
-///////////////////////////////////////////////////////////////////////////////
-// Plugin architecture example                                               //
-//                                                                           //
-// This code serves as an example to the plugin architecture discussed in    //
-// the article and can be freely used.                                       //
-///////////////////////////////////////////////////////////////////////////////
-#ifndef MYENGINE_STORAGE_SERVER_H
-#define MYENGINE_STORAGE_SERVER_H
 
-#include "Config.h"
+//cci_pub_and_sub.h      william k. johnson 2016
 
 #include <list>
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <memory>
 
-namespace MyEngine {
+namespace cci_daemon_impl
+{
 
-  // ----------------------------------------------------------------------- //
+          //forward declarations
+          //placeholder
+          class publish_and_subscribe{};
 
-  class Archive {}; // Dummy
+          ///publish-subscribe related domain
+          class publish_and_subscribe_server
+          {
 
-  // ----------------------------------------------------------------------- //
+             public:
 
-  /// <summary>Manages storage related stuff</summary>
-  class StorageServer {
+                ///
+                class publish_and_subscribe_consumer
+                {
 
-    /// <summary>Reads archive files like zips and rars</summary>
-    public: class ArchiveReader {
+                  public:
 
-      /// <summary>Releases any resources owned by the reader</summary>
-      public: virtual ~ArchiveReader() {}
+                      //ctor
+                      publish_and_subscribe_consumer() = default;
+                      //dtor
+                      virtual ~publish_and_subscribe_consumer()
+                      {}
 
-      /// <summary>Checks whether the reader can open an archive</summary>
-      /// <param name="filename">Name of the file that will be checked</param>
-      public: virtual bool canOpenArchive(const std::string &filename) = 0;
-                    {
-                            throw std::runtime_error( "could not unload shared object" );
-                          }
-      /// <summary>Opens an archive for reading</summary>
-      /// <param name="filename">Filename of the archive to open</param>
-      public: virtual std::auto_ptr<Archive> openArchive(
-        const std::string &filename
-      ) = 0;
+                  /// consumer can open a broker
+                  public:
 
-    };
+                      //services
+                      virtual bool can_open_broker( const std::string &config ) = 0;
+                      virtual std::unique_ptr<publish_and_subscribe> open_broker( const std::string &config ) = 0;
 
-    /// <summary>A list of archive readers</summary>
-    private: typedef std::list<ArchiveReader *> ArchiveReaderList;
+               };
+               ///
 
-    /// <summary>Destroys the storage server</summary>
-    public: MYENGINE_API ~StorageServer() {
-      for(
-        ArchiveReaderList::reverse_iterator it = this->archiveReaders.rbegin();
-        it != this->archiveReaders.rend();
-        ++it
-      ) {
-        delete *it;
-      }
-    }
+            private :
 
-    /// <summary>Allows plugins to add new archive readers</summary>
-    public: MYENGINE_API void addArchiveReader(
-      std::auto_ptr<ArchiveReader> archiveReader
-    ) {
-      this->archiveReaders.push_back(archiveReader.release());
-    }
+                //attributes
+               typedef std::list< std::unique_ptr<publish_and_subscribe_consumer>> consumer_list;
+               consumer_list m_consumers;
 
-    /// <summry>
-    ///   Opens an archive by searching for a matching archive reader
-    /// </summary>
-    /// <param name="filename">File a reader will be searched for</param>
-    public: MYENGINE_API std::auto_ptr<Archive> openArchive(
-      const std::string &filename
-    ) {
-      for(
-        ArchiveReaderList::iterator it = this->archiveReaders.begin();
-        it != this->archiveReaders.end();
-        ++it
-      ) {
-        if((*it)->canOpenArchive(filename))
-          return (*it)->openArchive(filename);
-      }
+            public:
 
-      throw std::runtime_error("Invalid or unsupported archive type");
-    }
+                void add_publish_subscribe_consumer( std::unique_ptr<publish_and_subscribe_consumer> consumer )
+                {
+                    m_consumers.push_back( std::move( consumer ) );
+                }
 
-    private: ArchiveReaderList archiveReaders; ///< All available archive readers
+                std::unique_ptr<publish_and_subscribe> open_broker( const std::string &config )
+                {
+                  for( auto& elem : m_consumers )
+                  {
+                    if(  elem->can_open_broker( config ) )
+                    {   return elem->open_broker( config ); }
+                  }
+                  throw std::runtime_error( "invalid or unsupported consumer type" );
 
-  };
+                }
 
-  // ----------------------------------------------------------------------- //
+          };
 
-} // namespace MyEngine
-
-#endif // MYENGINE_STORAGE_SERVER_H
+}

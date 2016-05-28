@@ -8,7 +8,7 @@
 //cci
 #include <cci_daemon_generic.h>
 #include <cci_daemon_plugin.h>
-
+#include <cci_pub_and_sub.h>
 
 namespace cci_daemon_impl
 {
@@ -21,41 +21,41 @@ namespace cci_daemon_impl
 
           //enumerations
 
-          /// <summary>The engine's core</summary>
+          ///core
           class cci_daemon_kernel
           {
 
-            /// <summary>Map of plugins by their associated file names</summary>
-            typedef std::map<std::string, Plugin> PluginMap;
+                typedef std::map<std::string , cci_daemon_plugin> plugin_dictionary;
 
-            /// <summary>Accesses the storage server</summaryv
-            public: MYENGINE_API StorageServer &getStorageServer() {
-              return this->storageServer;
-            }
+                public :
 
-            /// <summary>Accesses the graphics server</summary>
-            public: MYENGINE_API GraphicsServer &getGraphicsServer() {
-              return this->graphicsServer;
-            }
+                    //ctor
+                    explicit cci_daemon_kernel() = default;
+                    //dtor
+                    virtual ~cci_daemon_kernel() = default;
 
-            /// <summary>Loads a plugin</summary>
-            /// <param name="filename">File the plugin will be loaded from</param>
-            public: MYENGINE_API void loadPlugin(const std::string &filename) {
-              if(this->loadedPlugins.find(filename) == this->loadedPlugins.end()) {
-                this->loadedPlugins.insert(
-                  PluginMap::value_type(filename, Plugin(filename))
-                ).first->second.registerPlugin(*this);
-              }
-            }
+                private :
 
-            /// <summary>All plugins currently loaded</summary>
-            private: PluginMap loadedPlugins;
-            /// <summary>Manages storage-related tasks for the engine</summary>
-            private: StorageServer storageServer;
-            /// <summary>Manages graphics-related tasks for the engine</summary>
-            private: GraphicsServer graphicsServer;
+                    //attributes
+                    plugin_dictionary               m_loaded_plugins;
+                    publish_and_subscribe_server    m_pb_server;
 
-          };
+                public :
+
+                    //accessors-inspectors
+                    publish_and_subscribe_server&   get_pb_server() { return m_pb_server; }
+
+                    //services
+                    void load_plugin( const std::string &config )
+                    {
+                      if( m_loaded_plugins.find( config ) == m_loaded_plugins.end() )
+                      {
+                           m_loaded_plugins.insert(  plugin_dictionary::value_type( config ,
+                                                                                    cci_daemon_plugin( config ) )
+                        ).first->second.register_plugin( *this );
+                      }
+                   }
+              };
 
 }
 

@@ -14,11 +14,17 @@ include_directories(../../include
                     $ENV{DEV}/include)
 
 #executable
-add_executable(cci_daemon_test_run  test_cci_daemon.cpp)
-add_executable(cci_shared_test_run  test_shared_lib.cpp)
+add_executable(cci_daemon_test_run  test_cci_daemon.cpp
+                                    ../src/cci_daemon_engine.cpp
+                                    ../src/cci_daemon_plugin.cpp
+                                    ../src/cci_stack_trace.cpp )
+add_executable(cci_shared_test_run  test_shared_lib.cpp
+                                    ../src/cci_daemon_engine.cpp
+                                    ../src/cci_daemon_plugin.cpp
+                                    ../src/cci_stack_trace.cpp )
 
 #link libs
-target_link_libraries(cci_daemon_test_run  -lpthread -lgtest -lgtest_main)
+target_link_libraries(cci_daemon_test_run  -lpthread -lgtest -lgtest_main -ldl)
 target_link_libraries(cci_shared_test_run  -lpthread -ldl)
 
 

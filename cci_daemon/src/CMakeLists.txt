@@ -18,7 +18,9 @@ link_directories(${CCIDAEMON_SOURCE_DIR})
 #executable
 add_executable(cci-daemon  cci_stack_trace.cpp 
                            cci_daemon.cpp 
-                           cci_daemon_main.cpp )
+                           cci_daemon_plugin.cpp
+                           cci_daemon_main.cpp
+                           cci_daemon_engine.cpp)
 
 #link libs
 target_link_libraries(cci-daemon -lstdc++ -lpthread -ldl)

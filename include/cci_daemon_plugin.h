@@ -1,5 +1,5 @@
 //cci_daemon_plugin.h    william k. johnson  2016
-
+#pragma once
 
 #include  <string>
 #include  <map>
@@ -15,7 +15,7 @@ namespace cci_daemon_impl
           class cci_daemon_kernel;
 
           //aliases
-          using size_ptr_t = size*;
+          using size_ptr_t = size_t*;
 
           //representation of a plugin
           class cci_daemon_plugin
@@ -44,16 +44,16 @@ namespace cci_daemon_impl
                   typedef void  register_plugin_function( cci_daemon_kernel& cdk );
                   //helpers
                   get_engine_version_function* get_engine_version_address;
-                  register_plugin_function*    regiser_plugin_address;
+                  register_plugin_function*    register_plugin_address;
 
              public :
 
                   //accessors-inspectors
                   int get_engine_version() const noexcept
-                  { return this->get_engine_version_address(); }
+                  { return get_engine_version_address(); }
                   //services
                   void register_plugin( cci_daemon_kernel& kernel )
-                  { this->register_plugin_address( kernel ); }
+                  { register_plugin_address( kernel ); }
 
 
 

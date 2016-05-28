@@ -5,6 +5,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <sstream>
 #include <dlfcn.h>
 
 namespace cci_daemon_impl
