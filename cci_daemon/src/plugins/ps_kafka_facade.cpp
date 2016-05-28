@@ -1,7 +1,7 @@
-"
+
 
 #include <stdexcept>
-
+#include <exception>
 //cci
 #include <cci_daemon_kernel.h>
 
@@ -9,52 +9,39 @@
 namespace  cci_daemon_impl
 {
           //aliases
-          using pas_server = publish_and_subscribe_server;
-          using pas_consumer = publish_and_subscribe_consumer;
+          using pas_consumer = publish_and_subscribe_server::publish_and_subscribe_consumer;
 
           ///kafka consumer
-          class  ps_kafka_facade : public pas_server::pas_consumer
+          class  ps_kafka_facade : public pas_consumer
           {
 
             public :
 
                 //ctor
                 explicit ps_kafka_facade() = default;
-                //tor
+                //dtor
                 virtual ~ps_kafka_facade() = default;
 
                 //services
+                bool can_open_broker ( const std::string& config )
+                {  return true; }
 
-                bool canOpenArchive(const string &filename) {
-              return filename.find(".zip") == (filename.length() - 4);
-            }
+                std::unique_ptr<publish_and_subscribe> open_broker( const std::string& config )
+                {
+                  if( !can_open_broker( config ))
+                  {  throw std::runtime_error ( "broker cannnot be openend" ); }
 
-            /// <summary>Opens an archive for reading</summary>
-            /// <param name="filename">Archive that will be opened</param>
-            public: ZIPPLUGIN_API auto_ptr<Archive> openArchive(
-              const string &sFilename
-            ) {
-              if(!canOpenArchive(sFilename)) {
-                throw runtime_error("No Zip archive");
-              }
-
-              return auto_ptr<Archive>(new Archive());
-            }
+                  return std::make_unique<publish_and_subscribe>();
+                }
 
           };
 
-          /// <summary>Retrieves the engine version we're expecting</summary>
-          /// <returns>The engine version the plugin was built against</returns>
-          extern "C" ZIPPLUGIN_API int getEngineVersion() {
-            return 1;
-          }
-
-          /// <summary>Registers the plugin to an engine kernel</summary>
-          /// <param name="kernel">Kernel the plugin will be registered to</param>
-          extern "C" ZIPPLUGIN_API void registerPlugin(Kernel &kernel) {
-            kernel.getStorageServer().addArchiveReader(
-              auto_ptr<StorageServer::ArchiveReader>(new ZipArchiveReader())
-            );
+          //exports
+          extern "C" int get_engine_version() { return 1; }
+          extern "C" void register_plugin( cci_daemon_kernel& kernel )
+          {
+            kernel.get_pb_server().add_publish_subscribe_consumer(
+              std::make_unique<ps_kafka_facade>() );
           }
 
 }

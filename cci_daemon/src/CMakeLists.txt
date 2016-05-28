@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.82)
 #project
 project(CCIDAEMON)
 
+add_subdirectory(plugins)
 
 #cpp flags
 set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")
