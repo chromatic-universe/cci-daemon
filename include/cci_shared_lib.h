@@ -8,6 +8,8 @@
 #include <sstream>
 #include <dlfcn.h>
 
+#include <cassert>
+
 namespace cci_daemon_impl
 {
 
@@ -74,11 +76,7 @@ namespace cci_daemon_impl
                     ////handle of the shared object that will be unloaded
                     static void unload( cci_handle_t shared_handle )
                     {
-                          int result = ::dlclose( shared_handle) ;
-                          if( result != 0 )
-                          {
-                            throw std::runtime_error( "could not unload shared object" );
-                          }
+                          if ( shared_handle ) { dlclose( shared_handle); }
                     }
 
                     ///looks up a function exported by the shared object
@@ -91,18 +89,20 @@ namespace cci_daemon_impl
                         static T_signature* get_function_pointer( cci_handle_t shared_handle ,
                                                                   const std::string &function_name )
                         {
-                           // clear error value
-                           ::dlerror();
+                             // clear error value
+                             ::dlerror();
 
-                          cci_handle_t function_address = ::dlsym( shared_handle ,
-                                                          function_name.c_str() );
+                              assert( shared_handle );
 
-                          //check for error
-                          const char *error = ::dlerror();
-                          if( error != nullptr )
-                          {
-                            throw std::runtime_error( "could not find exported function" );
-                          }
+                              cci_handle_t function_address = ::dlsym( shared_handle ,
+                                                              function_name.c_str() );
+
+                              //check for error
+                              const char *error = ::dlerror();
+                              if( error != nullptr )
+                              {
+                                throw std::runtime_error( "could not find exported function" );
+                              }
 
                           return reinterpret_cast<T_signature*>( function_address );
                         }

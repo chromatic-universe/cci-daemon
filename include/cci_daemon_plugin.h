@@ -36,15 +36,16 @@ namespace cci_daemon_impl
 
                   //attributes
                   cci_handle_t      m_shared_lib;
-                  size_ptr_t        m_ref_count;
                   std::string       m_str_filename;
 
                   //prototypes
                   typedef int   get_engine_version_function();
                   typedef void  register_plugin_function( cci_daemon_kernel& cdk );
+                  typedef void  clear_context_function( cci_daemon_kernel& cdk );
                   //helpers
                   get_engine_version_function* get_engine_version_address;
                   register_plugin_function*    register_plugin_address;
+                  clear_context_function*      clear_context_address;
 
              public :
 
@@ -54,6 +55,9 @@ namespace cci_daemon_impl
                   //services
                   void register_plugin( cci_daemon_kernel& kernel )
                   { register_plugin_address( kernel ); }
+                  void clear_context( cci_daemon_kernel& kernel )
+                  { clear_context_address( kernel ); }
+
 
 
 

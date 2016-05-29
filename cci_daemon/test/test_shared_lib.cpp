@@ -23,7 +23,7 @@ void try_open_server( publish_and_subscribe_server& pbs )
 
         std::cout << "\tbroker successfully opened" << std::endl;
       }
-      catch(const std::exception &exception)
+      catch( const std::exception &exception )
       {
           std::cout << "\terror opening server: " << exception.what() << std::endl;
       }
@@ -35,7 +35,10 @@ int main( int argc , char* argv[] )
 {
     auto cci_kernel( std::make_unique<cci_daemon_kernel>() );
 
-    try_open_server( cci_kernel->get_pb_server() );
+    cci_kernel->load_plugin( "ps_kafka_facade" );
+    cci_kernel->destroy_contexts();
+    //cci_kernel->destroy_contexts();
+    //try_open_server( cci_kernel->get_pb_server() );
     /*
     {
         auto cci_shared( std::make_unique<cci_shared_lib>() ) ;

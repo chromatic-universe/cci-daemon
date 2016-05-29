@@ -10,7 +10,6 @@
 namespace cci_daemon_impl
 {
 
-          //forward declarations
           //placeholder
           class publish_and_subscribe{};
 
@@ -41,30 +40,42 @@ namespace cci_daemon_impl
 
                };
                ///
+               typedef std::list<publish_and_subscribe_consumer*> consumer_list;
+               //ctor
+               publish_and_subscribe_server() : m_consumers( new consumer_list )
+               {}
+               //dtor
+               virtual ~publish_and_subscribe_server()
+               {}
+
 
             private :
 
-                //attributes
-               typedef std::list< std::unique_ptr<publish_and_subscribe_consumer>> consumer_list;
-               consumer_list m_consumers;
+                      std::unique_ptr<consumer_list> m_consumers;
 
             public:
 
-                void add_publish_subscribe_consumer( std::unique_ptr<publish_and_subscribe_consumer> consumer )
+                //accessors-inspectors
+                consumer_list* consumers() { return  m_consumers.get(); }
+
+                //services
+                void add_publish_subscribe_consumer( publish_and_subscribe_consumer* consumer )
                 {
-                    m_consumers.push_back( std::move( consumer ) );
+                    m_consumers->push_back( consumer );
                 }
 
                 std::unique_ptr<publish_and_subscribe> open_broker( const std::string &config )
                 {
-                  for( auto& elem : m_consumers )
+                  for( auto& elem : *m_consumers )
                   {
                     if(  elem->can_open_broker( config ) )
                     {   return elem->open_broker( config ); }
                   }
                   throw std::runtime_error( "invalid or unsupported consumer type" );
 
-                }
+               }
+
+
 
           };
 
