@@ -23,7 +23,7 @@ namespace cci_daemon_impl
                 class publish_and_subscribe_consumer
                 {
 
-                  public:
+                  public :
 
                       //ctor
                       publish_and_subscribe_consumer() = default;
@@ -31,8 +31,13 @@ namespace cci_daemon_impl
                       virtual ~publish_and_subscribe_consumer()
                       {}
 
+                 private :
+
+                      //attributes
+                      std::string   m_str_moniker;
+
                   /// consumer can open a broker
-                  public:
+                  public :
 
                       //services
                       virtual bool can_open_broker( const std::string &config ) = 0;

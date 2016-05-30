@@ -49,10 +49,17 @@ namespace  cci_daemon_impl
           }
           extern "C" void clear_context( cci_daemon_kernel& kernel )
           {
-               std::cerr << "clear context....\n";
 
                pas_server::consumer_list* cl = kernel.get_pb_server().consumers();
-               if( cl ) { std::cerr << "clearing publish and subscribe context\n"; }
+               if( cl )
+               {
+                   std::cerr << "clearing publish and subscribe context\n";
+                   for( auto elem : *cl )
+                   {
+                       if( elem ) delete elem;
+                       std::cerr << "cleared context\n";
+                   }
+               }
           }
 
 }
