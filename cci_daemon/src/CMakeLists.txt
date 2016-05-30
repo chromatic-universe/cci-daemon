@@ -13,8 +13,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DND
 
 #includes
 include_directories(../../include
-                    $ENV{DEV}/include)
-link_directories(${CCIDAEMON_SOURCE_DIR})
+                    $ENV{DEV}/include
+                    $ENV{DEV}/include/cci)
+link_directories(${CCIDAEMON_SOURCE_DIR}
+                    $ENV{DEV}/lib
+                    $ENV{DEV}/lib/cci)
 
 #executable
 add_executable(cci-daemon  cci_stack_trace.cpp 
@@ -24,8 +27,11 @@ add_executable(cci-daemon  cci_stack_trace.cpp
                            cci_daemon_engine.cpp)
 
 #link libs
-target_link_libraries(cci-daemon -lstdc++ -lpthread -ldl)
+target_link_libraries(cci-daemon -lstdc++ -lpthread -ldl -lcci_expansion)
 
 #install
-install_targets( /bin cci-daemon)
+install_targets( /bin/cci cci-daemon)
+install (DIRECTORY ../../include/ 
+         DESTINATION include/cci )
+
 
