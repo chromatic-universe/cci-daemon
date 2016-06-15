@@ -101,7 +101,7 @@ namespace cci_daemon_impl
                             throw std::runtime_error( "could not find exported function" );
                           }
 
-                      return reinterpret_cast<T_signature*>( function_address );
+                          return reinterpret_cast<T_signature*>( function_address );
                     }
 
           };
