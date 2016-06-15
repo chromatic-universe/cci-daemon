@@ -81,8 +81,7 @@ namespace cci_daemon_impl
 
                     ///looks up a function exported by the shared object
                     ///handle of the shared object in which the function will be looked up
-                    ///unctionName of the function to look up
-                    ///returns pointer to the specified function
+                    ///returns casted pointer to the specified function
                     template<typename T_signature>
                     static T_signature* get_function_pointer( cci_handle_t shared_handle ,
                                                               const std::string &function_name )
