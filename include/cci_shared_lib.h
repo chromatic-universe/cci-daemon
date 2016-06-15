@@ -83,29 +83,27 @@ namespace cci_daemon_impl
                     ///handle of the shared object in which the function will be looked up
                     ///unctionName of the function to look up
                     ///returns pointer to the specified function
-                    public:
+                    template<typename T_signature>
+                    static T_signature* get_function_pointer( cci_handle_t shared_handle ,
+                                                              const std::string &function_name )
+                    {
+                         // clear error value
+                         ::dlerror();
 
-                        template<typename T_signature>
-                        static T_signature* get_function_pointer( cci_handle_t shared_handle ,
-                                                                  const std::string &function_name )
-                        {
-                             // clear error value
-                             ::dlerror();
+                          assert( shared_handle );
 
-                              assert( shared_handle );
+                          cci_handle_t function_address = ::dlsym( shared_handle ,
+                                                          function_name.c_str() );
 
-                              cci_handle_t function_address = ::dlsym( shared_handle ,
-                                                              function_name.c_str() );
+                          //check for error
+                          const char *error = ::dlerror();
+                          if( error != nullptr )
+                          {
+                            throw std::runtime_error( "could not find exported function" );
+                          }
 
-                              //check for error
-                              const char *error = ::dlerror();
-                              if( error != nullptr )
-                              {
-                                throw std::runtime_error( "could not find exported function" );
-                              }
-
-                          return reinterpret_cast<T_signature*>( function_address );
-                        }
+                      return reinterpret_cast<T_signature*>( function_address );
+                    }
 
           };
 
