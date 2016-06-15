@@ -42,6 +42,8 @@ namespace  cci_daemon_impl
           extern "C" int get_engine_version() { return 1; }
           extern "C" void register_plugin( cci_daemon_kernel& kernel )
           {
+               //register plugin - do all heap allocations/initializations
+               //here  for the plugin library
                pas_consumer* pas = new ps_kafka_facade();
                kernel.get_pb_server().add_publish_subscribe_consumer( pas );
                std::cerr << "registered plugin....\n";
@@ -49,7 +51,7 @@ namespace  cci_daemon_impl
           }
           extern "C" void clear_context( cci_daemon_kernel& kernel )
           {
-
+               //release any library allocations here
                pas_server::consumer_list* cl = kernel.get_pb_server().consumers();
                if( cl )
                {

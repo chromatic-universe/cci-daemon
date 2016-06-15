@@ -27,7 +27,10 @@ add_executable(cci-daemon  cci_stack_trace.cpp
                            cci_daemon_engine.cpp)
 
 #link libs
-target_link_libraries(cci-daemon -lstdc++ -lpthread -ldl -lcci_expansion)
+target_link_libraries(cci-daemon -lstdc++
+                                 -lpthread 
+                                 -ldl 
+                                 -lcci_expansion)
 
 #install
 install_targets( /bin/cci cci-daemon)

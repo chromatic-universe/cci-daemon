@@ -18,11 +18,13 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
                  $ENV{DEV}/lib/cci)
 
 #executable
-add_library(ps_kafka_facade SHARED ps_kafka_facade.cpp 
-                                   ../cci_daemon_engine.cpp)
+add_library(ps_kafka_facade SHARED ps_kafka_facade.cpp)
 
 #link libs
-target_link_libraries(ps_kafka_facade -lstdc++ -lpthread -ldl -lcci_expansion)
+target_link_libraries(ps_kafka_facade -lstdc++ 
+                                      -lpthread 
+                                      -ldl
+                                      -lcci_expansion)
 
 #install
 install_targets( /lib/cci ps_kafka_facade)
