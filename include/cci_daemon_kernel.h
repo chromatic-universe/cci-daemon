@@ -26,6 +26,7 @@ namespace cci_daemon_impl
           class cci_daemon_kernel
           {
 
+                //laughs
                 typedef std::map<std::string , cci_daemon_plugin> plugin_dictionary;
 
                 public :
