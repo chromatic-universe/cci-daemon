@@ -1,14 +1,19 @@
-//cci_shared_lib.h      william k. johnson 2016
+//cci_shared_lib.h      william k. johnson 2017
 
 
 #pragma once
 
+
+//c++ standard
 #include <string>
 #include <stdexcept>
 #include <sstream>
-#include <dlfcn.h>
-
 #include <cassert>
+//c runtime
+#include <dlfcn.h>
+#include <sys/stat.h>
+//cci
+#include <cci_daemon_utils.h>
 
 namespace cci_daemon_impl
 {
@@ -17,6 +22,12 @@ namespace cci_daemon_impl
 
 
           //enumerations
+
+
+
+          //immutable
+          static const std::string ldd_moniker { "ldd" };
+          static const std::string nm_moniker { "nm" };
 
 
           //aliases
@@ -31,7 +42,7 @@ namespace cci_daemon_impl
                 public :
 
                     //ctor
-                    explicit cci_shared_lib() : m_str_libpath { "" }
+                    explicit cci_shared_lib()
                     {}
                     //ctor
                     virtual ~cci_shared_lib() = default;
@@ -44,13 +55,15 @@ namespace cci_daemon_impl
                 private :
 
                     //attributes
-                    std::string     m_str_libpath;
+
 
                 protected :
 
                     //
 
                 public :
+
+                    //accessors-inspectors
 
                     //services
                     ////shared object with the specified handle
@@ -70,6 +83,13 @@ namespace cci_daemon_impl
                                                       + path_with_extension + "'");
                         }
 
+                        std::cerr << "...loaded library...."
+                                  << path_with_extension
+                                  << "...\n";
+
+
+
+
                         return shared_object;
                     }
 
@@ -79,7 +99,7 @@ namespace cci_daemon_impl
                           if ( shared_handle ) { dlclose( shared_handle); }
                     }
 
-                    ///looks up a function exported by the shared object
+                    ///looks up a function exported by the sharedd object
                     ///handle of the shared object in which the function will be looked up
                     ///returns casted pointer to the specified function
                     template<typename T_signature>
@@ -103,6 +123,41 @@ namespace cci_daemon_impl
 
                           return reinterpret_cast<T_signature*>( function_address );
                     }
+
+                    //helpers
+                    static bool file_exists( const std::string& file )
+                    {
+                        struct stat buf;
+                        return ( stat( file.c_str() , &buf ) == 0 );
+                    }
+
+                    static std::string dependencies( const std::string& file_name  )
+                    {
+                        std::ostringstream ostr;
+                        dependencies( file_name , ostr );
+
+                        return ostr.str();
+                    }
+
+                    static void dependencies( const std::string& file_name , std::ostream& ostr  )
+                    {
+                        assert( file_exists( ldd_moniker ) );
+
+                        try
+                        {
+                           //auto p = subprocess::Popen( { ldd_moniker.c_str() , file_name.c_str() } );
+                           //auto obuf = p.communicate().first;
+
+                           //ostr << obuf.buf.data();
+
+                        }
+                        catch( std::exception& e )
+                        {
+                            throw std::runtime_error( "could not retrieve library dependencies" );
+
+                        }
+                    }
+
 
           };
 

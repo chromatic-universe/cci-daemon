@@ -9,5 +9,11 @@
 namespace cci_daemon_impl
 {
 
+        class publish_and_subscribe_intf
+        {
+            public :
+                virtual bool connect( const std::string& connect_string ) = 0;
+                virtual std::string moniker() const noexcept = 0;
+        };
 
 }

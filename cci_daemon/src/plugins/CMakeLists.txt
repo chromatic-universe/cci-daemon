@@ -1,10 +1,3 @@
-#cmake ps_kafka_facade plugin  william k. johnson 2016
-
-#version
-cmake_minimum_required(VERSION 2.82)
-#project
-project(CCIDAEMON)
-
 
 #cpp flags
 set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")
@@ -17,7 +10,7 @@ include_directories(../../../include
 link_directories(${CCIDAEMON_SOURCE_DIR}
                  $ENV{DEV}/lib/cci)
 
-#executable
+#library
 add_library(ps_kafka_facade SHARED ps_kafka_facade.cpp)
 
 #link libs

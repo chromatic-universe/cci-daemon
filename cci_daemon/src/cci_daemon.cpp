@@ -1,5 +1,7 @@
-#include <cci_daemon.h>
 
+//cci_daemon.cpp    william k. johnson 2017
+#include <cci_daemon.h>
+#include <cci_daemon_kernel.h>
 //namespace
 using namespace cdi;
 

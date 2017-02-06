@@ -15,40 +15,57 @@ using namespace cci_daemon_impl;
 
 void try_open_server( publish_and_subscribe_server& pbs )
 {
-      try
-      {
-        //this method will succeed only if the plugin is registered
-        //to the p & b server
-        pbs.open_broker( "cci-aws-1:9092" ) ;
+              try
+              {
+                    //this method will succeed only if the plugin is registered
+                    //to the p & b server
+                    std::unique_ptr<publish_and_subscribe_intf> pb = pbs.open_broker( "cci-aws-1:9092" ) ;
+                    if( pb )
+                    {
+                        std::cerr << "...broker successfully opened..."
+                                  << "pub_sub = "
+                                  << pb->moniker()
+                                  << "\n";
+                    }
+              }
+              catch( const std::runtime_error &exception )
+              {
+                   std::cout << "...error opening server: "
+                             << exception.what()
+                             << "\n";
+              }
 
-        std::cout << "\tbroker successfully opened" << std::endl;
-      }
-      catch( const std::exception &exception )
-      {
-          std::cout << "\terror opening server: " << exception.what() << std::endl;
-      }
-
-      std::cout << std::endl;
 }
 
 int main( int argc , char* argv[] )
 {
-    auto cci_kernel( std::make_unique<cci_daemon_kernel>() );
 
-    cci_kernel->load_plugin( "ps_kafka_facade" );
-    cci_kernel->destroy_contexts();
-    //cci_kernel->destroy_contexts();
-    //try_open_server( cci_kernel->get_pb_server() );
-    /*
-    {
-        auto cci_shared( std::make_unique<cci_shared_lib>() ) ;
-        cci_handle_t st = cci_shared->load( "cci_expansion" );
-    }
-    catch( std::runtime_error& e )
-    {
-        std::cerr << e.what() << "\n";
-    }*/
+            try
+            {
+                std::string plug( "ps_kafka_facade" );
+                auto cci_kernel( std::make_unique<cci_daemon_kernel>() );
+                cci_kernel->load_plugin( plug );
+                std::cerr << "...loaded plugin...."
+                          << plug
+                          << "\n";
+                try_open_server( cci_kernel->get_pb_server() );
+                cci_kernel->unload_plugin( plug );
 
-    return 0;
+            }
+            catch( std::runtime_error& e )
+            {
+                std::cerr << "...cci_daemon runtime error..."
+                          << e.what()
+                          << "\n";
+            }
+            catch( std::exception& e )
+            {
+                std::cerr << e.what()
+                          << "\n";
+            }
+
+
+            return 0;
 }
+
 

@@ -16,7 +16,7 @@ cci_daemon_plugin::cci_daemon_plugin( const std::string& filename ) :  m_shared_
 {
 
             m_shared_lib = cci_shared_lib::load( filename );
-            if( m_shared_lib ) { std::cerr << "loaded library....\n"; }
+            assert( m_shared_lib );
 
             try
             {

@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.82)
 project(CCIDAEMON)
 
 add_subdirectory(plugins)
+add_subdirectory(procs)
 
 #cpp flags
 set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")
@@ -20,21 +21,25 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
                     $ENV{DEV}/lib/cci)
 
 #executable
-add_executable(cci-daemon  cci_stack_trace.cpp 
-                           cci_daemon.cpp 
-                           cci_daemon_plugin.cpp
-                           cci_daemon_main.cpp
-                           cci_daemon_engine.cpp)
+add_executable(cci-daemon-dispatcher   cci_stack_trace.cpp 
+                                       cci_daemon.cpp 
+                                       cci_daemon_plugin.cpp
+                                       cci_daemon_main.cpp
+                                       cci_daemon_utils.cpp
+                                       cci_daemon_engine.cpp)
 
 #link libs
-target_link_libraries(cci-daemon -lstdc++
-                                 -lpthread 
-                                 -ldl 
-                                 -lcci_expansion)
+target_link_libraries(cci-daemon-dispatcher  -lstdc++
+                                             -lpthread 
+                                             -ldl 
+                                             -lcci_expansion)
 
 #install
-install_targets( /bin/cci cci-daemon)
+install_targets( /bin/ cci-daemon-dispatcher)
 install (DIRECTORY ../../include/ 
          DESTINATION include/cci )
+install(FILES  ${CMAKE_SOURCE_DIR}/ldd
+        PERMISSIONS WORLD_EXECUTE WORLD_WRITE WORLD_READ
+        DESTINATION bin)
 
 

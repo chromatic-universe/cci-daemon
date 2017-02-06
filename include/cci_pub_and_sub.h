@@ -10,8 +10,6 @@
 namespace cci_daemon_impl
 {
 
-          //placeholder
-          class publish_and_subscribe{};
 
           ///publish-subscribe related domain
           class publish_and_subscribe_server
@@ -20,6 +18,7 @@ namespace cci_daemon_impl
              public:
 
                 ///
+                //chain of responsibility
                 class publish_and_subscribe_consumer
                 {
 
@@ -41,7 +40,7 @@ namespace cci_daemon_impl
 
                       //services
                       virtual bool can_open_broker( const std::string &config ) = 0;
-                      virtual std::unique_ptr<publish_and_subscribe> open_broker( const std::string &config ) = 0;
+                      virtual std::unique_ptr<publish_and_subscribe_intf> open_broker( const std::string &config ) = 0;
 
                };
                ///
@@ -69,7 +68,7 @@ namespace cci_daemon_impl
                     m_consumers->push_back( consumer );
                 }
 
-                std::unique_ptr<publish_and_subscribe> open_broker( const std::string &config )
+                std::unique_ptr<publish_and_subscribe_intf> open_broker( const std::string &config )
                 {
                   for( auto& elem : *m_consumers )
                   {

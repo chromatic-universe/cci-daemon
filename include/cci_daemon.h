@@ -32,186 +32,190 @@
 
 namespace cci_daemon_impl
 {
-    //forward
-    class cci_daemon_facade;
+            //forward
+            class cci_daemon_facade;
 
-    //aliases
-    using  cci_daemon_facade_ptr = cci_daemon_facade*;
-    using  file_ptr = FILE*;
+            //aliases
+            using  cci_daemon_facade_ptr = cci_daemon_facade*;
+            using  file_ptr = FILE*;
 
-    //enumerations
-    enum class daemon_proc : unsigned long
-    {
-        dp_fork_background_proc = 0 ,
-        dp_fork_no_session_leader ,
-        dp_make_session_leader ,
-        dp_clear_file_create_mask ,
-        dp_change_to_root_dir ,
-        dp_close_all_open_files ,
-        dp_reopen_streams_dev_null ,
-        dp_daemonized ,
-        dp_error
-    };
+            //enumerations
+            enum class daemon_proc : unsigned long
+            {
+                dp_fork_background_proc = 0 ,
+                dp_fork_no_session_leader ,
+                dp_make_session_leader ,
+                dp_clear_file_create_mask ,
+                dp_change_to_root_dir ,
+                dp_close_all_open_files ,
+                dp_reopen_streams_dev_null ,
+                dp_daemonized ,
+                dp_error
+            };
 
-    enum class service_proc : unsigned long
-    {
-        sp_default_service = 0 ,
-        sp_kafka_metadata
-    };
+            enum class service_proc : unsigned long
+            {
+                sp_default_service = 0 ,
+                sp_custom_dispatch
+            };
 
-    //services
-    class cci_daemon_facade
-    {
-        public :
+            //services
+            class cci_daemon_facade
+            {
+                public :
 
-            //types
-
-            //ctors
-            explicit cci_daemon_facade() ;//explicit
-
-            //dtor
-            virtual ~cci_daemon_facade();
-
-            //no copy
-            cci_daemon_facade( const cci_daemon_facade& cdf ) = delete;
-            //no assing
-            cci_daemon_facade& operator= ( const cci_daemon_facade& cdf ) = delete;
+                    //types
+                    //function pointer prototype
+                    typedef int (cci_daemon_facade::*ptr_to_proc)
+                                (  const std::string& str_params , const unsigned long dw_flags  );
 
 
-        protected :
+                    //ctors
+                    explicit cci_daemon_facade() ;//explicit
 
-            //support
-            virtual bool open_log();
-            virtual bool log_message( const std::string& msg );
-            virtual void close_log();
-            virtual bool read_config_file( const std::string& config_path );
-            virtual bool write_pid( const std::string& pid_file ,
-                                    int flags  );
-            virtual bool remove_pid( const std::string& pid_file );
-            virtual int lock_region( int fd ,
-                                     int type ,
-                                     int whence ,
-                                     int start ,
-                                     int len );
-            void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
-            void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
+                    //dtor
+                    virtual ~cci_daemon_facade();
 
-        private :
+                    //no copy
+                    cci_daemon_facade( const cci_daemon_facade& cdf ) = delete;
+                    //no assing
+                    cci_daemon_facade& operator= ( const cci_daemon_facade& cdf ) = delete;
 
-            //attributes
-            unsigned long       m_dw_flags;
-            file_ptr            m_log_fp;
-            bool                m_b_opened;
-            service_proc        m_service_proc;
-            std::string         m_str_conf;
-            std::string         m_str_pid_path;
-            bool                m_backtrace;
 
-        public  :
+                protected :
 
-            //accessors-inspectors
-            constexpr unsigned long flags() const noexcept { return m_dw_flags; }
-            constexpr unsigned long backtrace() const noexcept { return m_backtrace; }
-            service_proc proc() const noexcept { return m_service_proc; }
-            std::string config_path() const noexcept { return m_str_conf; }
-            std::string pid_path() const noexcept { return m_str_pid_path; }
+                    //support
+                    virtual bool open_log();
+                    virtual bool log_message( const std::string& msg );
+                    virtual void close_log();
+                    virtual bool read_config_file( const std::string& config_path );
+                    virtual bool write_pid( const std::string& pid_file ,
+                                            int flags  );
+                    virtual bool remove_pid( const std::string& pid_file );
+                    virtual int lock_region( int fd ,
+                                             int type ,
+                                             int whence ,
+                                             int start ,
+                                             int len );
+                    void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
+                    void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
 
-            //mutators
-            void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }
-            void backtrace( const unsigned long trace ) noexcept { m_backtrace = trace; }
-            void config_path( const std::string& path ) { m_str_conf = path; }
-            void pid_path( const std::string& path ) { m_str_pid_path = path; }
+                private :
 
-            //stream
-			friend std::ostream& operator<< ( std::ostream& o , const cci_daemon_facade& df );
+                    //attributes
+                    unsigned long       m_dw_flags;
+                    file_ptr            m_log_fp;
+                    bool                m_b_opened;
+                    service_proc        m_service_proc;
+                    std::string         m_str_conf;
+                    std::string         m_str_pid_path;
+                    bool                m_backtrace;
 
-			//daemon execute procs
-			virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
+                public  :
 
-			//services
-			virtual int daemonize();
+                    //accessors-inspectors
+                    constexpr unsigned long flags() const noexcept { return m_dw_flags; }
+                    constexpr unsigned long backtrace() const noexcept { return m_backtrace; }
+                    service_proc proc() const noexcept { return m_service_proc; }
+                    std::string config_path() const noexcept { return m_str_conf; }
+                    std::string pid_path() const noexcept { return m_str_pid_path; }
 
-			//immutable
-			///< constant bitmask arguments for daemonize call
-            ///don't change directory to root("/")
-            static const unsigned bd_no_chdir;
-            ///< don't close all open files
-            static const unsigned bd_no_close_files;
-            ///< don;t reopen stdin , stderr and std:out to to /dev_null
-            static const unsigned bd_no_reopen_std_fds;
-            ///< don't do a umask( 0 )
-            static const unsigned bd_no_umask_0;
-            ///< maximum file descriptors to close if sysconf is indeterminate
-            static const unsigned bd_max_handles;
-            ///< log
-            //
-            //
-            static const std::string log_path;
-            ///buffer isze
-            static const unsigned buffer_size;
-            ///default config
-            static const std::string path_config;
-            ///pid
-            static const std::string path_pid;
-            ///close exec
-            static const unsigned cpf_cloexec;
+                    //mutators
+                    void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }
+                    void backtrace( const unsigned long trace ) noexcept { m_backtrace = trace; }
+                    void config_path( const std::string& path ) { m_str_conf = path; }
+                    void pid_path( const std::string& path ) { m_str_pid_path = path; }
 
-    };
-    inline std::ostream& operator<< ( std::ostream& ostr, const cci_daemon_facade& df )
-    {
-        //todo
-        return ostr << "daemon facade "
-                    << "log=>" << cci_daemon_impl::cci_daemon_facade::log_path;
-    }
+                    //stream
+                    friend std::ostream& operator<< ( std::ostream& o , const cci_daemon_facade& df );
 
-    //immutable
+                    //daemon execute procs
+                    virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
 
-    static void chromatic_terminate() noexcept
-    {
-        //core dump if environment set , else use exit
-        char* s = getenv( "EF_DUMPCORE" );
-        if( s != nullptr && *s != '\0' )
-        {
-            abort();
-        }
-        else
-        {
-            exit( EXIT_FAILURE );
-        }
-    }
-    static volatile sig_atomic_t hup_received = 0; //set non-zero on receipt of SIGHUP
-    static void sighup_handler( int signal )
-    {
-        hup_received = 1;
-    }
-    static void sigterm_handler( int signal )
-    {
-        openlog( "cci-daemon" , 0  , LOG_USER );
-        syslog ( LOG_USER | LOG_INFO , "%s", "cci-daemon deactivated by sigterm...." );
-        closelog();
+                    //services
+                    virtual int daemonize();
 
-        exit( EXIT_SUCCESS );
-    }
-    //todo
-    static void sigsev_handler( int signal )
-    {
-       void *array[10];
-       size_t size;
-       file_ptr log_p { nullptr };
-       int fn( 0L );
+                    //immutable
+                    ///< constant bitmask arguments for daemonize call
+                    ///don't change directory to root("/")
+                    static const unsigned bd_no_chdir;
+                    ///< don't close all open files
+                    static const unsigned bd_no_close_files;
+                    ///< don;t reopen stdin , stderr and std:out to to /dev_null
+                    static const unsigned bd_no_reopen_std_fds;
+                    ///< don't do a umask( 0 )
+                    static const unsigned bd_no_umask_0;
+                    ///< maximum file descriptors to close if sysconf is indeterminate
+                    static const unsigned bd_max_handles;
+                    ///< log
+                    //
+                    //
+                    static const std::string log_path;
+                    ///buffer isze
+                    static const unsigned buffer_size;
+                    ///default config
+                    static const std::string path_config;
+                    ///pid
+                    static const std::string path_pid;
+                    ///close exec
+                    static const unsigned cpf_cloexec;
 
-      // void*'s for all entries on the stack
-      size = backtrace( array, 10 );
+            };
+            inline std::ostream& operator<< ( std::ostream& ostr, const cci_daemon_facade& df )
+            {
+                //todo
+                return ostr << "daemon facade "
+                            << "log=>" << cci_daemon_impl::cci_daemon_facade::log_path;
+            }
 
-      // print out all the frames to stderr
-      if( log_p )
-      {
-          fprintf( log_p , "error: signal %d:\n" , signal );
-          backtrace_symbols_fd( array, size, fn );
+            //immutable
 
-          exit( 1 );
-      }
-    }
+            static void chromatic_terminate() noexcept
+            {
+                //core dump if environment set , else use exit
+                char* s = getenv( "EF_DUMPCORE" );
+                if( s != nullptr && *s != '\0' )
+                {
+                    abort();
+                }
+                else
+                {
+                    exit( EXIT_FAILURE );
+                }
+            }
+            static volatile sig_atomic_t hup_received = 0; //set non-zero on receipt of SIGHUP
+            static void sighup_handler( int signal )
+            {
+                hup_received = 1;
+            }
+            static void sigterm_handler( int signal )
+            {
+                openlog( "cci-daemon" , 0  , LOG_USER );
+                syslog ( LOG_USER | LOG_INFO , "%s", "cci-daemon deactivated by sigterm...." );
+                closelog();
+
+                exit( EXIT_SUCCESS );
+            }
+            //todo
+            static void sigsev_handler( int signal )
+            {
+               void *array[10];
+               size_t size;
+               file_ptr log_p { nullptr };
+               int fn( 0L );
+
+              // void*'s for all entries on the stack
+              size = backtrace( array, 10 );
+
+              // print out all the frames to stderr
+              if( log_p )
+              {
+                  fprintf( log_p , "error: signal %d:\n" , signal );
+                  backtrace_symbols_fd( array, size, fn );
+
+                  exit( 1 );
+              }
+            }
 
 }
 namespace cdi = cci_daemon_impl;
