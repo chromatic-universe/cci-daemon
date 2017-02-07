@@ -15,17 +15,18 @@ namespace proc_ace
             class proc_acceptor;
             class proc_protocol_data;
 
-            //aliases
-            using proc_acceptor_base = ACE_Acceptor <proc_handler, ACE_SOCK_ACCEPTOR>;
-            using counter_t = ACE_Atomic_Op<ACE_Mutex, int>;
-            using protocol_data_ptr = proc_protocol_data*;
-            using proc_thread_pool_ptr = proc_thread_pool*;
-            using proc_acceptor_ptr = proc_acceptor*;
-            using set_map = std::map<proc_set_param , bool>;
 
             //immutable
             //seconds
             static unsigned long max_client_timeout { 1800 };
+            static const char crlf[] { "\015\012" };
+			static const char cr[] { "\015" };
+		 	static const char lf[] = { "\012" };
+			static const unsigned short timer_id { 0 };
+			static const unsigned long cmd_buffer_len { 65536L };
+            static const unsigned long constCommandBufferLength { 1024 } ;
+            static const unsigned short constMaxTokenLength { 10 };
+
 
             //enumerations
             enum class concurrency_t : unsigned long
@@ -77,6 +78,25 @@ namespace proc_ace
                 ospPrompt = 0
             };
 
+            enum class proc_packet_part : unsigned long
+            {
+                ppToken = 0 ,
+                ppCommand ,
+                ppPayload ,
+                ppUid
+            };
+
+
+            //aliases
+            using proc_acceptor_base = ACE_Acceptor <proc_handler, ACE_SOCK_ACCEPTOR>;
+            using counter_t = ACE_Atomic_Op<ACE_Mutex, int>;
+            using protocol_data_ptr = proc_protocol_data*;
+            using proc_thread_pool_ptr = proc_thread_pool*;
+            using proc_acceptor_ptr = proc_acceptor*;
+            using set_map = std::map<proc_set_param , bool>;
+            using byte_ptr = unsigned char*;
+            using map_of_parts = std::multimap<proc_packet_part , std::string>;
+
 
             //adt
             //----------------------------------------------------------------------------------------------
@@ -121,6 +141,11 @@ namespace proc_ace
 						void thread_pool_size( unsigned long pool_size ) { m_dwThreads = pool_size; }
 
 			};
+
+            //string utils
+            static std::string ucase( const std::string& str );
+            static std::string lcase( const std::string& str );
+
 
             //-----------------------------------------------------------------------------------------------
             class proc_counter_guard
@@ -185,7 +210,7 @@ namespace proc_ace
 
                         public:
 
-                          //services
+                          //servicestao developer
                           int start ( int pool_size = default_pool_size_ );
                           virtual int stop ( void );
                           int enqueue ( ACE_Event_Handler *handler ) ;
@@ -235,11 +260,15 @@ namespace proc_ace
                            long                             m_dwTimerToken;
                            const ACE_Time_Value             m_maximumTimeToWait;
                            set_map                          m_set_map;
+                           bool                             m_bSilent;
+                           ACE_Time_Value                   m_lastActivityTime;
+
 
                         protected:
 
                           proc_thread_pool* thread_pool();
                           ACE_thread_t creator_;
+                          concurrency_t concurrency ();
 
                           //adaptive communication environment overrides
                           int svc ();
@@ -251,8 +280,46 @@ namespace proc_ace
                            //hidden destructor
 					      ~proc_handler();
 
+                          //helpers
+                          void output_boiler_plate( std::string str_concurrency = "" );
+                          std::string output_prompt( bool bToken = true );
+                          void map_commands();
+                          void perform( const std::string& str );
+                          void flush_stream_to_connector();
+                          void flush_binary_stream_to_connector( unsigned char* u_buffer , unsigned long dwLen );
+                          void format_packet_error( proc_packet_error pe );
+                          std::string client_addr();
+                          void stream_out( const std::string& str );
+					      void stream_out( const std::string& str , unsigned long len );
+					      void stream_out( const byte_ptr& ptrBytes , unsigned long len );
+                          void output_ok_response( const std::string& ack );
+					      void output_no_response( const std::string& nack );
+                          void flush_immediate( const std::string& atom );
+                          void parse_command( const std::string& packet ,
+										 map_of_parts& parts ,
+										 unsigned short& usCommandParamCount );
+
 
                         public :
+
+                          //accessors-inspectors
+                          proc_acceptor* acceptor() { return ( m_proc_acceptor ); }
+                          std::string computer_name() const noexcept { return ( m_strComputerName ); }
+                          std::ostringstream& stream() { return ( m_ostr ); }
+                          std::string token() const noexcept  { return ( m_strToken ); }
+                          map_of_commands& command_map() { return ( m_command_map ); }
+                          bool silent() { return ( m_bSilent ); }
+                          proc_command command() const noexcept  { return ( m_current_command ); }
+                          proc_packet_error error_packet() const noexcept { return ( m_proc_packet_error ); }
+                          std::string command_str() const noexcept { return ( ucase( m_strCommand ) ); }
+
+                          //mutators
+                          void silent( bool bSilent ) { m_bSilent = bSilent; }
+                          void error_packet( proc_packet_error error ) { m_proc_packet_error = error; }
+                          void acceptor( proc_acceptor_ptr acceptor ) { m_proc_acceptor = acceptor; }
+                          void command( proc_command command ) { m_current_command = command; }
+                          void command_str( const std::string& str_command ) { m_strCommand = str_command; }
+
 
                           //handlers
 						  int on_login( const std::string& params );
@@ -294,14 +361,53 @@ namespace proc_ace
                   int thread_pool_is_private (void) {return &the_thread_pool_ == &private_thread_pool_; }
                   protocol_data_ptr  data() { return ( m_instance_data ); }
 
+
                   //mutators
                   void thread_pool( ACE_Thread_Manager* thrd_mgr ) { ACE_Task<ACE_MT_SYNCH> ( thr_mgr ); }
                   void data( protocol_data_ptr data ) { m_instance_data = data; }
 
             };
 
+            std::string ucase( const std::string& str )
+            {
+                std::string localstr( str );
+
+                if( localstr.empty() )
+                {
+                    return( "" );
+                }
+
+                std::string::iterator iter = localstr.begin();
+                while ( iter != localstr.end() )
+                {
+                    *iter = toupper( *iter );
+                    iter++;
+                }
+
+                return ( localstr );
+            }
+            std::string lcase( const std::string& str )
+            {
+                std::string localstr( str );
+
+                if( localstr.empty() )
+                {
+                    return( "" );
+                }
+
+                std::string::iterator iter = localstr.begin();
+                while ( iter != localstr.end() )
+                {
+                    *iter = tolower( *iter );
+                    iter++;
+                }
+
+                return ( localstr );
+            }
+
 
 
 }
+
 
 
