@@ -51,6 +51,7 @@ proc_handler::proc_handler ( const ACE_Time_Value& max_inactivity ) :   m_proc_a
                   char hostname[1024];
                   gethostname( hostname , 1023 );
                   m_strComputerName = hostname;
+                  m_currentState.insert( proc_state::oesNonAuthenticated );
               }
               catch( ... )
 
@@ -493,9 +494,8 @@ void proc_handler::perform( const string& str )
                     return;
                 }
 
-                proc_handler::ptr_to_function ptrFunc = c_iter->second;
-
-                if( ptrFunc == NULL )
+                proc_handler::ptr_to_function ptr_func = c_iter->second;
+                if( ptr_func == NULL )
                 {
                     stream() << output_prompt( false );
                     stream() << "NO no default action for this keyword" << crlf;
@@ -509,9 +509,9 @@ void proc_handler::perform( const string& str )
                 string strPayload;
 
                 pIter != PartsMap.end() ? strPayload = pIter->second : strPayload = "";
-                int	lRetVal = ( this->*ptrFunc ) ( strPayload );
+                int	lRetVal = ( this->*ptr_func ) ( strPayload );
 
-                if( ( lRetVal != 0 ) || ( command() == chromatic_command::oecError ) )
+                if( ( lRetVal != 0 ) || ( command() == proc_command::proc_error ) )
                 {
                     return;
                 }
@@ -594,8 +594,8 @@ void proc_handler::flush_immediate( const string& atom )
 
 //---------------------------------------------------------------------------------------
 void proc_handler::parse_command( const  string& packet ,
-									   map_of_parts& parts ,
-									   unsigned short& uscommandParamCount )
+								  map_of_parts& parts ,
+								  unsigned short& uscommandParamCount )
 {
             if( packet.empty() )
             {
@@ -669,7 +669,7 @@ void proc_handler::parse_command( const  string& packet ,
             }
             else
             {
-                error_packet( proc__packet_error::peNoCommand );
+                error_packet( proc_packet_error::peNoCommand );
 
                 return;
             }
@@ -685,11 +685,239 @@ void proc_handler::output_ok_response( const string& ack )
 }
 
 //---------------------------------------------------------------------------------------
-void prox_handler::output_no_response( const string& nack )
+bool proc_handler::check_connection_state( proc_state state )
+{
+            bool bRet = false;
+
+            current_state::iterator iter = m_currentState.find( state );
+            iter == m_currentState.end() ? bRet = false  : bRet = true;
+
+            return ( bRet );
+}
+
+//---------------------------------------------------------------------------------------
+void proc_handler::update_connection_state( proc_set_op op , proc_state state )
+{
+            switch( op )
+            {
+                case proc_set_op::osopAdd:
+                    m_currentState.insert( state );
+                    break;
+                case proc_set_op::osopDelete:
+                    m_currentState.erase( state );
+                    break;
+                case proc_set_op::osopClear:
+                    m_currentState.clear();
+                    break;
+            }
+}
+
+
+//---------------------------------------------------------------------------------------
+void proc_handler::output_no_response( const string& nack )
 {
 	        stream() << token() << " " << "NO " << nack << crlf;
 	        command_str( "" );
 }
+
+//---------------------------------------------------------------------------------------
+void proc_handler::chomp( string& str , const string& token )
+{
+            string strTemp( str );
+
+            if( str.empty() )
+            {
+                return;
+            }
+
+            string::size_type idx = str.find( token );
+            if( idx != string::npos )
+            {
+                str = str.substr( 0 , --idx );
+            }
+
+}
+
+//---------------------------------------------------------------------------------------
+void proc_handler::gnaw( string& str , const string& token )
+{
+            string::size_type st;
+
+            st = str.find( token , 0 );
+
+            if( st != string::npos )
+            {
+                str.resize( st );
+            }
+}
+
+//---------------------------------------------------------------------------------------
+void proc_handler::rtrimlast( string& str , const string& token )
+{
+            if ( str.empty() )
+            {
+                return;
+            }
+
+            string::size_type idx = str.find_last_of( (char*) token.c_str() );
+
+            //if not the last ignore
+            if( idx != str.size() - 1 )
+            {
+                return;
+            }
+
+            if( idx != string::npos )
+            {
+                str = str.substr( 0 , --idx );
+            }
+}
+
+//---------------------------------------------------------------------------------------
+string proc_handler::ltrim( const string &szToTrim, const string& szTrimChars )
+{
+            string szToReturn = szToTrim;
+
+            while( strchr( szTrimChars.c_str(), szToReturn[0] ) != NULL )
+            {
+                if( szToReturn.length() < 1 )
+                {
+                    return ( "" );
+                }
+
+                szToReturn.replace( 0, 1, "" );
+            }
+
+            return szToReturn;
+}
+
+//---------------------------------------------------------------------------------------
+string proc_handler::rtrim( const string &szToTrim, const string& szTrimChars )
+{
+            string szToReturn = szToTrim;
+
+            int nLastPos = szToReturn.length() - 1;
+
+            if( nLastPos <= 0 )
+            {
+                return ( "" );
+            }
+
+            while( strchr( szTrimChars.c_str(), szToReturn[nLastPos] ) != NULL )
+            {
+                szToReturn.replace( nLastPos, 1, "" );
+
+                nLastPos = szToReturn.length() - 1;
+
+                if( nLastPos <= 0 )
+                {
+                    return ( "" );
+                }
+            }
+
+            return szToReturn;
+}
+
+//---------------------------------------------------------------------------------------
+string proc_handler::lcase( const string& str )
+{
+            string localstr( str );
+
+            if( localstr.empty() )
+            {
+                return( "" );
+            }
+
+            string::iterator iter = localstr.begin();
+            while ( iter != localstr.end() )
+            {
+                *iter = tolower( *iter );
+                iter++;
+            }
+
+            return ( localstr );
+}
+
+
+//---------------------------------------------------------------------------------------
+string proc_handler::ucase( const string& str )
+{
+            string localstr( str );
+
+            if( localstr.empty() )
+            {
+                return( "" );
+            }
+
+            string::iterator iter = localstr.begin();
+            while ( iter != localstr.end() )
+            {
+                *iter = toupper( *iter );
+                iter++;
+            }
+
+            return ( localstr );
+}
+
+//---------------------------------------------------------------------------------------
+string proc_handler::extract_quoted_string( const string& str )
+{
+           string s( str );
+           if( s.empty() )
+           {
+               return ( s );
+           }
+
+           string::size_type idx = s.find_first_of( "\"" );
+           if( idx != string::npos )
+           {
+                s.erase( idx , 1 );
+                idx = s.find_last_of( "\"" );
+                if( idx != string::npos )
+                {
+                    s.erase( idx , 1 );
+                }
+           }
+
+
+           return ( s );
+
+}
+
+
+
+//demultiplex handlers
+//---------------------------------------------------------------------------------------
+int proc_handler::on_login( const string& params )
+{
+        ACE_Trace _( ACE_TEXT( "chromatic_handler::on_login" ) , __LINE__ );
+
+        command( proc_command::proc_login );
+
+        if( check_connection_state( proc_state::oesAuthenticated ) == true )
+        {
+            error_packet( proc_packet_error::peAlreadyAuthenticated );
+
+            return ( 0 );
+        }
+
+        ostringstream ostr;
+
+        //todo
+        bool bRet = true;// context_ptr()->on_login( params , ostr.str() , stream() );
+        if( bRet == true )
+        {
+            update_connection_state( proc_set_op::osopAdd , proc_state::oesAuthenticated );
+            output_ok_response( "login completed" );
+        }
+        else
+        {
+            output_no_response( "login failed" );
+        }
+
+	return ( 0 );
+}
+
 
 
 

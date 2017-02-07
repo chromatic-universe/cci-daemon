@@ -86,6 +86,24 @@ namespace proc_ace
                 ppUid
             };
 
+            enum class proc_state : unsigned long
+            {
+                oesNonAuthenticated = 0 ,
+                oesConnected ,
+                oesAuthenticated ,
+                oesSelected ,
+                oesAdmin ,
+                oesWait ,
+                oesLogout
+            };
+
+            enum class proc_set_op : unsigned long
+            {
+                osopAdd ,
+                osopDelete ,
+                osopClear
+            };
+
 
             //aliases
             using proc_acceptor_base = ACE_Acceptor <proc_handler, ACE_SOCK_ACCEPTOR>;
@@ -96,6 +114,7 @@ namespace proc_ace
             using set_map = std::map<proc_set_param , bool>;
             using byte_ptr = unsigned char*;
             using map_of_parts = std::multimap<proc_packet_part , std::string>;
+            using current_state = std::set<proc_state>;
 
 
             //adt
@@ -141,10 +160,6 @@ namespace proc_ace
 						void thread_pool_size( unsigned long pool_size ) { m_dwThreads = pool_size; }
 
 			};
-
-            //string utils
-            static std::string ucase( const std::string& str );
-            static std::string lcase( const std::string& str );
 
 
             //-----------------------------------------------------------------------------------------------
@@ -262,6 +277,7 @@ namespace proc_ace
                            set_map                          m_set_map;
                            bool                             m_bSilent;
                            ACE_Time_Value                   m_lastActivityTime;
+                           current_state                    m_currentState;
 
 
                         protected:
@@ -298,6 +314,10 @@ namespace proc_ace
                           void parse_command( const std::string& packet ,
 										 map_of_parts& parts ,
 										 unsigned short& usCommandParamCount );
+                          bool check_connection_state( proc_state state );
+                          void update_connection_state( proc_set_op op , proc_state state );
+
+
 
 
                         public :
@@ -319,10 +339,28 @@ namespace proc_ace
                           void acceptor( proc_acceptor_ptr acceptor ) { m_proc_acceptor = acceptor; }
                           void command( proc_command command ) { m_current_command = command; }
                           void command_str( const std::string& str_command ) { m_strCommand = str_command; }
+                          void token( const std::string& str_token ) { m_strToken = str_token; }
 
 
                           //handlers
 						  int on_login( const std::string& params );
+
+
+                          //string utils
+                          static std::string ucase( const std::string& str );
+                          static std::string lcase( const std::string& str );
+                          static void gnaw( std::string& str , const std::string& token );
+                          static void rtrimlast( std::string& str , const std::string& token );
+                          static void chomp( std::string& str , const std::string& token );
+                          static std::string ltrim( const std::string &szToTrim ,
+                                                    const std::string& szTrimChars );
+                          static std::string rtrim( const std::string &szToTrim ,
+                                                    const std::string& szTrimChars );
+                          static std::string extract_quoted_string( const std::string& str );
+
+
+
+
 
 
             };
@@ -367,44 +405,6 @@ namespace proc_ace
                   void data( protocol_data_ptr data ) { m_instance_data = data; }
 
             };
-
-            std::string ucase( const std::string& str )
-            {
-                std::string localstr( str );
-
-                if( localstr.empty() )
-                {
-                    return( "" );
-                }
-
-                std::string::iterator iter = localstr.begin();
-                while ( iter != localstr.end() )
-                {
-                    *iter = toupper( *iter );
-                    iter++;
-                }
-
-                return ( localstr );
-            }
-            std::string lcase( const std::string& str )
-            {
-                std::string localstr( str );
-
-                if( localstr.empty() )
-                {
-                    return( "" );
-                }
-
-                std::string::iterator iter = localstr.begin();
-                while ( iter != localstr.end() )
-                {
-                    *iter = tolower( *iter );
-                    iter++;
-                }
-
-                return ( localstr );
-            }
-
 
 
 }
