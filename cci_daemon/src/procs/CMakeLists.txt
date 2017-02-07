@@ -19,10 +19,16 @@ link_directories(${PROCACEACCEPTOR_SOURCE_DIR}
                  $ENV{DEV}/lib)
 
 
-#executable
+#library
 add_library(proc_ace_acceptor SHARED proc_ace_acceptor.cpp
-                                     proc_ace_thread_pool
-                                     proc_ace_handler)
+                                     proc_ace_thread_pool.cpp
+                                     proc_ace_handler.cpp)
+
+#executable harness
+add_executable(proc-ace-harness proc_ace_acceptor.cpp
+                                proc_ace_thread_pool.cpp
+                                proc_ace_handler.cpp
+                                proc_ace_harness.cpp) 
 
 
 #link libs
@@ -30,7 +36,14 @@ target_link_libraries(proc_ace_acceptor -lstdc++
                                         -lpthread 
                                         -ldl
                                         -lACE)
+target_link_libraries(proc-ace-harness  -lstdc++ 
+                                        -lpthread 
+                                        -ldl
+                                        -lACE)
+
+                                    
 
 #install
 install_targets( /lib/cci proc_ace_acceptor)
+install_targets( /bin proc-ace-harness)
 
