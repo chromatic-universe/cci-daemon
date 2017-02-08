@@ -3,4 +3,7 @@
 #pragma once
 
 
-#include <proc_ace.h>
+#include <string>
+
+
+static void bootstrap_coordinator( const std::string& params );

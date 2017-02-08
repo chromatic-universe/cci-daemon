@@ -7,6 +7,7 @@ project(CCIDAEMON)
 
 add_subdirectory(plugins)
 add_subdirectory(procs)
+add_subdirectory(coordinator)
 
 #cpp flags
 set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")

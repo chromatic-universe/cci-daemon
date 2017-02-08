@@ -32,8 +32,17 @@ int main( int argc , char* argv[] )
             syslog ( LOG_USER , "%s", "daemonizing cci-daemon...." );
             closelog();
 
-            if( df->proc() == service_proc::sp_default_service )
-            { df->daemon_default_exec( str_default , 0 ); }
+            switch( df->proc() )
+            {
+                case service_proc::sp_default_coordinator  :
+                    df->bootstrap_coordinator();
+                    break;
+                case service_proc::sp_custom_coordinator :
+                    break;
+                case service_proc::sp_default_service :
+                default  :
+                    df->daemon_default_exec( str_default , 0 );
+            }
 
 
             exit( EXIT_SUCCESS );

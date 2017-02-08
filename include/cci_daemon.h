@@ -56,7 +56,8 @@ namespace cci_daemon_impl
             enum class service_proc : unsigned long
             {
                 sp_default_service = 0 ,
-                sp_custom_dispatch
+                sp_default_coordinator ,
+                sp_custom_coordinator
             };
 
             //services
@@ -131,6 +132,7 @@ namespace cci_daemon_impl
 
                     //daemon execute procs
                     virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
+                    virtual void bootstrap_coordinator();
 
                     //services
                     virtual int daemonize();

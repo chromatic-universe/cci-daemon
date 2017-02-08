@@ -20,6 +20,7 @@ const std::string cci_daemon_facade::path_pid = "/var/run/cci-daemon.pid";
 
 //--------------------------------------------------------------------------------------
 cci_daemon_facade::cci_daemon_facade()  : m_dw_flags { 0L } ,
+                                          m_log_fp { nullptr } ,
                                           m_b_opened { false } ,
                                           m_service_proc { service_proc::sp_default_service } ,
                                           m_str_conf { cci_daemon_facade::path_config } ,
@@ -405,3 +406,8 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
           return ( 0 );
 }
 
+//---------------------------------------------------------------------------------------------------
+void cci_daemon_facade::bootstrap_coordinator()
+{
+            //
+}
