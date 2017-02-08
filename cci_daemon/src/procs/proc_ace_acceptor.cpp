@@ -35,9 +35,9 @@ using std::ostringstream;
 
    //----------------------------------------------------------------------------------------------------------------------------
     int proc_acceptor::open (	const ACE_INET_Addr &addr,
-									ACE_Reactor *reactor,
-									protocol_data_ptr instance_data ,
-									int pool_size )
+								ACE_Reactor *reactor,
+								protocol_data_ptr instance_data ,
+								int pool_size )
     {
     	  ACE_Trace _( ACE_TEXT( "int proc_acceptor::open" ) , __LINE__ );
 
