@@ -3,8 +3,12 @@
 #include <cci_daemon.h>
 #include <execinfo.h>
 #include <cxxabi.h>
+
 using namespace cdi;
 
+//cmd line
+static char* cmd_option( char ** begin, char ** end, const std::string & option );
+static bool  cmd_option_exists( char** begin, char** end, const std::string& option );
 
 
 //--------------------------------------------------------------------------
@@ -17,20 +21,32 @@ int main( int argc , char* argv[] )
             int options = 0;
             options |= LOG_PID;
             const char* identity = "cci-daemon";
+            bool daemonize { true };
 
+            if( cmd_option_exists( argv, argv+argc , "-a" ) )
+            { df->proc( service_proc::sp_default_coordinator ); }
+            else if( cmd_option_exists( argv, argv+argc , "-c" ) )
+            { df->proc( service_proc::sp_custom_coordinator ); }
+            if( cmd_option_exists( argv, argv+argc , "-t" ) )
+            { daemonize = false; }
 
             //daemonize
-            if(  df->daemonize() == -1 )
+            if( daemonize )
             {
-                std::set_terminate ( cdi::chromatic_terminate );
+                if(  df->daemonize() == -1 )
+                {
+                    std::set_terminate ( cdi::chromatic_terminate );
+                    syslog (LOG_USER | LOG_ERR , "%s", "error in cci-daemon start...." );
 
-                syslog (LOG_USER | LOG_ERR , "%s", "error in cci-daemon start...." );
+                    throw;
+                }
+                openlog( identity , options , LOG_USER );
+                syslog ( LOG_USER , "%s", "daemonized cci-daemon-dispatcher...." );
+                closelog();
 
-                throw;
             }
-            openlog( identity , options , LOG_USER );
-            syslog ( LOG_USER , "%s", "daemonizing cci-daemon...." );
-            closelog();
+
+
 
             switch( df->proc() )
             {
@@ -39,9 +55,9 @@ int main( int argc , char* argv[] )
                     break;
                 case service_proc::sp_custom_coordinator :
                     break;
-                case service_proc::sp_default_service :
+                /*case service_proc::sp_default_service :
                 default  :
-                    df->daemon_default_exec( str_default , 0 );
+                    df->daemon_default_exec( str_default , 0 );*/
             }
 
 
@@ -50,3 +66,22 @@ int main( int argc , char* argv[] )
 
 
 }
+
+//--------------------------------------------------------------------------------
+char* get_cmd_option( char ** begin , char ** end , const std::string & option)
+{
+    char ** itr = std::find(begin, end, option);
+    if (itr != end && ++itr != end)
+    {
+        return *itr;
+    }
+    return 0;
+}
+
+//--------------------------------------------------------------------------------
+bool cmd_option_exists( char** begin , char** end , const std::string& option )
+{
+    return std::find( begin , end , option ) != end;
+}
+
+

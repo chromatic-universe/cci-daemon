@@ -186,21 +186,26 @@ bool cci_daemon_facade::log_message( const std::string& msg )
 
 //---------------------------------------------------------------------------------------------------
 bool cci_daemon_facade::open_log()
-{
-    mode_t m;
-    bool b_ret { true };
+    {
+        mode_t m;
+        bool b_ret { true };
 
-    m = umask(077);
-    m_log_fp = fopen((char*) cci_daemon_facade::log_path.c_str() , "a");
-    umask( m );
+        m = umask(077);
+        if( access( (char*) cci_daemon_facade::log_path.c_str() , R_OK | W_OK ) == -1 )
+        {
+            fprintf ( stderr , "cannot access syslog..not enough permissions...are you root?\n" );
+            exit( 1 );
+        }
+        m_log_fp = fopen((char*) cci_daemon_facade::log_path.c_str() , "a");
+        umask( m );
 
-    if ( m_log_fp == NULL )
-       b_ret = false;
+        if ( m_log_fp == NULL )
+           b_ret = false;
 
-    //disable stdio buffering
-    setbuf( m_log_fp, NULL );
+        //disable stdio buffering
+        setbuf( m_log_fp, NULL );
 
-    return b_ret;
+        return b_ret;
 
 }
 
@@ -415,7 +420,7 @@ void cci_daemon_facade::bootstrap_default_coordinator()
           const char* identity = "cci-daemon";
 
           //daemonize has closed all file handles , reopen log file if closed
-          if( m_b_opened == false )
+          if( ! m_b_opened )
           {
               m_b_opened = open_log();
               if( m_b_opened == true )
@@ -428,5 +433,8 @@ void cci_daemon_facade::bootstrap_default_coordinator()
 
               }
           }
+
+          //std::string boostrap{  }
+          //auto boostrap_lib = std::unique_ptr<cci_shared_lib>();
 
 }

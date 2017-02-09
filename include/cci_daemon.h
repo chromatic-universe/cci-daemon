@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <sys/stat.h>
+
+#include <unistd.h>
 //c++ standard
 #include <iostream>
 #include <sstream>
@@ -24,6 +26,7 @@
 #include <string>
 #include <memory>
 #include <exception>
+#include <algorithm>
 
 //cci
 #include <cci_stack_trace.h>
@@ -126,6 +129,7 @@ namespace cci_daemon_impl
                     void backtrace( const unsigned long trace ) noexcept { m_backtrace = trace; }
                     void config_path( const std::string& path ) { m_str_conf = path; }
                     void pid_path( const std::string& path ) { m_str_pid_path = path; }
+                    void proc( service_proc sp ) { m_service_proc = sp; }
 
                     //stream
                     friend std::ostream& operator<< ( std::ostream& o , const cci_daemon_facade& df );
