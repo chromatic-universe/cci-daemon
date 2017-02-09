@@ -4,6 +4,7 @@
 
 
 #include <string>
+#include <syslog.h>
 
+extern "C" void bootstrap_default_coordinator( const std::string& params );
 
-static void bootstrap_default_coordinator( const std::string& params );

@@ -115,6 +115,11 @@ namespace cci_daemon_impl
                     std::string         m_str_pid_path;
                     bool                m_backtrace;
 
+                    //prototypes
+                    typedef int bootstrap_function( const std::string& params );
+                    //helpers
+                    bootstrap_function* bootstrap_function_address;
+
                 public  :
 
                     //accessors-inspectors
@@ -123,6 +128,9 @@ namespace cci_daemon_impl
                     service_proc proc() const noexcept { return m_service_proc; }
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
+                    int bootstrap( const std::string& params )
+                    { return bootstrap_function_address( params ); }
+
 
                     //mutators
                     void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }

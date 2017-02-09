@@ -27,6 +27,7 @@ int main( int argc , char* argv[] )
             { df->proc( service_proc::sp_default_coordinator ); }
             else if( cmd_option_exists( argv, argv+argc , "-c" ) )
             { df->proc( service_proc::sp_custom_coordinator ); }
+            //run from terminal
             if( cmd_option_exists( argv, argv+argc , "-t" ) )
             { daemonize = false; }
 
@@ -46,8 +47,6 @@ int main( int argc , char* argv[] )
 
             }
 
-
-
             switch( df->proc() )
             {
                 case service_proc::sp_default_coordinator  :
@@ -55,9 +54,10 @@ int main( int argc , char* argv[] )
                     break;
                 case service_proc::sp_custom_coordinator :
                     break;
-                /*case service_proc::sp_default_service :
+                case service_proc::sp_default_service :
                 default  :
-                    df->daemon_default_exec( str_default , 0 );*/
+                    df->daemon_default_exec( str_default , 0 );
+                    break;
             }
 
 

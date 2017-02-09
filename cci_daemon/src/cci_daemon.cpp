@@ -419,22 +419,54 @@ void cci_daemon_facade::bootstrap_default_coordinator()
           options |= LOG_PID;
           const char* identity = "cci-daemon";
 
-          //daemonize has closed all file handles , reopen log file if closed
           if( ! m_b_opened )
           {
               m_b_opened = open_log();
               if( m_b_opened == true )
               {
-                std::string msg( "cci_daemon.....bootstrapping default coordinator....william k. johnson 2016" );
+                std::string msg( "cci_daemon.....bootstrapping default coordinator....william k. johnson 2017" );
                 log_message( msg );
                 read_config_file( config_path() );
-
+                //read config closed the log , reopen it
+                if( m_b_opened == false )
+                {
+                  m_b_opened = open_log();
+                }
                 syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "bootstrapping default coordinator...." );
-
               }
           }
 
-          //std::string boostrap{  }
-          //auto boostrap_lib = std::unique_ptr<cci_shared_lib>();
+          //load bootstrap lib explicitly
+          //we're going through these gyrations
+          //for  a good cause: isolate the daemon
+          //proper from dependencies of the plugins
+          //and dynamic procs
+
+          //library moniker
+          std::string bootstrap {"cci_daemon_bootstrap" };
+          //function moniker
+          std::string bootstrap_str { "bootstrap_default_coordinator" };
+
+          try
+          {
+              //load library  - this will throw if the load fails
+              auto bootstrap_lib = cci_shared_lib::load( bootstrap );
+              assert( bootstrap_lib );
+              //assign the library address to our member attribute
+              bootstrap_function_address = cci_shared_lib::get_function_pointer<bootstrap_function>
+                          ( bootstrap_lib ,bootstrap_str );
+              if( bootstrap_function_address == nullptr )
+              {  log_message( "could not retrieve bootstrap function addresss" ); }
+              else
+              //call our dynamic library function
+              {
+                    this->bootstrap( "the original corny snaps!" );
+              }
+
+          }
+          catch( std::runtime_error& err )
+          {
+              log_message( err.what() );
+          }
 
 }
