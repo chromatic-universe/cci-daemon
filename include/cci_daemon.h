@@ -132,7 +132,7 @@ namespace cci_daemon_impl
 
                     //daemon execute procs
                     virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
-                    virtual void bootstrap_coordinator();
+                    virtual void bootstrap_default_coordinator();
 
                     //services
                     virtual int daemonize();

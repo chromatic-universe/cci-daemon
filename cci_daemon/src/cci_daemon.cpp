@@ -407,7 +407,26 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
 }
 
 //---------------------------------------------------------------------------------------------------
-void cci_daemon_facade::bootstrap_coordinator()
+void cci_daemon_facade::bootstrap_default_coordinator()
 {
-            //
+
+          int options = 0;
+          options |= LOG_PID;
+          const char* identity = "cci-daemon";
+
+          //daemonize has closed all file handles , reopen log file if closed
+          if( m_b_opened == false )
+          {
+              m_b_opened = open_log();
+              if( m_b_opened == true )
+              {
+                std::string msg( "cci_daemon.....bootstrapping default coordinator....william k. johnson 2016" );
+                log_message( msg );
+                read_config_file( config_path() );
+
+                syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "bootstrapping default coordinator...." );
+
+              }
+          }
+
 }

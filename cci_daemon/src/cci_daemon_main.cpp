@@ -35,7 +35,7 @@ int main( int argc , char* argv[] )
             switch( df->proc() )
             {
                 case service_proc::sp_default_coordinator  :
-                    df->bootstrap_coordinator();
+                    df->bootstrap_default_coordinator();
                     break;
                 case service_proc::sp_custom_coordinator :
                     break;
