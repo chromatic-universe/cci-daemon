@@ -19,13 +19,15 @@ const std::string cci_daemon_facade::path_pid = "/var/run/cci-daemon.pid";
 
 
 //--------------------------------------------------------------------------------------
-cci_daemon_facade::cci_daemon_facade()  : m_dw_flags { 0L } ,
-                                          m_log_fp { nullptr } ,
-                                          m_b_opened { false } ,
-                                          m_service_proc { service_proc::sp_default_service } ,
-                                          m_str_conf { cci_daemon_facade::path_config } ,
-                                          m_str_pid_path { cci_daemon_facade::path_pid } ,
-                                          m_backtrace { false }
+cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0L } ,
+                                                                  m_log_fp { nullptr } ,
+                                                                  m_b_opened { false } ,
+                                                                  m_service_proc { service_proc::sp_default_service } ,
+                                                                  m_str_conf { cci_daemon_facade::path_config } ,
+                                                                  m_str_pid_path { cci_daemon_facade::path_pid } ,
+                                                                  m_backtrace { false } ,
+                                                                  m_argc{ argc } ,
+                                                                  m_argv { argv }
 {
       //
 }
@@ -385,7 +387,7 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
               {
                   if( cdi::hup_received )
                   {
-                      //sighup
+                      //
                       openlog( identity , options , LOG_USER );
                       syslog ( LOG_USER | LOG_INFO , "%s", "cci-daemon received sighup....reading config....continuing" );
                       closelog();
@@ -414,7 +416,6 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
 //---------------------------------------------------------------------------------------------------
 void cci_daemon_facade::bootstrap_default_coordinator()
 {
-
           int options = 0;
           options |= LOG_PID;
           const char* identity = "cci-daemon";
@@ -443,7 +444,7 @@ void cci_daemon_facade::bootstrap_default_coordinator()
           //and dynamic procs
 
           //library moniker
-          std::string bootstrap {"cci_daemon_bootstrap" };
+          std::string bootstrap { "cci_daemon_bootstrap" };
           //function moniker
           std::string bootstrap_str { "bootstrap_default_coordinator" };
 
@@ -460,7 +461,8 @@ void cci_daemon_facade::bootstrap_default_coordinator()
               else
               //call our dynamic library function
               {
-                    this->bootstrap( "the original corny snaps!" );
+                    //for debugging library symbols
+                    int dw = this->bootstrap( this->m_argc , this->m_argv );
               }
 
           }

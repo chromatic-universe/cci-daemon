@@ -75,7 +75,7 @@ namespace cci_daemon_impl
 
 
                     //ctors
-                    explicit cci_daemon_facade() ;//explicit
+                    explicit cci_daemon_facade( int argc , char* argv[] ) ;
 
                     //dtor
                     virtual ~cci_daemon_facade();
@@ -114,9 +114,11 @@ namespace cci_daemon_impl
                     std::string         m_str_conf;
                     std::string         m_str_pid_path;
                     bool                m_backtrace;
+                    int                 m_argc;
+                    char**              m_argv;
 
                     //prototypes
-                    typedef int bootstrap_function( const std::string& params );
+                    typedef int bootstrap_function( int argc , char* argv[] );
                     //helpers
                     bootstrap_function* bootstrap_function_address;
 
@@ -128,8 +130,8 @@ namespace cci_daemon_impl
                     service_proc proc() const noexcept { return m_service_proc; }
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
-                    int bootstrap( const std::string& params )
-                    { return bootstrap_function_address( params ); }
+                    int bootstrap( int argc , char* argv[]  )
+                    { return bootstrap_function_address( argc , argv ); }
 
 
                     //mutators

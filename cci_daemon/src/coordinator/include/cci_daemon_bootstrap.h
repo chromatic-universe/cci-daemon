@@ -6,5 +6,5 @@
 #include <string>
 #include <syslog.h>
 
-extern "C" int bootstrap_default_coordinator( const std::string& params );
+extern "C" int bootstrap_default_coordinator( int argc , char* argv[] );
 

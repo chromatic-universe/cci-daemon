@@ -3,6 +3,7 @@
 
 #include <cci_daemon_bootstrap.h>
 #include <proc_ace_acceptor.h>
+#include <unistd.h>
 
 using namespace proc_ace;
 
@@ -68,31 +69,42 @@ class bootstrap_signal_handler : public ACE_Event_Handler
 
 //coordinator
 //------------------------------------------------------------------------
-extern "C" int bootstrap_default_coordinator( const std::string& params )
+extern "C" int bootstrap_default_coordinator( int argc , char* argv[] )
 {
 
-         syslog ( LOG_USER | LOG_INFO | LOG_PID ,
+          syslog ( LOG_USER | LOG_INFO | LOG_PID ,
                 "%s",
                 "default cci-dispatcher coordinator initializing...." );
+          ACE_LOG_MSG->open ( argv[0] , ACE_Log_Msg::SYSLOG, "cci-daemon-dispatcher" );
+          ACE_LOG_MSG->set_flags ( ACE_Log_Msg::STDERR );
 
-
-          auto callback = std::make_unique<log_callback>();
-          ACE_LOG_MSG->set_flags (ACE_Log_Msg::MSG_CALLBACK);
-          ACE_LOG_MSG->clr_flags (ACE_Log_Msg::STDERR);
-          ACE_LOG_MSG->msg_callback ( callback.get() );
 
           //register signals
-          proc_signal_handler* handler = new proc_signal_handler();
+          bootstrap_signal_handler* handler = new bootstrap_signal_handler();
           ACE_Reactor::instance()->register_handler( SIGINT ,  handler );
           ACE_Reactor::instance()->register_handler( SIGTERM ,  handler );
 
-          ///bring up our protocpol stack
-          int dw = ACE_Service_Config::open( argc , argv );
+          ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
+
+          //daemonizing has switched us to the root directory
+          int dw = ::chdir( "/cci/dev_t/bin" );
           if( dw != 0 )
           {
-              ACE_ERROR_RETURN( ( LM_ERROR , "(%t) servicce config returned with errors..exiting\n") , 1 );
+            ACE_ERROR_RETURN( ( LM_ERROR , "%D (%t) could not chdir to working directory..exiting\n"   ) , 1  );
           }
+          ACE_DEBUG( ( LM_INFO , "%D (%t) changed directory to working directory....\n" ) );
+          dw = ACE_Service_Config::open( argc , argv );
+          if( dw != 0 )
+          {
+              ACE_DEBUG ((LM_ERROR , "(%P|%t) ...unraveling protocol stack error..%d.\n" , dw )  );
+              ACE_ERROR_RETURN( ( LM_ERROR , "(%t) service config returned with errors..exiting\n"   ) , 1  );
+          }
+          ACE_DEBUG( ( LM_INFO , "%D (%t) opened coordinator....\n" ) );
+          ACE_DEBUG( ( LM_INFO , "%D (%t) starting event reactor....\n" ) );
           ACE_Reactor::instance()->run_reactor_event_loop();
+
+
+          return 0;
 
 }
 

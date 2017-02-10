@@ -14,7 +14,7 @@ static bool  cmd_option_exists( char** begin, char** end, const std::string& opt
 //--------------------------------------------------------------------------
 int main( int argc , char* argv[] )
 {
-            auto df( std::make_unique<cci_daemon_facade>() );
+            auto df( std::make_unique<cci_daemon_facade>( argc , argv ) );
             df->backtrace( true );
 
             std::string str_default( "cci-daemon-default" );
