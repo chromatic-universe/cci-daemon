@@ -1,9 +1,0 @@
-<map id="include/cci_daemon.h" name="include/cci_daemon.h">
-<area shape="rect" id="node18" href="$dc/d8b/cci__stack__trace_8h.html" title="cci_stack_trace.h" alt="" coords="449,80,575,107"/>
-<area shape="rect" id="node23" href="$d4/d8e/cci__shared__lib_8h.html" title="cci_shared_lib.h" alt="" coords="759,229,875,256"/>
-<area shape="rect" id="node28" href="$d2/d66/cci__daemon__kernel_8h.html" title="cci_daemon_kernel.h" alt="" coords="1037,80,1181,107"/>
-<area shape="rect" id="node25" href="$d7/dc2/cci__daemon__utils_8h.html" title="cci_daemon_utils.h" alt="" coords="750,304,884,331"/>
-<area shape="rect" id="node31" href="$de/df4/cci__daemon__generic_8h.html" title="cci_daemon_generic.h" alt="" coords="1352,155,1504,181"/>
-<area shape="rect" id="node32" href="$d0/d9e/cci__daemon__plugin_8h.html" title="cci_daemon_plugin.h" alt="" coords="896,155,1040,181"/>
-<area shape="rect" id="node33" href="$df/dcb/cci__pub__and__sub_8h.html" title="cci_pub_and_sub.h" alt="" coords="1193,155,1327,181"/>
-</map>

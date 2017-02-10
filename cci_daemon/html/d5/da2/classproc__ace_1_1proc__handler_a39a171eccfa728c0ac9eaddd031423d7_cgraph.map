@@ -1,8 +1,0 @@
-<map id="proc_ace::proc_handler::format_packet_error" name="proc_ace::proc_handler::format_packet_error">
-<area shape="rect" id="node2" href="$d5/da2/classproc__ace_1_1proc__handler.html#aa432cbc0f4b3aa67f9f4a70b6565ec49" title="proc_ace::proc_handler\l::command" alt="" coords="225,5,383,46"/>
-<area shape="rect" id="node3" href="$d5/da2/classproc__ace_1_1proc__handler.html#a09206fc07f63e4b65e58f2b92fe3a8b0" title="proc_ace::proc_handler\l::stream" alt="" coords="445,131,603,173"/>
-<area shape="rect" id="node4" href="$d5/da2/classproc__ace_1_1proc__handler.html#a667b277a97291e649e6b802299114b92" title="proc_ace::proc_handler\l::output_prompt" alt="" coords="225,70,383,111"/>
-<area shape="rect" id="node6" href="$d5/da2/classproc__ace_1_1proc__handler.html#a56afa205c7b25c611c332b1d815ab809" title="proc_ace::proc_handler\l::flush_stream_to_connector" alt="" coords="211,187,397,229"/>
-<area shape="rect" id="node5" href="$d5/da2/classproc__ace_1_1proc__handler.html#ac132259cfd0ce9e84cd8918f2615319e" title="proc_ace::proc_handler\l::token" alt="" coords="445,66,603,107"/>
-<area shape="rect" id="node7" href="$d5/da2/classproc__ace_1_1proc__handler.html#ae7635417ce752b67fa4f261a189f5e4f" title="proc_ace::proc_handler\l::silent" alt="" coords="445,197,603,238"/>
-</map>

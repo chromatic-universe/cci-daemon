@@ -1,9 +1,0 @@
-<map id="include/cci_daemon_kernel.h" name="include/cci_daemon_kernel.h">
-<area shape="rect" id="node2" href="$d4/d90/cci__daemon_8cpp.html" title="cci_daemon/src/cci\l_daemon.cpp" alt="" coords="361,187,495,229"/>
-<area shape="rect" id="node3" href="$de/d24/cci__daemon__engine_8cpp.html" title="cci_daemon/src/cci\l_daemon_engine.cpp" alt="" coords="206,97,351,138"/>
-<area shape="rect" id="node4" href="$dc/dfc/ps__kafka__facade_8cpp.html" title="cci_daemon/src/plugins\l/ps_kafka_facade.cpp" alt="" coords="102,187,260,229"/>
-<area shape="rect" id="node5" href="$d4/da9/cci__daemon_8h.html" title="include/cci_daemon.h" alt="" coords="501,104,648,131"/>
-<area shape="rect" id="node8" href="$d9/dbe/ps__kafka__facade_8h.html" title="include/ps_kafka_facade.h" alt="" coords="5,104,181,131"/>
-<area shape="rect" id="node6" href="$db/dbb/cci__daemon__main_8cpp.html" title="cci_daemon/src/cci\l_daemon_main.cpp" alt="" coords="519,187,653,229"/>
-<area shape="rect" id="node7" href="$d6/d44/cci__test__daemon_8h.html" title="include/cci_test_daemon.h" alt="" coords="678,195,855,221"/>
-</map>

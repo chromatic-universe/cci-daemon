@@ -1,8 +1,0 @@
-<map id="cci_daemon_impl::cci_daemon_facade::_bt" name="cci_daemon_impl::cci_daemon_facade::_bt">
-<area shape="rect" id="node2" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#a5a5b913cc36c6f088ae98dc72487f8cf" title="cci_daemon_impl::cci\l_daemon_facade::log_message" alt="" coords="203,77,410,118"/>
-<area shape="rect" id="node3" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#a0d2b58c0b864ee3d621832e7d66679c1" title="cci_daemon_impl::cci\l_daemon_facade::read\l_config_file" alt="" coords="480,4,635,60"/>
-<area shape="rect" id="node5" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#aa60c198af193939bd7a00fd61f570696" title="cci_daemon_impl::cci\l_daemon_facade::write_pid" alt="" coords="467,135,648,177"/>
-<area shape="rect" id="node6" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#a612fb889bc7777c2b505052b901faf10" title="cci_daemon_impl::cci\l_daemon_facade::remove_pid" alt="" coords="459,201,655,242"/>
-<area shape="rect" id="node7" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#a7edbd8b9f3f7abce87b6f6e84a59fed2" title="cci_daemon_impl::cci\l_daemon_facade::~cci\l_daemon_facade" alt="" coords="229,244,384,300"/>
-<area shape="rect" id="node4" href="$dd/d5b/classcci__daemon__impl_1_1cci__daemon__facade.html#af4654e5d13f2bd5b6bbcf339fe64378a" title="cci_daemon_impl::cci\l_daemon_facade::daemon\l_default_exec" alt="" coords="705,99,879,155"/>
-</map>
