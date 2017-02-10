@@ -6,7 +6,6 @@
 
 using namespace proc_ace;
 
-unsigned long g_dw_finished = 0L;
 
 //log callback
 class log_callback : public ACE_Log_Msg_Callback
@@ -39,9 +38,25 @@ class proc_signal_handler : public ACE_Event_Handler
                     switch( signum )
                     {
                         case SIGINT :
+                        case SIGTERM :
 
-                            ACE_DEBUG(( LM_INFO , "...cci-dameon-dispatcher oprotocol stack..sigint received..\n" ) );
-                            g_dw_finished = 1L;
+                            ACE_DEBUG(( LM_INFO , "...cci-dameon-dispatcher protocol stack..sigint received..\n" ) );
+
+                            //fini
+                            ACE_Thread_Manager::instance()->cancel_all();
+                            ACE_Time_Value timeout( 5 );
+                            if ( ACE_Thread_Manager::instance()->wait( &timeout , 1 ) == -1 )
+                            {
+                                  ACE_ERROR_RETURN( ( LM_ERROR , "(%t) wait() failed\n") , 1 );
+                            }
+
+                            ACE_DEBUG ((LM_DEBUG,
+                                          "(%P|%t) shutting down ::cci-dispatch-daemon::proc_ace daemon\n"));
+
+                            //unravel protocol stack
+                            ACE_DEBUG ((LM_INFO,
+                                          "(%P|%t) ...unraveling protocol stack...\n"));
+                            ACE_Service_Config::fini_svcs();
 
                             exit( 1 );
                     }
@@ -63,7 +78,7 @@ int ACE_TMAIN ( int argc , ACE_TCHAR * argv[] )
               //register signals
               proc_signal_handler* handler = new proc_signal_handler();
               ACE_Reactor::instance()->register_handler( SIGINT ,  handler );
-
+              ACE_Reactor::instance()->register_handler( SIGTERM ,  handler );
 
               ///bring up our protocpol stack
               int dw = ACE_Service_Config::open( argc , argv );
@@ -73,19 +88,6 @@ int ACE_TMAIN ( int argc , ACE_TCHAR * argv[] )
               }
               ACE_Reactor::instance()->run_reactor_event_loop();
 
-
-              /*/fini
-              ACE_Thread_Manager::instance()->cancel_all();
-              ACE_Time_Value timeout( 5 );
-              if ( ACE_Thread_Manager::instance()->wait( &timeout , 1 ) == -1 )
-              {
-                  ACE_ERROR_RETURN( ( LM_ERROR , "(%t) wait() failed\n") , 1 );
-              }
-
-               ACE_DEBUG ((LM_DEBUG,
-                          "(%P|%t) shutting down ::cci-dispatch-daemon::proc_ace daemon\n"));
-
-              */
 
               return 0;
 
