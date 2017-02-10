@@ -1,0 +1,6 @@
+<map id="include/proc.h" name="include/proc.h">
+<area shape="rect" id="node2" href="$de/d89/proc__ace__acceptor_8h.html" title="include/proc_ace_acceptor.h" alt="" coords="173,80,360,107"/>
+<area shape="rect" id="node3" href="$d8/de5/proc__ace__acceptor_8cpp.html" title="cci_daemon/src/procs\l/proc_ace_acceptor.cpp" alt="" coords="5,155,165,197"/>
+<area shape="rect" id="node4" href="$d5/d18/proc__ace__handler_8cpp.html" title="cci_daemon/src/procs\l/proc_ace_handler.cpp" alt="" coords="190,155,343,197"/>
+<area shape="rect" id="node5" href="$d6/de7/proc__ace__thread__pool_8cpp.html" title="cci_daemon/src/procs\l/proc_ace_thread_pool.cpp" alt="" coords="368,155,547,197"/>
+</map>

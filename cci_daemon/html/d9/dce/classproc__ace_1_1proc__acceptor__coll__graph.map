@@ -1,0 +1,4 @@
+<map id="proc_ace::proc_acceptor" name="proc_ace::proc_acceptor">
+<area shape="rect" id="node3" href="$de/dce/classproc__ace_1_1proc__thread__pool.html" title="{proc_ace::proc_thread_pool\n|# active_threads_\l|+ proc_thread_pool()\l+ start()\l+ stop()\l+ enqueue()\l# svc()\l}" alt="" coords="169,256,351,392"/>
+<area shape="rect" id="node5" href="$d2/dc7/classproc__ace_1_1proc__protocol__data.html" title="{proc_ace::proc_protocol_data\n|# m_dwPort\l# m_dwThreads\l|+ proc_protocol_data()\l+ ~proc_protocol_data()\l+ tag()\l+ default_host()\l+ dn()\l+ document_path()\l+ port()\l+ thread_pool_size()\l+ port()\l+ default_host()\l+ dn()\l+ document_path()\l+ thread_pool_size()\l}" alt="" coords="375,190,568,458"/>
+</map>

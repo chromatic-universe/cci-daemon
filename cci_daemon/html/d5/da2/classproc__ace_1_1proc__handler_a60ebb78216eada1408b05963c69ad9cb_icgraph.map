@@ -1,0 +1,8 @@
+<map id="proc_ace::proc_handler::command_map" name="proc_ace::proc_handler::command_map">
+<area shape="rect" id="node2" href="$d5/da2/classproc__ace_1_1proc__handler.html#a274da79ed4fe5630bdc958f90970e406" title="proc_ace::proc_handler\l::map_commands" alt="" coords="211,5,368,46"/>
+<area shape="rect" id="node4" href="$d5/da2/classproc__ace_1_1proc__handler.html#a27b25d8c5086122170cd0e33506213c1" title="proc_ace::proc_handler\l::perform" alt="" coords="211,70,368,111"/>
+<area shape="rect" id="node3" href="$d5/da2/classproc__ace_1_1proc__handler.html#adb8cd8c5171d4728c2c252d64589115c" title="proc_ace::proc_handler\l::open" alt="" coords="416,5,573,46"/>
+<area shape="rect" id="node5" href="$d5/da2/classproc__ace_1_1proc__handler.html#a640500118764cf294601917547e0e0f3" title="proc_ace::proc_handler\l::process" alt="" coords="416,70,573,111"/>
+<area shape="rect" id="node6" href="$d5/da2/classproc__ace_1_1proc__handler.html#a88d0b7d7c472a1bc36b4e71bd793d098" title="proc_ace::proc_handler\l::handle_input" alt="" coords="636,41,793,82"/>
+<area shape="rect" id="node7" href="$d5/da2/classproc__ace_1_1proc__handler.html#a5a741869fae05580594db2147b72b141" title="proc_ace::proc_handler::svc" alt="" coords="621,107,808,133"/>
+</map>

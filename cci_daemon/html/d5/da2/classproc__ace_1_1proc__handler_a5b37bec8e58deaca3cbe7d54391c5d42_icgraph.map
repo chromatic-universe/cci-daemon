@@ -1,0 +1,6 @@
+<map id="proc_ace::proc_handler::acceptor" name="proc_ace::proc_handler::acceptor">
+<area shape="rect" id="node2" href="$d5/da2/classproc__ace_1_1proc__handler.html#aea9b6e322c2a605ffa1bfe52fe712080" title="proc_ace::proc_handler\l::concurrency" alt="" coords="211,34,368,75"/>
+<area shape="rect" id="node3" href="$d5/da2/classproc__ace_1_1proc__handler.html#adb8cd8c5171d4728c2c252d64589115c" title="proc_ace::proc_handler\l::open" alt="" coords="416,5,573,46"/>
+<area shape="rect" id="node5" href="$d5/da2/classproc__ace_1_1proc__handler.html#ab85ac213ed7c3c784b94ceb3c2be1fc8" title="proc_ace::proc_handler\l::thread_pool" alt="" coords="211,99,368,141"/>
+<area shape="rect" id="node4" href="$d5/da2/classproc__ace_1_1proc__handler.html#a88d0b7d7c472a1bc36b4e71bd793d098" title="proc_ace::proc_handler\l::handle_input" alt="" coords="416,85,573,126"/>
+</map>

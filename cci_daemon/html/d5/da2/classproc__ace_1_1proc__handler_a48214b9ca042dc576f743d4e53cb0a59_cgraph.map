@@ -1,0 +1,7 @@
+<map id="proc_ace::proc_handler::handle_close" name="proc_ace::proc_handler::handle_close">
+<area shape="rect" id="node2" href="$d5/da2/classproc__ace_1_1proc__handler.html#a09206fc07f63e4b65e58f2b92fe3a8b0" title="proc_ace::proc_handler\l::stream" alt="" coords="445,5,603,46"/>
+<area shape="rect" id="node3" href="$d5/da2/classproc__ace_1_1proc__handler.html#a17057f35ce7eb2f3c080bbbb50db03fd" title="proc_ace::proc_handler\l::client_addr" alt="" coords="225,34,383,75"/>
+<area shape="rect" id="node4" href="$d5/da2/classproc__ace_1_1proc__handler.html#a56afa205c7b25c611c332b1d815ab809" title="proc_ace::proc_handler\l::flush_stream_to_connector" alt="" coords="211,99,397,141"/>
+<area shape="rect" id="node6" href="$d5/da2/classproc__ace_1_1proc__handler.html#ae3907854bfd9627628d8576df22436ea" title="proc_ace::proc_handler\l::destroy" alt="" coords="225,165,383,206"/>
+<area shape="rect" id="node5" href="$d5/da2/classproc__ace_1_1proc__handler.html#ae7635417ce752b67fa4f261a189f5e4f" title="proc_ace::proc_handler\l::silent" alt="" coords="445,99,603,141"/>
+</map>
