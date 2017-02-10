@@ -25,8 +25,7 @@ add_library(proc_ace_acceptor SHARED proc_ace_acceptor.cpp
                                      proc_ace_handler.cpp)
 
 #executable harness
-add_executable(proc-ace-harness proc_ace_acceptor.cpp
-                                proc_ace_thread_pool.cpp
+add_executable(proc-ace-harness proc_ace_thread_pool.cpp
                                 proc_ace_handler.cpp
                                 proc_ace_harness.cpp) 
 
