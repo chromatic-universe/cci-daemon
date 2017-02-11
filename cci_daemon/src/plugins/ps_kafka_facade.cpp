@@ -13,7 +13,7 @@ using namespace cci_daemon_impl;
 
 ////kaka impl
 //--------------------------------------------------------------------------
-ps_kafka_impl::ps_kafka_impl() : m_moniker { "kafka" }
+ps_kafka_impl::ps_kafka_impl() : m_moniker { "plugin:kafka" }
 {
 
 }

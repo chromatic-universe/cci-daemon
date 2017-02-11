@@ -121,10 +121,6 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
                                          -1 );
               }
 
-              //unsigned long  wait_time = 1L;
-              //auto tv =  ACE_Time_Value( wait_time );
-              //while ( ! g_dw_finished )
-              //{	ACE_Reactor::instance()->handle_events ( &tv ); }
 
 
               return 0;
