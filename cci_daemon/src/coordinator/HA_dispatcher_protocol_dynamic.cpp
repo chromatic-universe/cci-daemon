@@ -101,9 +101,6 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
                                   -1 );
               data_()->port( dispatcher_port );
 
-              //register signals
-              //proc_signal_handler* handler = new proc_signal_handler();
-              //CE_Reactor::instance()->register_handler( SIGINT ,  handler );
 
               //initialize timer
               ACE_High_Res_Timer::global_scale_factor();
