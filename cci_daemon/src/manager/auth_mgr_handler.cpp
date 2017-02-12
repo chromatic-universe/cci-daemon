@@ -1,9 +1,9 @@
 
 //proc_ace_handler.h chromatic universe 2017 william k. johnson
 
-#include <proc_ace_acceptor.h>
+#include <auth_ace_manager.h>
 
-using namespace proc_ace;
+using namespace auth_ace_manager;
 
 
 
@@ -12,7 +12,7 @@ using namespace proc_ace;
 #pragma clang diagnostic ignored "-Wconstant-logical-operand"
 
 
-using namespace proc_ace;
+using namespace auth_ace_manager;
 using std::ostringstream;
 
 using std::string;
@@ -35,23 +35,24 @@ using std::unique_ptr;
 
 
 //---------------------------------------------------------------------------------------
-proc_handler::proc_handler ( const ACE_Time_Value& max_inactivity ) :   m_proc_acceptor{ nullptr } ,
-                                                                        m_current_command{ proc_command::proc_no_command } ,
-                                                                        m_proc_packet_error{ proc_packet_error::peNoPacketError } ,
-                                                                        m_dwTimerToken{ 0 } ,
-                                                                        m_maximumTimeToWait{ max_inactivity } ,
-                                                                        m_bSilent{ false } ,
-                                                                        creator_ { ACE_Thread::self() }
+auth_mgr_handler::auth_mgr_handler ( const ACE_Time_Value& max_inactivity ) :   m_auth_mgr_acceptor{ nullptr } ,
+                                                                                m_auth_packet_error{ auth_packet_error::peNoPacketError } ,
+                                                                                m_dw_timer_token{ 0 } ,
+                                                                                m_maximum_time_to_wait{ max_inactivity } ,
+                                                                                m_str_computer_name { "" } ,
+                                                                                m_str_command { "" } ,
+                                                                                m_current_command { auth_command::auth_no_command } ,
+                                                                                m_str_token { "" } ,
+                                                                                creator_ { ACE_Thread::self() }
 {
 
-              ACE_Trace _( ACE_TEXT( "proc_handler::proc_handler" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::auth_mgr_handler" ) , __LINE__ );
 
               try
               {
                   char hostname[1024];
                   gethostname( hostname , 1023 );
-                  m_strComputerName = hostname;
-                  m_currentState.insert( proc_state::oesNonAuthenticated );
+                  m_str_computer_name = hostname;
               }
               catch( ... )
 
@@ -59,29 +60,28 @@ proc_handler::proc_handler ( const ACE_Time_Value& max_inactivity ) :   m_proc_a
                  //
               }
 
-              m_set_map.insert( make_pair( proc_set_param::ospPrompt , true ) );
 }
 
 //---------------------------------------------------------------------------------------
-proc_handler::~proc_handler ()
+auth_mgr_handler::~auth_mgr_handler ()
 {
-            ACE_Trace _( ACE_TEXT( "proc_handler::~proc_handler" ) , __LINE__ );
+            ACE_Trace _( ACE_TEXT( "auth_mgr_handler::~auth_mgr_handler" ) , __LINE__ );
 
             peer().close();
 }
 
 //---------------------------------------------------------------------------------------
-concurrency_t proc_handler::concurrency()
+concurrency_t auth_mgr_handler::concurrency()
 {           return ( acceptor()->concurrency () );}
 
 //---------------------------------------------------------------------------------------
-proc_thread_pool_ptr proc_handler::thread_pool()
+auth_mgr_thread_pool_ptr auth_mgr_handler::thread_pool()
 {           return ( acceptor()->thread_pool () ); }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::destroy ()
+void auth_mgr_handler::destroy ()
 {
-           ACE_Trace _( ACE_TEXT( "proc_handler::destroy" ) , __LINE__ );
+           ACE_Trace _( ACE_TEXT( "auth_mgr_handler::destroy" ) , __LINE__ );
            reactor()->remove_handler ( this, REMOVE_MASK );
 
 
@@ -90,11 +90,11 @@ void proc_handler::destroy ()
 
 
 //---------------------------------------------------------------------------------------
-void  proc_handler::output_boiler_plate( string str_concurrency )
+void  auth_mgr_handler::output_boiler_plate( string str_concurrency )
 {
 
 
-              stream() << "* OK cci-dispatch daemon speaking.... "
+              stream() << "* OK authentication manager speaking.... "
                        << computer_name()
                        << " chromatic universe 2017 all rights reserved  ready";
               stream() << crlf;
@@ -105,7 +105,7 @@ void  proc_handler::output_boiler_plate( string str_concurrency )
 }
 
 //---------------------------------------------------------------------------------------
-string proc_handler::output_prompt( bool btoken )
+string auth_mgr_handler::output_prompt( bool btoken )
 {
 
               ostringstream ostr;
@@ -121,10 +121,10 @@ string proc_handler::output_prompt( bool btoken )
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::map_commands()
+void auth_mgr_handler::map_commands()
 {
 
-            command_map().insert( std::pair<string , ptr_to_function> ( "login", &proc_handler::on_login ) );
+            command_map().insert( std::pair<string , ptr_to_function> ( "login", &auth_mgr_handler::on_login ) );
             /*command_map().insert( std::pair<string , ptrToFunction> ( "logout", &chromatic_handler::on_logout ) );
             command_map().insert( std::pair<string , ptrToFunction> ( "create", &chromatic_handler::on_create ) );
             command_map().insert( std::pair<string , ptrToFunction> ( "select", &chromatic_handler::on_select ) );
@@ -152,16 +152,9 @@ void proc_handler::map_commands()
 }
 
 //---------------------------------------------------------------------------------------
-void  proc_handler::flush_stream_to_connector()
+void  auth_mgr_handler::flush_stream_to_connector()
 {
-            ACE_Trace _( ACE_TEXT( "proc_handler::flush_stream_to_connector" ) , __LINE__ );
-
-            if( silent() == true )
-            {
-                stream().str( "" );
-
-                return;
-            }
+            ACE_Trace _( ACE_TEXT( "auth_mgr_handler::flush_stream_to_connector" ) , __LINE__ );
 
             ACE_Time_Value timeout( 2 );
             size_t bytes_sent;
@@ -172,14 +165,8 @@ void  proc_handler::flush_stream_to_connector()
 }
 
 //---------------------------------------------------------------------------------------
-void  proc_handler::flush_binary_stream_to_connector( unsigned char* u_buffer , unsigned long dwLen )
+void  auth_mgr_handler::flush_binary_stream_to_connector( unsigned char* u_buffer , unsigned long dwLen )
 {
-            if( silent() == true )
-            {
-                stream().str( "" );
-
-                return;
-            }
 
             ACE_Time_Value timeout( 5 );
 
@@ -187,7 +174,7 @@ void  proc_handler::flush_binary_stream_to_connector( unsigned char* u_buffer , 
 }
 
 //---------------------------------------------------------------------------------------
-string proc_handler::client_addr()
+string auth_mgr_handler::client_addr()
 {
             ACE_INET_Addr addr;
             char addrstr[MAXHOSTNAMELEN + 1];
@@ -202,25 +189,23 @@ string proc_handler::client_addr()
 
 
 //---------------------------------------------------------------------------------------
-int proc_handler::open ( void* accept )
+int auth_mgr_handler::open ( void* accept )
 {
 
-              ACE_Trace _( ACE_TEXT( "proc_handler::open" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::open" ) , __LINE__ );
               output_boiler_plate();
 
               map_commands();
-              silent( false );
-
-              acceptor ( ( proc_acceptor_ptr) accept);
+              acceptor ( (auth_mgr_acceptor_ptr) accept);
 
               string strConcurrency;
 
               //check for timeout every 30 seconds
-              ACE_Time_Value reschedule( m_maximumTimeToWait.sec() / 60 );
+              ACE_Time_Value reschedule( m_maximum_time_to_wait.sec() / 60 );
 
-              m_dwTimerToken = reactor()->schedule_timer( this ,
+              m_dw_timer_token = reactor()->schedule_timer( this ,
                                                           (void*) timer_id ,
-                                                          m_maximumTimeToWait ,
+                                                          m_maximum_time_to_wait ,
                                                           reschedule );
 
               if ( concurrency () == concurrency_t::thread_per_connection_ )
@@ -252,9 +237,9 @@ int proc_handler::open ( void* accept )
 }
 
 //---------------------------------------------------------------------------------------
-int proc_handler::close(u_long flags)
+int auth_mgr_handler::close(u_long flags)
 {
-              ACE_Trace _( ACE_TEXT( "proc_handler::closed" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::closed" ) , __LINE__ );
               ACE_UNUSED_ARG( flags );
 
 
@@ -264,13 +249,13 @@ int proc_handler::close(u_long flags)
 }
 
 //----------------------------------------------------------------------------------------
-int proc_handler::handle_input (ACE_HANDLE handle)
+int auth_mgr_handler::handle_input (ACE_HANDLE handle)
 {
-              ACE_Trace _( ACE_TEXT( "proc_handler::handle_input" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::handle_input" ) , __LINE__ );
 
               ACE_UNUSED_ARG ( handle );
 
-              m_lastActivityTime = reactor()->timer_queue()->gettimeofday();
+              m_last_activity_time = reactor()->timer_queue()->gettimeofday();
 
               if ( concurrency () ==  concurrency_t::thread_pool_ )
               {
@@ -298,17 +283,17 @@ int proc_handler::handle_input (ACE_HANDLE handle)
 }
 
 //----------------------------------------------------------------------------------------
-int proc_handler::handle_close( ACE_HANDLE handle,
+int auth_mgr_handler::handle_close( ACE_HANDLE handle,
                                  ACE_Reactor_Mask mask )
 {
-              ACE_Trace _( ACE_TEXT( "proc_handler::handle_close" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::handle_close" ) , __LINE__ );
 
               ACE_UNUSED_ARG (handle);
               ACE_UNUSED_ARG (mask);
 
               stream() << " * goodbye "
                        << client_addr()
-                       << "......chromatic unvierse cci-daemon-dispatcher" << crlf;
+                       << "......chromatic auth-manager..." << crlf;
               flush_stream_to_connector();
 
               this->destroy ();
@@ -316,14 +301,14 @@ int proc_handler::handle_close( ACE_HANDLE handle,
 }
 
 //----------------------------------------------------------------------------------------
-int proc_handler::handle_timeout( const ACE_Time_Value& now , const void* act )
+int auth_mgr_handler::handle_timeout( const ACE_Time_Value& now , const void* act )
 {
-                ACE_Trace _( ACE_TEXT( "proc_handler::handle_timeout" ) , __LINE__ );
+                ACE_Trace _( ACE_TEXT( "auth_mgr_handler::handle_timeout" ) , __LINE__ );
 
                 short unsigned int* sui = (short unsigned int*) act;
                 if( *sui == (short unsigned int) timer_id )
                 {
-                    if( ( now - m_lastActivityTime ) >= m_maximumTimeToWait )
+                    if( ( now - m_last_activity_time ) >= m_maximum_time_to_wait )
                     {
                         cout << client_addr() << " timed out" << endl;
                         stream() <<  " autologout; idle for too long" << crlf;
@@ -338,9 +323,9 @@ int proc_handler::handle_timeout( const ACE_Time_Value& now , const void* act )
 }
 
 //---------------------------------------------------------------------------------------
-int proc_handler::svc()
+int auth_mgr_handler::svc()
 {
-              ACE_Trace _( ACE_TEXT( "proc_handler::svc" ) , __LINE__ );
+              ACE_Trace _( ACE_TEXT( "auth_mgr_handler::svc" ) , __LINE__ );
 
               char buf[BUFSIZ];
 
@@ -354,6 +339,7 @@ int proc_handler::svc()
 
                   }
                   milliseconds dura( 50 );
+
                   std::this_thread::sleep_for( dura );
                 }
 
@@ -361,7 +347,7 @@ int proc_handler::svc()
 }
 
 //--------------------------------------------------------------------------------------
-int proc_handler::process ( char *rdbuf ,  int rdbuf_len )
+int auth_mgr_handler::process ( char *rdbuf ,  int rdbuf_len )
 {
 
               //process request
@@ -374,7 +360,7 @@ int proc_handler::process ( char *rdbuf ,  int rdbuf_len )
               //we'll only wait this
               ACE_Time_Value timeout( 50 );
               memset( (void*) rdbuf , '\0' , rdbuf_len );
-              error_packet( proc_packet_error::peNoPacketError );
+              error_packet( auth_packet_error::peNoPacketError );
 
               //read buffer
               while ( ( bytes_read = peer().recv ( rdbuf, rdbuf_len , &timeout) ) > 0 )
@@ -423,10 +409,10 @@ int proc_handler::process ( char *rdbuf ,  int rdbuf_len )
                        }
 
                        //logout
-                       if( command() != proc_command::proc_logout )
+                       if( command() != auth_command::auth_logout )
                        {
                             //fini
-                            if( error_packet() != proc_packet_error::peNoPacketError )
+                            if( error_packet() != auth_packet_error::peNoPacketError )
                             {
                                 format_packet_error( error_packet() );
 
@@ -459,12 +445,12 @@ int proc_handler::process ( char *rdbuf ,  int rdbuf_len )
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::perform( const string& str )
+void auth_mgr_handler::perform( const string& str )
 {
 
             if( str.empty() )
             {
-                error_packet( proc_packet_error::peInvalidPayload );
+                error_packet( auth_packet_error::peInvalidPayload );
 
                 return;
             }
@@ -474,13 +460,13 @@ void proc_handler::perform( const string& str )
 
             //parse the packet
             parse_command( str , PartsMap , uscommands );
-            if( error_packet() != proc_packet_error::peNoPacketError )
+            if( error_packet() != auth_packet_error::peNoPacketError )
             {
                 return;
             }
 
             //call the required function
-            map_of_parts::iterator pIter = PartsMap.find( proc_packet_part::ppCommand );
+            map_of_parts::iterator pIter = PartsMap.find( auth_packet_part::ppCommand );
             if( pIter != PartsMap.end() )
             {
                 string strcommand( pIter->second );
@@ -489,12 +475,12 @@ void proc_handler::perform( const string& str )
                 map_of_commands::iterator c_iter = command_map().find( strcommand );
                 if( c_iter  == command_map().end() )
                 {
-                    error_packet( proc_packet_error::peUnrecognizedCommand );
+                    error_packet( auth_packet_error::peUnrecognizedCommand );
 
                     return;
                 }
 
-                proc_handler::ptr_to_function ptr_func = c_iter->second;
+                auth_mgr_handler::ptr_to_function ptr_func = c_iter->second;
                 if( ptr_func == NULL )
                 {
                     stream() << output_prompt( false );
@@ -505,13 +491,13 @@ void proc_handler::perform( const string& str )
                 }
 
                 //params
-                pIter = PartsMap.find( proc_packet_part::ppPayload );
+                pIter = PartsMap.find( auth_packet_part::ppPayload );
                 string strPayload;
 
                 pIter != PartsMap.end() ? strPayload = pIter->second : strPayload = "";
                 int	lRetVal = ( this->*ptr_func ) ( strPayload );
 
-                if( ( lRetVal != 0 ) || ( command() == proc_command::proc_error ) )
+                if( ( lRetVal != 0 ) || ( command() == auth_command::auth_error ) )
                 {
                     return;
                 }
@@ -526,35 +512,35 @@ void proc_handler::perform( const string& str )
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::format_packet_error( proc_packet_error pe )
+void auth_mgr_handler::format_packet_error( auth_packet_error pe )
 {
 
-            command( proc_command::proc_error );
+            command( auth_command::auth_error );
             stream() << output_prompt();
 
             stream() << " NO ";
 
-            if( pe == proc_packet_error::peNoToken ) stream() << "no token supplied - expected";
-            else if( pe == proc_packet_error::peTokenTooLong) stream() << "token too long";
-            else if( pe == proc_packet_error::peNoCommand ) stream() << "no command supplied - expected";
-            else if( pe == proc_packet_error::peCommandTooLong ) stream() << "buffer to large";
-            else if( pe == proc_packet_error::peTooManyParameters ) stream() << "too many parameters supplied";
-            else if( pe == proc_packet_error::peInvalidPayload ) stream() << "invalid buffer";
-            else if( pe == proc_packet_error::peInvalidSyntax ) stream() << "invalid syntax";
-            else if( pe == proc_packet_error::peUnrecognizedCommand ) stream() << "command unrecognized";
-            else if( pe == proc_packet_error::peSelectState ) stream() << " a target must be selected before a query";
-            else if( pe == proc_packet_error::peTooFewParameters ) stream() << " too few parameters - more";
-            else if( pe == proc_packet_error::peNoParametersExpectedGotSome ) stream() << " no parameters expected - got some";
-            else if( pe == proc_packet_error::peParametersExpectedGotNone ) stream() << "parameters expected - got none";
-            else if( pe == proc_packet_error::peFailure ) stream() << "a server operation within this context failed";
-            else if( pe == proc_packet_error::peInvalidObject ) stream() << "object does not exist";
-            else if( pe == proc_packet_error::peInvalidSpecification ) stream() << "invalid specification";
-            else if( pe == proc_packet_error::peNoSpecification ) stream() << "no specification";
-            else if( pe == proc_packet_error::peInvalidState ) stream() << "invalid state";
-            else if( pe == proc_packet_error::peAttributeNotSupported ) stream() << "attribute not supported";
-            else if( pe == proc_packet_error::peNotAuthenticated ) stream() << "please login";
-            else if( pe == proc_packet_error::peAlreadyAuthenticated ) stream() << "already logged in";
-            else if( pe == proc_packet_error::peNotEnoughPrivileges ) stream() << "not enough privileges";
+            if( pe == auth_packet_error::peNoToken ) stream() << "no token supplied - expected";
+            else if( pe == auth_packet_error::peTokenTooLong) stream() << "token too long";
+            else if( pe == auth_packet_error::peNoCommand ) stream() << "no command supplied - expected";
+            else if( pe == auth_packet_error::peCommandTooLong ) stream() << "buffer to large";
+            else if( pe == auth_packet_error::peTooManyParameters ) stream() << "too many parameters supplied";
+            else if( pe == auth_packet_error::peInvalidPayload ) stream() << "invalid buffer";
+            else if( pe == auth_packet_error::peInvalidSyntax ) stream() << "invalid syntax";
+            else if( pe == auth_packet_error::peUnrecognizedCommand ) stream() << "command unrecognized";
+            else if( pe == auth_packet_error::peSelectState ) stream() << " a target must be selected before a query";
+            else if( pe == auth_packet_error::peTooFewParameters ) stream() << " too few parameters - more";
+            else if( pe == auth_packet_error::peNoParametersExpectedGotSome ) stream() << " no parameters expected - got some";
+            else if( pe == auth_packet_error::peParametersExpectedGotNone ) stream() << "parameters expected - got none";
+            else if( pe == auth_packet_error::peFailure ) stream() << "a server operation within this context failed";
+            else if( pe == auth_packet_error::peInvalidObject ) stream() << "object does not exist";
+            else if( pe == auth_packet_error::peInvalidSpecification ) stream() << "invalid specification";
+            else if( pe == auth_packet_error::peNoSpecification ) stream() << "no specification";
+            else if( pe == auth_packet_error::peInvalidState ) stream() << "invalid state";
+            else if( pe == auth_packet_error::peAttributeNotSupported ) stream() << "attribute not supported";
+            else if( pe == auth_packet_error::peNotAuthenticated ) stream() << "please login";
+            else if( pe == auth_packet_error::peAlreadyAuthenticated ) stream() << "already logged in";
+            else if( pe == auth_packet_error::peNotEnoughPrivileges ) stream() << "not enough privileges";
 
 
             stream() << crlf;
@@ -564,12 +550,12 @@ void proc_handler::format_packet_error( proc_packet_error pe )
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::stream_out( const std::string& str )
+void auth_mgr_handler::stream_out( const std::string& str )
 {
 	        stream() << str;
 }
 
-void proc_handler::stream_out( const byte_ptr& ptrBytes ,  unsigned long len )
+void auth_mgr_handler::stream_out( const byte_ptr& ptrBytes ,  unsigned long len )
 {
 
 	        //todo
@@ -577,13 +563,13 @@ void proc_handler::stream_out( const byte_ptr& ptrBytes ,  unsigned long len )
 }
 
 //----------------------------------------------------------------------------------------
-void proc_handler::stream_out( const std::string& str , unsigned long len )
+void auth_mgr_handler::stream_out( const std::string& str , unsigned long len )
 {
 	        stream() << str.substr( 0 , len );
 }
 
 //----------------------------------------------------------------------------------------
-void proc_handler::flush_immediate( const string& atom )
+void auth_mgr_handler::flush_immediate( const string& atom )
 {
             stream() << atom;
 
@@ -593,13 +579,13 @@ void proc_handler::flush_immediate( const string& atom )
 
 
 //---------------------------------------------------------------------------------------
-void proc_handler::parse_command( const  string& packet ,
+void auth_mgr_handler::parse_command( const  string& packet ,
 								  map_of_parts& parts ,
 								  unsigned short& uscommandParamCount )
 {
             if( packet.empty() )
             {
-                error_packet( proc_packet_error::peInvalidSyntax );
+                error_packet( auth_packet_error::peInvalidSyntax );
 
                 return;
             }
@@ -620,12 +606,12 @@ void proc_handler::parse_command( const  string& packet ,
                 strtoken = str.substr( 0 , idx );
                 if( strtoken.size() > constMaxTokenLength )
                 {
-                    error_packet( proc_packet_error::peTokenTooLong );
+                    error_packet( auth_packet_error::peTokenTooLong );
 
                     return;
                 }
 
-                parts.insert( make_pair( proc_packet_part::ppToken , strtoken ) );
+                parts.insert( make_pair( auth_packet_part::ppToken , strtoken ) );
                 token( strtoken );
 
                 //truncate
@@ -633,7 +619,7 @@ void proc_handler::parse_command( const  string& packet ,
                 str = str.substr( idx );
                 if( str.size() == 0 )
                 {
-                    error_packet( proc_packet_error::peInvalidSyntax );
+                    error_packet( auth_packet_error::peInvalidSyntax );
 
                     return;
                 }
@@ -649,7 +635,7 @@ void proc_handler::parse_command( const  string& packet ,
                     rtrimlast( strcommand , "\n" );
                     command_str( strcommand );
 
-                    parts.insert( make_pair( proc_packet_part::ppCommand , strcommand ) );
+                    parts.insert( make_pair( auth_packet_part::ppCommand , strcommand ) );
                 }
                 else
                 {
@@ -662,66 +648,46 @@ void proc_handler::parse_command( const  string& packet ,
                     idx++;
                     str = str.substr( idx );
 
-                    parts.insert( make_pair( proc_packet_part::ppCommand , strcommand ) );
+                    parts.insert( make_pair( auth_packet_part::ppCommand , strcommand ) );
                     chomp( str , "\n" );
-                    parts.insert( make_pair( proc_packet_part::ppPayload , str ) );
+                    parts.insert( make_pair( auth_packet_part::ppPayload , str ) );
                 }
             }
             else
             {
-                error_packet( proc_packet_error::peNoCommand );
+                error_packet( auth_packet_error::peNoCommand );
 
                 return;
             }
 
-            error_packet( proc_packet_error::peNoPacketError );
+            error_packet( auth_packet_error::peNoPacketError );
 
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::output_ok_response( const string& ack )
+void auth_mgr_handler::output_ok_response( const string& ack )
 {
 	        stream() << token() << " " << "OK " << ack << crlf;
 }
 
+
+//demultiplex handlers
 //---------------------------------------------------------------------------------------
-bool proc_handler::check_connection_state( proc_state state )
+int auth_mgr_handler::on_login( const string& params )
 {
-            bool bRet = false;
+        ACE_Trace _( ACE_TEXT( "auth_mgr_handler::on_login" ) , __LINE__ );
 
-            current_state::iterator iter = m_currentState.find( state );
-            iter == m_currentState.end() ? bRet = false  : bRet = true;
+         command( auth_command::auth_login );
 
-            return ( bRet );
+
+
+
+	    return ( 0 );
 }
 
+//string handlers
 //---------------------------------------------------------------------------------------
-void proc_handler::update_connection_state( proc_set_op op , proc_state state )
-{
-            switch( op )
-            {
-                case proc_set_op::osopAdd:
-                    m_currentState.insert( state );
-                    break;
-                case proc_set_op::osopDelete:
-                    m_currentState.erase( state );
-                    break;
-                case proc_set_op::osopClear:
-                    m_currentState.clear();
-                    break;
-            }
-}
-
-
-//---------------------------------------------------------------------------------------
-void proc_handler::output_no_response( const string& nack )
-{
-	        stream() << token() << " " << "NO " << nack << crlf;
-	        command_str( "" );
-}
-
-//---------------------------------------------------------------------------------------
-void proc_handler::chomp( string& str , const string& token )
+void auth_mgr_handler::chomp( string& str , const string& token )
 {
             string strTemp( str );
 
@@ -739,20 +705,27 @@ void proc_handler::chomp( string& str , const string& token )
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::gnaw( string& str , const string& token )
+string auth_mgr_handler::lcase( const string& str )
 {
-            string::size_type st;
+            string localstr( str );
 
-            st = str.find( token , 0 );
-
-            if( st != string::npos )
+            if( localstr.empty() )
             {
-                str.resize( st );
+                return( "" );
             }
+
+            string::iterator iter = localstr.begin();
+            while ( iter != localstr.end() )
+            {
+                *iter = tolower( *iter );
+                iter++;
+            }
+
+            return ( localstr );
 }
 
 //---------------------------------------------------------------------------------------
-void proc_handler::rtrimlast( string& str , const string& token )
+void auth_mgr_handler::rtrimlast( string& str , const string& token )
 {
             if ( str.empty() )
             {
@@ -773,150 +746,7 @@ void proc_handler::rtrimlast( string& str , const string& token )
             }
 }
 
-//---------------------------------------------------------------------------------------
-string proc_handler::ltrim( const string &szToTrim, const string& szTrimChars )
-{
-            string szToReturn = szToTrim;
 
-            while( strchr( szTrimChars.c_str(), szToReturn[0] ) != NULL )
-            {
-                if( szToReturn.length() < 1 )
-                {
-                    return ( "" );
-                }
-
-                szToReturn.replace( 0, 1, "" );
-            }
-
-            return szToReturn;
-}
-
-//---------------------------------------------------------------------------------------
-string proc_handler::rtrim( const string &szToTrim, const string& szTrimChars )
-{
-            string szToReturn = szToTrim;
-
-            int nLastPos = szToReturn.length() - 1;
-
-            if( nLastPos <= 0 )
-            {
-                return ( "" );
-            }
-
-            while( strchr( szTrimChars.c_str(), szToReturn[nLastPos] ) != NULL )
-            {
-                szToReturn.replace( nLastPos, 1, "" );
-
-                nLastPos = szToReturn.length() - 1;
-
-                if( nLastPos <= 0 )
-                {
-                    return ( "" );
-                }
-            }
-
-            return szToReturn;
-}
-
-//---------------------------------------------------------------------------------------
-string proc_handler::lcase( const string& str )
-{
-            string localstr( str );
-
-            if( localstr.empty() )
-            {
-                return( "" );
-            }
-
-            string::iterator iter = localstr.begin();
-            while ( iter != localstr.end() )
-            {
-                *iter = tolower( *iter );
-                iter++;
-            }
-
-            return ( localstr );
-}
-
-
-//---------------------------------------------------------------------------------------
-string proc_handler::ucase( const string& str )
-{
-            string localstr( str );
-
-            if( localstr.empty() )
-            {
-                return( "" );
-            }
-
-            string::iterator iter = localstr.begin();
-            while ( iter != localstr.end() )
-            {
-                *iter = toupper( *iter );
-                iter++;
-            }
-
-            return ( localstr );
-}
-
-//---------------------------------------------------------------------------------------
-string proc_handler::extract_quoted_string( const string& str )
-{
-           string s( str );
-           if( s.empty() )
-           {
-               return ( s );
-           }
-
-           string::size_type idx = s.find_first_of( "\"" );
-           if( idx != string::npos )
-           {
-                s.erase( idx , 1 );
-                idx = s.find_last_of( "\"" );
-                if( idx != string::npos )
-                {
-                    s.erase( idx , 1 );
-                }
-           }
-
-
-           return ( s );
-
-}
-
-
-
-//demultiplex handlers
-//---------------------------------------------------------------------------------------
-int proc_handler::on_login( const string& params )
-{
-        ACE_Trace _( ACE_TEXT( "chromatic_handler::on_login" ) , __LINE__ );
-
-        command( proc_command::proc_login );
-
-        if( check_connection_state( proc_state::oesAuthenticated ) == true )
-        {
-            error_packet( proc_packet_error::peAlreadyAuthenticated );
-
-            return ( 0 );
-        }
-
-        ostringstream ostr;
-
-        //todo
-        bool bRet = true;// context_ptr()->on_login( params , ostr.str() , stream() );
-        if( bRet == true )
-        {
-            update_connection_state( proc_set_op::osopAdd , proc_state::oesAuthenticated );
-            output_ok_response( "login completed" );
-        }
-        else
-        {
-            output_no_response( "login failed" );
-        }
-
-	return ( 0 );
-}
 
 
 

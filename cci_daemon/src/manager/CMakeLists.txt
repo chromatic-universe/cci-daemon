@@ -13,25 +13,20 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
                  $ENV{DEV}/lib/cci)
 
 #library
-if(WITH_ACE_COORDINATOR)
-    add_library(cci_daemon_bootstrap SHARED cci_daemon_bootstrap.cpp)
-    add_library(HA_proc_ace_acceptor SHARED  HA_dispatcher_protocol_dynamic.cpp)
+if(WITH_ACE_AUTH)
+    
+    add_library(HA_auth_mgr_acceptor SHARED  HA_manager_protocol_dynamic.cpp 
+                                            auth_mgr_acceptor.cpp
+                                            auth_mgr_handler.cpp
+                                            auth_mgr_thread_pool.cpp)
 
     #link libs
-    target_link_libraries(cci_daemon_bootstrap -lstdc++ 
+    target_link_libraries(HA_auth_mgr_acceptor -lstdc++ 
                                                -lpthread 
                                                -ldl
-                                               -lcci_expansion
                                                -lACE)
-    target_link_libraries(HA_proc_ace_acceptor -lstdc++ 
-                                               -lpthread 
-                                               -ldl
-                                               -lproc_ace_acceptor
-                                               -lACE)
-
 
     #install
-    install_targets( /lib/cci cci_daemon_bootstrap)
-    install_targets( /lib/cci HA_proc_ace_acceptor)
+    install_targets( /lib/cci HA_auth_mgr_acceptor)
 endif()
 

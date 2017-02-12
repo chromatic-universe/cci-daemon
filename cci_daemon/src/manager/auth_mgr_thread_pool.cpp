@@ -1,9 +1,6 @@
-//proc_thread_pool.cpp  william k. johnson 2017
+//auth_mgr_thread_pool.cpp  william k. johnson 2017
 
-#include <proc_ace_acceptor.h>
-
-using namespace proc_ace;
-
+#include <auth_ace_manager.h>
 
 
 //suppress from adaptive communication environment
@@ -11,24 +8,25 @@ using namespace proc_ace;
 #pragma clang diagnostic ignored "-Wconstant-logical-operand"
 
 
-using namespace proc_ace;
+using namespace auth_ace_manager;
+
 using std::ostringstream;
 
 //----------------------------------------------------------------------------------------------------------------------------
-proc_thread_pool::proc_thread_pool (void)
+auth_mgr_thread_pool::auth_mgr_thread_pool (void)
   : active_threads_ ( 0L )
 {
 	//
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
-int proc_thread_pool::start ( int pool_size )
+int auth_mgr_thread_pool::start ( int pool_size )
 {
         return this->activate ( THR_NEW_LWP | THR_DETACHED , pool_size );
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
-int proc_thread_pool::stop ( void )
+int auth_mgr_thread_pool::stop ( void )
 {
 
       int counter = active_threads_.value ();
@@ -47,7 +45,7 @@ int proc_thread_pool::stop ( void )
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
-int proc_thread_pool::enqueue (ACE_Event_Handler *handler)
+int auth_mgr_thread_pool::enqueue (ACE_Event_Handler *handler)
 {
 
       void *v_data = (void *) handler;
@@ -69,7 +67,7 @@ int proc_thread_pool::enqueue (ACE_Event_Handler *handler)
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
-int proc_thread_pool::svc ( void )
+int auth_mgr_thread_pool::svc ( void )
 {
 
 
@@ -83,12 +81,12 @@ int proc_thread_pool::svc ( void )
           return ( 0L );
       }
 
-      proc_counter_guard counter_guard ( active_threads_ );
+      auth_mgr_counter_guard counter_guard ( active_threads_ );
 
       while (this->getq ( mb) != -1 )
       {
 
-          proc_message_block_guard message_block_guard ( mb );
+          auth_mgr_message_block_guard message_block_guard ( mb );
           char *c_data = mb->base ();
 
           if ( c_data )

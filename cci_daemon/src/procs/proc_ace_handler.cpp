@@ -3,9 +3,6 @@
 
 #include <proc_ace_acceptor.h>
 
-using namespace proc_ace;
-
-
 
 //suppress from adaptive communication environment
 #pragma clang diagnostic ignored "-Wself-assign"

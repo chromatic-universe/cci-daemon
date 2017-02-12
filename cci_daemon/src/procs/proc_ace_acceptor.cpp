@@ -15,54 +15,54 @@ using std::ostringstream;
  }
 
  //----------------------------------------------------------------------------------------------------------------------------
-  proc_acceptor::proc_acceptor ( proc_thread_pool &thread_pool ) : concurrency_ { concurrency_t::thread_pool_ },
-		    																	  the_thread_pool_ ( thread_pool ) ,
-		    																	  m_instance_data{ nullptr }
-  {
-	  	  ACE_Trace _( ACE_TEXT( "proc_acceptor::proc_acceptor ( proc_thread_pool &thread_pool)" ) , __LINE__ );
-  }
+proc_acceptor::proc_acceptor ( proc_thread_pool &thread_pool ) : concurrency_ { concurrency_t::thread_pool_ },
+                                                                              the_thread_pool_ ( thread_pool ) ,
+                                                                              m_instance_data{ nullptr }
+{
+      ACE_Trace _( ACE_TEXT( "proc_acceptor::proc_acceptor ( proc_thread_pool &thread_pool)" ) , __LINE__ );
+}
 
-  //----------------------------------------------------------------------------------------------------------------------------
-   proc_acceptor::~proc_acceptor ( void )
-   {
-	   	   ACE_Trace _( ACE_TEXT( "proc_acceptor::~proc_acceptor ( void )" ) , __LINE__ );
+//----------------------------------------------------------------------------------------------------------------------------
+proc_acceptor::~proc_acceptor ( void )
+{
+       ACE_Trace _( ACE_TEXT( "proc_acceptor::~proc_acceptor ( void )" ) , __LINE__ );
 
-		   if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private () )
-		   {
-			  thread_pool ()->close ();
-		   }
-   }
+       if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private () )
+       {
+          thread_pool ()->close ();
+       }
+}
 
-   //----------------------------------------------------------------------------------------------------------------------------
-    int proc_acceptor::open (	const ACE_INET_Addr &addr,
-								ACE_Reactor *reactor,
-								protocol_data_ptr instance_data ,
-								int pool_size )
-    {
-    	  ACE_Trace _( ACE_TEXT( "int proc_acceptor::open" ) , __LINE__ );
+//----------------------------------------------------------------------------------------------------------------------------
+int proc_acceptor::open (	const ACE_INET_Addr &addr,
+                            ACE_Reactor *reactor,
+                            protocol_data_ptr instance_data ,
+                            int pool_size )
+{
+      ACE_Trace _( ACE_TEXT( "int proc_acceptor::open" ) , __LINE__ );
 
-    	  data( instance_data );
+      data( instance_data );
 
-    	  if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private() )
-    	  {
-    	    thread_pool()->start( pool_size );
-    	  }
+      if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private() )
+      {
+        thread_pool()->start( pool_size );
+      }
 
-    	  return inherited::open ( addr , reactor );
-    }
+      return inherited::open ( addr , reactor );
+}
 
-    //----------------------------------------------------------------------------------------------------------------------------
-    int proc_acceptor::close ( void )
-    {
-    	ACE_Trace _( ACE_TEXT( "proc_acceptor::close" ) , __LINE__ );
+//----------------------------------------------------------------------------------------------------------------------------
+int proc_acceptor::close ( void )
+{
+    ACE_Trace _( ACE_TEXT( "proc_acceptor::close" ) , __LINE__ );
 
-    	if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private () )
-    	  {
-    	    thread_pool ()->stop();
-    	  }
+    if ( concurrency() == concurrency_t::thread_pool_ && thread_pool_is_private () )
+      {
+        thread_pool ()->stop();
+      }
 
-    	  return inherited::close();
-    }
+      return inherited::close();
+}
 
 
 

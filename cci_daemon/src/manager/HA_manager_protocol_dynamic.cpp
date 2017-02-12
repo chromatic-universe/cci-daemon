@@ -1,11 +1,10 @@
-//HA_dispatcher_protocol_dynamic.cpp   chromatic universe william k. johnson 2017
+//HA_manager_protocol_dynamic.cpp   chromatic universe william k. johnson 2017
 
-#include <HA_dispatcher_protocol_dynamic.h>
+#include <HA_manager_protocol_dynamic.h>
 
 
 
-static std::string conf_path { "/etc/chromatic-universe/ha_proc_ace_acceptor.ini" };
-unsigned long g_dw_finished = 0L;
+static std::string conf_path { "/etc/chromatic-universe/ha_mgr_ace_acceptor.ini" };
 
 
 //signal handles
@@ -21,14 +20,13 @@ class proc_signal_handler : public ACE_Event_Handler
                                     ucontext_t * = 0 )
                 {
 
-    	            ACE_Trace _( ACE_TEXT( "proc_signal_handler..HA_proc_ace_acceptor.." ) , __LINE__ );
+    	            ACE_Trace _( ACE_TEXT( "proc_signal_handler..HA_auth_mgr_acceptor.." ) , __LINE__ );
 
                     switch( signum )
                     {
                         case SIGINT :
 
                             ACE_DEBUG(( LM_INFO , "...sigint received...\n" ) );
-                            g_dw_finished = 1L;
 
                             break;
                     }
@@ -38,10 +36,10 @@ class proc_signal_handler : public ACE_Event_Handler
 };
 
 //---------------------------------------------------------------------------------------------
-int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
+int HA_auth_mgr_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 {
 
-               ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
+               ACE_Trace _( ACE_TEXT( "HA_auth_mgr_acceptor::init" ) , __LINE__ );
 
               //command line
               //-------------------------------------------------------------------------------
@@ -83,12 +81,12 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 
               ACE_Configuration_Section_Key dispatcher_section;
               if (config.open_section (config.root_section (),
-                                       ACE_TEXT ( "HA_proc_ace_acceptor" ),
+                                       ACE_TEXT ( "HA_auth_mgr_acceptor" ),
                                        0,
                                        dispatcher_section) == -1)
                 ACE_ERROR_RETURN ((LM_ERROR,
                                    ACE_TEXT ("%p\n"),
-                                   ACE_TEXT ( "can't open HA_proc_ace_acceptor section"  ) ) ,
+                                   ACE_TEXT ( "can't open HA_auth_mgr_acceptor section"  ) ) ,
                                   -1 );
               //listen port
               u_int dispatcher_port;
@@ -96,7 +94,7 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
                                              ACE_TEXT ( "listen_port" ) ,
                                              dispatcher_port ) == -1 )
                 ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("HA_proc_ace_acceptor listen_port ")
+                                   ACE_TEXT ("HA_auth_mgr_acceptor listen_port ")
                                    ACE_TEXT (" does not exist\n") ) ,
                                   -1 );
               data_()->port( dispatcher_port );
@@ -127,10 +125,10 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 }
 
 //------------------------------------------------------------------------------------------------
-int  HA_proc_ace_acceptor::fini()
+int  HA_auth_mgr_acceptor::fini()
 {
 
-            ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::fini" ) , __LINE__ );
+            ACE_Trace _( ACE_TEXT( "HA_auth_mgr_acceptor::fini" ) , __LINE__ );
 
 
             this->m_acceptor->close();
@@ -139,15 +137,15 @@ int  HA_proc_ace_acceptor::fini()
 }
 
 //------------------------------------------------------------------------------------------------
-int HA_proc_ace_acceptor::info( ACE_TCHAR **str , size_t len ) const
+int HA_auth_mgr_acceptor::info( ACE_TCHAR **str , size_t len ) const
 {
 
-            ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::info" ) , __LINE__ );
+            ACE_Trace _( ACE_TEXT( "HA_auth_mgr_acceptor::info" ) , __LINE__ );
 
 
             ACE_TCHAR buf[BUFSIZ];
             ACE_OS::sprintf ( buf,
-                              ACE_TEXT ("HA_proc_ace_accepotr listening on port %lu\n"),
+                              ACE_TEXT ("HA_auth_mgr_acceptor listening on port %lu\n"),
                               this->m_data->port() );
             if ( *str == 0 )
             { *str = ACE::strnew (buf); }
