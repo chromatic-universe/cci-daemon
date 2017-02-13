@@ -23,6 +23,9 @@ link_directories(${PROCACEACCEPTOR_SOURCE_DIR}
 add_library(proc_ace_acceptor SHARED proc_ace_acceptor.cpp
                                      proc_ace_thread_pool.cpp
                                      proc_ace_handler.cpp)
+set_target_properties(proc_ace_acceptor PROPERTIES
+                                        VERSION 1.0.0
+                                        SOVERSION 1)                                 
 
 #executable harness
 add_executable(proc-ace-harness proc_ace_thread_pool.cpp
