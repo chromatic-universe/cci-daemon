@@ -11,16 +11,22 @@
 
 # Author: William K. Johnson
 #
-
+red='\033[0;31m'
+green='\033[0;32m'
+nc='\033[0m' # No Color
 
 # Do NOT "set -e"
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/cci/dev_t/bin:/sbin:/usr/sbin:/bin:/usr/bin
 DESC="cci daemon services"
-NAME=cci-daemon
+NAME=cci-daemon-dispatcher
 DAEMON=/cci/dev_t/bin/$NAME
-DAEMON_ARGS="--default_service"
+# -a default protocol stack coordinator
+# -c custom coordinator
+#run from the coonsole with combination of the other switches
+#i.e. ./cci-daemon-dispatcher -a -t runs the default coordinator  
+DAEMON_ARGS="-a"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -43,6 +49,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
+	echo "${green}...starting cci daemon....${nc}"
 	# Return
 	#   0 if daemon has been started
 	#   1 if daemon was already running
@@ -67,6 +74,7 @@ do_stop()
 	#   1 if daemon was already stopped
 	#   2 if daemon could not be stopped
 	#   other if a failure occurred
+	echo "${red}...stopping cci daemon...${nc}"
 	start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
 	RETVAL="$?"
 	[ "$RETVAL" = 2 ] && return 2
@@ -93,12 +101,13 @@ do_reload() {
 	# then implement that here.
 	#
 	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+
 	return 0
 }
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "starting $DESC" "$NAME"
 	do_start
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -106,7 +115,7 @@ case "$1" in
 	esac
 	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	[ "$VERBOSE" != no ] && log_daemon_msg "stopping $DESC" "$NAME"
 	do_stop
 	case "$?" in
 		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -116,21 +125,21 @@ case "$1" in
   status)
 	status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
 	;;
-  #reload|force-reload)
+  reload|force-reload)
 	#
 	# If do_reload() is not implemented then leave this commented out
 	# and leave 'force-reload' as an alias for 'restart'.
 	#
-	#log_daemon_msg "Reloading $DESC" "$NAME"
-	#do_reload
-	#log_end_msg $?
-	#;;
-  restart|force-reload)
+	log_daemon_msg "reloading $DESC" "$NAME"
+	do_reload
+	log_end_msg $?
+	;;  
+  restart)
 	#
 	# If the "reload" option is implemented then remove the
 	# 'force-reload' alias
 	#
-	log_daemon_msg "Restarting $DESC" "$NAME"
+	log_daemon_msg "restarting $DESC" "$NAME"
 	do_stop
 	case "$?" in
 	  0|1)
