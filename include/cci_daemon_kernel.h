@@ -1,4 +1,4 @@
-//cci_daaemon_kernel.h     william k. johnson 2016
+//cci_daaemon_kernel.h     william k. johnson 2017
 
 #pragma once
 
@@ -10,6 +10,7 @@
 #include <cci_daemon_generic.h>
 #include <cci_daemon_plugin.h>
 #include <cci_pub_and_sub.h>
+#include <cci_kernel_directives.h>
 
 namespace cci_daemon_impl
 {
@@ -106,6 +107,8 @@ namespace cci_daemon_impl
 
                     //services
                     //
+                    bool supported( const std::string& key )
+                    { return m_dict_supported.find( key ) != m_dict_supported.end(); }
                     virtual void load_plugin( const std::string &config );
                     virtual void unload_plugin( const std::string& config );
                     size_t plugin_count() { return m_loaded_plugins->size(); }

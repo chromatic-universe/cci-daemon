@@ -5,6 +5,7 @@
 
 
 using namespace cci_daemon_impl;
+using json = nlohmann::json;
 
 supported_dictionary cci_daemon_kernel::m_dict_supported = { { "publish_subscribe" ,
                                            "{ \"moniker\" : \"publish_and_subscibe\"" } };
