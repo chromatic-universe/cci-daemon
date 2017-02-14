@@ -10,6 +10,7 @@ add_subdirectory(procs)
 add_subdirectory(coordinator)
 add_subdirectory(manager)
 add_subdirectory(core)
+add_subdirectory(kernel)
 
 
 

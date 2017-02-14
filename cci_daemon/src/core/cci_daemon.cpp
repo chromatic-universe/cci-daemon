@@ -413,6 +413,35 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
           return ( 0 );
 }
 
+
+//--------------------------------------------------------------------------------
+lib_handle_t cci_daemon_facade::load_lib( const std::string& lib )
+{
+
+            std::ostringstream ostr;
+            ostr << "lib"
+                 << lib
+                 << ".so"
+                 << std::ends;
+            std::string path_with_extension = ostr.str();
+            lib_handle_t shared_object = ::dlopen( path_with_extension.c_str() ,
+                                                   RTLD_NOW) ;
+            if( shared_object == nullptr )
+            {
+                throw std::runtime_error( std::string( "could not load '")
+                                          + path_with_extension + "'");
+            }
+
+            std::cerr << "...loaded library...."
+                      << path_with_extension
+                      << "...\n";
+
+
+
+
+            return shared_object;
+}
+
 //---------------------------------------------------------------------------------------------------
 void cci_daemon_facade::bootstrap_default_coordinator()
 {
@@ -451,10 +480,10 @@ void cci_daemon_facade::bootstrap_default_coordinator()
           try
           {
               //load library  - this will throw if the load fails
-              auto bootstrap_lib = cci_shared_lib::load( bootstrap );
+              auto bootstrap_lib = load_lib( bootstrap );
               assert( bootstrap_lib );
               //assign the library address to our member attribute
-              bootstrap_function_address = cci_shared_lib::get_function_pointer<bootstrap_function>
+              bootstrap_function_address = get_function_pointer<bootstrap_function>
                           ( bootstrap_lib ,bootstrap_str );
               if( bootstrap_function_address == nullptr )
               {  log_message( "could not retrieve bootstrap function addresss" ); }

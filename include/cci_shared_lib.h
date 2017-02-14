@@ -67,38 +67,9 @@ namespace cci_daemon_impl
 
                     //services
                     ////shared object with the specified handle
-                    static cci_handle_t load( const std::string& lib )
-                    {
-                        std::ostringstream ostr;
-                        ostr << "lib"
-                             << lib
-                             << ".so"
-                             << std::ends;
-                        std::string path_with_extension = ostr.str();
-                        cci_handle_t shared_object = ::dlopen( path_with_extension.c_str() ,
-                                                               RTLD_NOW) ;
-                        if( shared_object == nullptr )
-                        {
-                            throw std::runtime_error( std::string( "could not load '")
-                                                      + path_with_extension + "'");
-                        }
-
-                        std::cerr << "...loaded library...."
-                                  << path_with_extension
-                                  << "...\n";
-
-
-
-
-                        return shared_object;
-                    }
-
+                    static cci_handle_t load( const std::string& lib );
                     ////handle of the shared object that will be unloaded
-                    static void unload( cci_handle_t shared_handle )
-                    {
-                          if ( shared_handle ) { dlclose( shared_handle); }
-                    }
-
+                    static void unload( cci_handle_t shared_handle );
                     ///looks up a function exported by the sharedd object
                     ///handle of the shared object in which the function will be looked up
                     ///returns casted pointer to the specified function
@@ -162,3 +133,5 @@ namespace cci_daemon_impl
           };
 
 }
+
+

@@ -103,54 +103,9 @@ namespace cci_daemon_impl
 
                     //services
                     //
-                    virtual void load_plugin( const std::string &config )
-                    {
-
-                          if( m_loaded_plugins->find( config ) == m_loaded_plugins->end() )
-                          {
-                               std::cerr << "loading plugin..."
-                                         << config
-                                         << "...\n";
-
-                               cci_daemon_plugin cdp = cci_daemon_plugin( config );
-                               auto iter = m_loaded_plugins->insert( std::make_pair( config , cdp ) );
-                               //library instance specific , we're assigning
-                               //our kernel instance for use in the library
-                               //address space through function pointers
-                               //--everyobdy handles their own memory management
-                               //--see the constructorof the cci_dameon_plugin
-                               iter.first->second.register_plugin( *this );
-                               std::cerr << "...version is "
-                                         << iter.first->second.get_engine_version()
-                                         << "\n";
-                          }
-                          else
-                          {
-                             std::cerr << "...plugin already loaded...\n";
-                          }
-
-                    }
-
-                    virtual void unload_plugin( const std::string& config )
-                    {
-                        //deregister
-                        if( m_loaded_plugins->find( config ) != m_loaded_plugins->end() )
-                        {
-                            std::cerr << "...deregistering plugin..."
-                                      << config
-                                      << "\n";
-                            std::cerr << "...releasing local contexts..\n";
-                            destroy_contexts();
-                            m_loaded_plugins->erase( config );
-                        }
-                        else
-                        {
-                             std::cerr << "...plugin not loaded...\n";
-                        }
-                    }
-
+                    virtual void load_plugin( const std::string &config );
+                    virtual void unload_plugin( const std::string& config );
                     size_t plugin_count() { return m_loaded_plugins->size(); }
-
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
 

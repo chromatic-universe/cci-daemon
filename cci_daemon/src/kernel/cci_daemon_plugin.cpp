@@ -7,7 +7,6 @@
 using namespace cci_daemon_impl;
 
 
-
 //------------------------------------------------------------------------------------
 cci_daemon_plugin::cci_daemon_plugin( const std::string& filename ) :  m_shared_lib  { nullptr } ,                                                                                                                                              m_str_filename { filename } ,
                                                                        get_engine_version_address { nullptr } ,
@@ -49,10 +48,10 @@ cci_daemon_plugin::cci_daemon_plugin( const std::string& filename ) :  m_shared_
 //------------------------------------------------------------------------------------
 cci_daemon_plugin::cci_daemon_plugin( const cci_daemon_plugin& cdp )
 {
-      m_shared_lib = cdp.m_shared_lib;
-      register_plugin_address =  cdp.register_plugin_address;
-      get_engine_version_address = cdp.get_engine_version_address;
-      clear_context_address = cdp.clear_context_address;
+          m_shared_lib = cdp.m_shared_lib;
+          register_plugin_address =  cdp.register_plugin_address;
+          get_engine_version_address = cdp.get_engine_version_address;
+          clear_context_address = cdp.clear_context_address;
 }
 
 //------------------------------------------------------------------------------------

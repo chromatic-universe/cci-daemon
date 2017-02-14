@@ -16,11 +16,15 @@ include_directories(../../include
 #executable
 add_executable(cci_daemon_test_run  test_cci_daemon.cpp
                                     ../src/core/cci_daemon_engine.cpp
-                                    ../src/core/cci_daemon_plugin.cpp
+                                    ../src/kernel/cci_daemon_plugin.cpp
+                                    ../src/kernel/cci_shared_lib.cpp
+                                    ../src/kernel/cci_daemon_kernel.cpp
                                     ../src/core/cci_stack_trace.cpp )
 add_executable(cci_shared_test_run  test_shared_lib.cpp
                                     ../src/core/cci_daemon_engine.cpp
-                                    ../src/core/cci_daemon_plugin.cpp
+                                    ../src/kernel/cci_daemon_plugin.cpp
+                                    ../src/kernel/cci_daemon_kernel.cpp
+                                    ../src/kernel/cci_shared_lib.cpp
                                     ../src/core/cci_stack_trace.cpp )
 
 #link libs

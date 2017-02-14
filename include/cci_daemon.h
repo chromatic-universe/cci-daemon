@@ -41,6 +41,8 @@ namespace cci_daemon_impl
             //aliases
             using  cci_daemon_facade_ptr = cci_daemon_facade*;
             using  file_ptr = FILE*;
+            using  lib_handle_t = void*;
+
 
             //enumerations
             enum class daemon_proc : unsigned long
@@ -103,6 +105,8 @@ namespace cci_daemon_impl
                                              int len );
                     void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
                     void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
+                    lib_handle_t load_lib( const std::string& lib );
+
 
                 private :
 
@@ -175,6 +179,34 @@ namespace cci_daemon_impl
                     static const std::string path_pid;
                     ///close exec
                     static const unsigned cpf_cloexec;
+
+                    //generic
+                    ///looks up a function exported by the sharedd object
+                    ///handle of the shared object in which the function will be looked up
+                    ///returns casted pointer to the specified function
+                    template<typename T_signature>
+                    static T_signature* get_function_pointer( lib_handle_t shared_handle ,
+                                                              const std::string &function_name )
+                    {
+                         // clear error value
+                         ::dlerror();
+
+                          assert( shared_handle );
+
+                          lib_handle_t function_address = ::dlsym( shared_handle ,
+                                                          function_name.c_str() );
+
+                          //check for error
+                          const char *error = ::dlerror();
+                          if( error != nullptr )
+                          {
+                            throw std::runtime_error( "could not find exported function" );
+                          }
+
+                          return reinterpret_cast<T_signature*>( function_address );
+                    }
+
+
 
             };
             inline std::ostream& operator<< ( std::ostream& ostr, const cci_daemon_facade& df )
