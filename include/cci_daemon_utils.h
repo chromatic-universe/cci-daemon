@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
-
+#include <json.h>
 
 
 namespace cci_daemon_utils

@@ -20,6 +20,7 @@ namespace cci_daemon_impl
           //aliases
           using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
           using plugins_ptr = plugin_dictionary*;
+          using supported_dictionary = std::map<std::string,std::string>;
 
           //enumerations
 
@@ -68,6 +69,8 @@ namespace cci_daemon_impl
                     //container for publish/subscribe
                     ////consumers
                     publish_and_subscribe_server            m_pb_server;
+                    //supported
+                    static supported_dictionary             m_dict_supported;
 
 
                 protected :

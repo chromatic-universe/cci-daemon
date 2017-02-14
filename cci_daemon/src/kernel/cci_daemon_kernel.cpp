@@ -6,6 +6,9 @@
 
 using namespace cci_daemon_impl;
 
+supported_dictionary cci_daemon_kernel::m_dict_supported = { { "publish_subscribe" ,
+                                           "{ \"moniker\" : \"publish_and_subscibe\"" } };
+
 //------------------------------------------------------------------------
 void cci_daemon_kernel::load_plugin( const std::string &config )
 {
