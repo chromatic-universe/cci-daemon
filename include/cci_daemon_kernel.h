@@ -18,12 +18,14 @@ namespace cci_daemon_impl
 {
 
           //forward
+          class cci_daemon_kernel;
 
 
           //aliases
           using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
           using plugins_ptr = plugin_dictionary*;
           using supported_dictionary = std::map<std::string,std::string>;
+          using cci_daemon_kernel_ptr = cci_daemon_kernel*;
 
           //enumerations
 
@@ -49,11 +51,10 @@ namespace cci_daemon_impl
 
                     //ctor
                     explicit cci_daemon_kernel( bool b_perform_immediate = false )  : m_loaded_plugins( new plugin_dictionary )
-                    { if( b_perform_immediate ) { perform(); }  }
-                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd ,
-                                                bool b_perform_immediate = false ) :
-                                                m_loaded_plugins( std::move( pd ) )
-                    { if( b_perform_immediate ) { perform(); }  }
+                    {}
+                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) : m_loaded_plugins( std::move( pd ) )
+                    {}
+
                     //dtor
                     virtual ~cci_daemon_kernel() = default;
 
@@ -112,13 +113,13 @@ namespace cci_daemon_impl
                     //
                     bool supported( const std::string& key )
                     { return m_dict_supported.find( key ) != m_dict_supported.end(); }
+                    static std::string version() noexcept { return version_string();  }
                     virtual void load_plugin( const std::string &config );
                     virtual void unload_plugin( const std::string& config );
                     size_t plugin_count() { return m_loaded_plugins->size(); }
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
 
-                    void perform();
 
 
            };

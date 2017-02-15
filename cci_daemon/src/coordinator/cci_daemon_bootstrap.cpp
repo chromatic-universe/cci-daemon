@@ -40,6 +40,7 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                     {
                         case SIGINT :
                         case SIGTERM :
+                        case SIGSEGV :
 
                             ACE_DEBUG(( LM_INFO , "...cci-dameon-dispatcher protocol stack..sigint received..\n" ) );
 

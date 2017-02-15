@@ -16,14 +16,30 @@
 #include <json.h>
 
 
-static std::string kernel_fifo{ "/etc/chromatic-universe/fifo" };
-static std::string supplicant_fifo( const std::string& supplicant )
+namespace cci_daemon_impl
 {
-         std::ostringstream ostr;
-         ostr << "/etc/chromatic-universe/supplicant-"
-              << supplicant;
+        static size_t major_version   { 1 };
+        static size_t minor_version   { 1 };
+        static size_t release_version { 2 };
+        static std::string version_string()
+        {
+                std::ostringstream ostr;
+                ostr << major_version
+                     <<"."
+                     << minor_version
+                     <<"."
+                     << release_version;
+                return ostr.str();
+        }
+        static std::string kernel_fifo{ "/etc/chromatic-universe/fifo" };
+        static std::string supplicant_fifo( const std::string& supplicant )
+        {
+                 std::ostringstream ostr;
+                 ostr << "/etc/chromatic-universe/supplicant-"
+                      << supplicant;
 
-         return ostr.str();
+                 return ostr.str();
+        }
+        static size_t supplicant_fifo_len { 64 };
 }
-static size_t supplicant_fifo_len { 64 };
 

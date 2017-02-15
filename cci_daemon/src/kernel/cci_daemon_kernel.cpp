@@ -59,9 +59,3 @@ void cci_daemon_kernel::unload_plugin( const std::string& config )
 }
 
 
-//--------------------------------------------------------------------------
-void cci_daemon_kernel::perform()
-{
-            std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-}
-
