@@ -6,6 +6,8 @@
 #include <map>
 #include <iostream>
 #include <utility>
+#include <chrono>
+#include <thread>
 //cci
 #include <cci_daemon_generic.h>
 #include <cci_daemon_plugin.h>
@@ -46,11 +48,12 @@ namespace cci_daemon_impl
 
 
                     //ctor
-                    explicit cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary )
-                    {}
-                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd ) :
-                        m_loaded_plugins( std::move( pd ) )
-                    {}
+                    explicit cci_daemon_kernel( bool b_perform_immediate = false )  : m_loaded_plugins( new plugin_dictionary )
+                    { if( b_perform_immediate ) { perform(); }  }
+                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd ,
+                                                bool b_perform_immediate = false ) :
+                                                m_loaded_plugins( std::move( pd ) )
+                    { if( b_perform_immediate ) { perform(); }  }
                     //dtor
                     virtual ~cci_daemon_kernel() = default;
 
@@ -114,6 +117,8 @@ namespace cci_daemon_impl
                     size_t plugin_count() { return m_loaded_plugins->size(); }
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
+
+                    void perform();
 
 
            };
