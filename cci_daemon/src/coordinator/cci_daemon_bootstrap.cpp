@@ -50,14 +50,11 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                         case SIGTERM :
 
                             ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigint received..\n" ) );
-
                             ACE_Thread_Manager::instance()->join( dw_thread_id );
-
                             //unravel protocol stack
                             ACE_DEBUG ((LM_INFO,
                                           "(%P|%t) ...unraveling protocol stack...\n"));
                             ACE_Service_Config::fini_svcs();
-
                             ACE_DEBUG ((LM_DEBUG,
                                                   "(%P|%t) shutting down dispatch protocol stack coordinator...\n"));
 

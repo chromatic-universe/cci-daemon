@@ -50,7 +50,7 @@ namespace cci_daemon_impl
 
 
                     //ctor
-                    explicit cci_daemon_kernel( bool b_perform_immediate = false )  : m_loaded_plugins( new plugin_dictionary )
+                    explicit cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary )
                     {}
                     explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) : m_loaded_plugins( std::move( pd ) )
                     {}
