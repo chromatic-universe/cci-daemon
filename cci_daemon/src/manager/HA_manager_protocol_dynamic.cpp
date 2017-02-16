@@ -40,6 +40,8 @@ int HA_auth_mgr_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 {
 
                ACE_Trace _( ACE_TEXT( "HA_auth_mgr_acceptor::init" ) , __LINE__ );
+               ACE_DEBUG( ( LM_INFO ,  "%P %t auth_mgr...thread pool size=%d\n"  , data_()->thread_pool_size() ) )  ;
+
 
               //command line
               //-------------------------------------------------------------------------------

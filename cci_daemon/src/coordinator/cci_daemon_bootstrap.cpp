@@ -3,9 +3,11 @@
 
 #include <cci_daemon_bootstrap.h>
 #include <proc_ace_acceptor.h>
-#include <unistd.h>
 
 using namespace proc_ace;
+
+static int  dw_thread_id;
+
 
 //log callback
 //------------------------------------------------------------------------
@@ -38,33 +40,53 @@ class bootstrap_signal_handler : public ACE_Event_Handler
 
                     switch( signum )
                     {
+                        case SIGSEGV :
+                            {
+                                  ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigsegv received..\n" ) );
+
+                                  exit( 1  );
+                            }
                         case SIGINT :
                         case SIGTERM :
-                        case SIGSEGV :
 
-                            ACE_DEBUG(( LM_INFO , "...cci-dameon-dispatcher protocol stack..sigint received..\n" ) );
+                            ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigint received..\n" ) );
 
-                            //fini
-                            ACE_Thread_Manager::instance()->cancel_all();
-                            ACE_Time_Value timeout( 5 );
-                            if ( ACE_Thread_Manager::instance()->wait( &timeout , 1 ) == -1 )
-                            {
-                                  ACE_ERROR_RETURN( ( LM_ERROR , "(%t) wait() failed\n") , 1 );
-                            }
-
-                            ACE_DEBUG ((LM_DEBUG,
-                                          "(%P|%t) shutting down dispatch protocol stack coordinator...\n"));
+                            ACE_Thread_Manager::instance()->join( dw_thread_id );
 
                             //unravel protocol stack
                             ACE_DEBUG ((LM_INFO,
                                           "(%P|%t) ...unraveling protocol stack...\n"));
                             ACE_Service_Config::fini_svcs();
 
+                            ACE_DEBUG ((LM_DEBUG,
+                                                  "(%P|%t) shutting down dispatch protocol stack coordinator...\n"));
+
                             exit( 1 );
                     }
 
                     return 0;
                 }
+};
+
+//async reactor thread
+//-----------------------------------------------------------------------
+class HA_async_handler : public ACE_Task_Base
+{
+       public:
+          virtual int svc (void)
+          {
+            ACE_DEBUG
+              ((LM_DEBUG, ACE_TEXT ("(%t) ..kernel async handler thread..\n")));
+
+            ACE_Proactor::instance ()->proactor_run_event_loop ();
+
+            ACE_DEBUG
+              ((LM_DEBUG, ACE_TEXT ("(%t) ..kernel async exit..\n")));
+
+
+            return 0;
+
+          }
 };
 
 
@@ -84,6 +106,8 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] )
           bootstrap_signal_handler* handler = new bootstrap_signal_handler();
           ACE_Reactor::instance()->register_handler( SIGINT ,  handler );
           ACE_Reactor::instance()->register_handler( SIGTERM ,  handler );
+          ACE_Reactor::instance()->register_handler( SIGSEGV ,  handler );
+
 
           ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
 
@@ -100,6 +124,16 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] )
               ACE_DEBUG ((LM_ERROR , "(%P|%t) ...unraveling protocol stack error..%d.\n" , dw )  );
               ACE_ERROR_RETURN( ( LM_ERROR , "(%t) service config returned with errors..exiting\n"   ) , 1  );
           }
+          HA_async_handler a_handler;
+          dw_thread_id = a_handler.activate( THR_NEW_LWP | THR_JOINABLE |  THR_SUSPENDED );
+          ACE_ASSERT( dw_thread_id == 0 );
+          ACE_DEBUG((LM_DEBUG ,
+                        "(%t) the current thread count is %d\n",
+                        a_handler.thr_count() ) );
+          ACE_DEBUG((LM_DEBUG , "(%t) the group identifier is %d\n",
+                                a_handler.grp_id() ) );
+          a_handler.resume();
+
           ACE_DEBUG( ( LM_INFO , "%D (%t) opened coordinator....\n" ) );
           ACE_DEBUG( ( LM_INFO , "%D (%t) starting event reactor....\n" ) );
           ACE_Reactor::instance()->run_reactor_event_loop();

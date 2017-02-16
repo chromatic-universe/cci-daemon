@@ -42,6 +42,8 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 {
 
                ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
+               ACE_DEBUG( ( LM_INFO ,  "%P %t proc_acceptor...\n" ) );
+
 
               //command line
               //-------------------------------------------------------------------------------
