@@ -5,6 +5,8 @@
 
 #include <string>
 #include <syslog.h>
+#include <cci_daemon.h>
 
-extern "C" int bootstrap_default_coordinator( int argc , char* argv[] );
+
+extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* ptr );
 

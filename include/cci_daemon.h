@@ -124,7 +124,7 @@ namespace cci_daemon_impl
                     char**              m_argv;
 
                     //prototypes
-                    typedef int bootstrap_function( int argc , char* argv[] );
+                    typedef int bootstrap_function( int argc , char* argv[] , void* ptr );
                     typedef cci_daemon_impl::cci_daemon_kernel_ptr kernel_function();
                     typedef void remove_kernel_function( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr ) ;
 
@@ -145,8 +145,8 @@ namespace cci_daemon_impl
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
                     //functoroids
-                    int bootstrap( int argc , char* argv[]  )
-                    { return bootstrap_function_address( argc , argv ); }
+                    int bootstrap( int argc , char* argv[] , void* ptr  )
+                    { return bootstrap_function_address( argc , argv , ptr ); }
                     cci_daemon_impl::cci_daemon_kernel_ptr bootstrap_kernel()
                     { return kernel_function_address(); }
                     void remove_kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr )
@@ -165,7 +165,7 @@ namespace cci_daemon_impl
 
                     //daemon execute procs
                     virtual int daemon_default_exec( const std::string& str_params , const unsigned long dw_flags );
-                    virtual void bootstrap_default_coordinator();
+                    virtual void bootstrap_coordinator();
 
                     //services
                     virtual int daemonize();

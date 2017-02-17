@@ -12,9 +12,10 @@ const unsigned cci_daemon_facade::bd_no_umask_0 = 010;
 const unsigned cci_daemon_facade::bd_max_handles = 8192;
 const unsigned cci_daemon_facade::buffer_size = 1024;
 const unsigned cci_daemon_facade::cpf_cloexec = 1;
-const std::string cci_daemon_facade::path_config = "/etc/cci-daemon/cci-daemon.conf";
+const std::string cci_daemon_facade::path_config = "/etc/chromatic-universe/cci-daemon.conf";
 const std::string cci_daemon_facade::log_path = "/var/log/cci-daemon/cci-daemon.log";
 const std::string cci_daemon_facade::path_pid = "/var/run/cci-daemon.pid";
+
 
 
 //--------------------------------------------------------------------------------------
@@ -46,11 +47,11 @@ cci_daemon_facade::~cci_daemon_facade()
             {
                 this->remove_kernel( m_ptr_kernel );
                 log_message( "...kernel unloaded...." );
-
             }
             catch( ... )
             {  log_message( "...error in unloading kernel...." ); }
         }
+
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -460,11 +461,12 @@ lib_handle_t cci_daemon_facade::load_lib( const std::string& lib )
 }
 
 //---------------------------------------------------------------------------------------------------
-void cci_daemon_facade::bootstrap_default_coordinator()
+void cci_daemon_facade::bootstrap_coordinator()
 {
           int options = 0;
           options |= LOG_PID;
           const char* identity = "cci-daemon";
+
 
           if( ! m_b_opened )
           {
@@ -479,7 +481,7 @@ void cci_daemon_facade::bootstrap_default_coordinator()
                 {
                   m_b_opened = open_log();
                 }
-                syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "bootstrapping default coordinator...." );
+                log_message( msg );
               }
           }
 
@@ -502,7 +504,8 @@ void cci_daemon_facade::bootstrap_default_coordinator()
           {
               //load the kernel
               //load library  - this will throw if the load fails
-              syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...loading kernel...." );
+              log_message( "...loading kernel" );
+
               auto bootstrap_kernel_lib = load_lib( kernel );
               assert( bootstrap_kernel_lib );
               //assign the kernel library address to our member attribute
@@ -513,6 +516,7 @@ void cci_daemon_facade::bootstrap_default_coordinator()
                   log_message( "could not retrieve kernel function addresss" );
                   exit( 1 );
               }
+              log_message( "...registering kernel removal function...." );
               m_ptr_kernel = this->bootstrap_kernel();
               assert( m_ptr_kernel );
               remove_kernel_function_address = get_function_pointer<remove_kernel_function>
@@ -523,7 +527,7 @@ void cci_daemon_facade::bootstrap_default_coordinator()
                   log_message( "could not retrieve remove kernel function addresss" );
                   exit( 1 );
               }
-              syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...kernel loaded...." );
+              log_message( "...kernel loaded...." );
 
               //load library  - this will throw if the load fails
               auto bootstrap_lib = load_lib( bootstrap );
@@ -537,10 +541,10 @@ void cci_daemon_facade::bootstrap_default_coordinator()
               //call our dynamic library function
               {
                     //for debugging library symbols
-                    int dw = this->bootstrap( this->m_argc , this->m_argv );
+                    log_message( "...bootstrapping cooordinator..." );
+                    int dw = this->bootstrap( this->m_argc , this->m_argv , (void*) this );
                     if( dw == 0 )
                     {
-                       syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...frazzle...." );
 
                     }
               }

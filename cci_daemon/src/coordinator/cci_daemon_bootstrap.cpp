@@ -7,7 +7,7 @@
 using namespace proc_ace;
 
 static int  dw_thread_id;
-
+static cci_daemon_impl::cci_daemon_facade_ptr g_facade_ptr;
 
 //log callback
 //------------------------------------------------------------------------
@@ -50,6 +50,11 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                         case SIGTERM :
 
                             ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigint received..\n" ) );
+                            //we have to explicitly call facade destructor , seemingly because
+                            //the service coordinator is being called from  a library and not ace tmain
+                            if( g_facade_ptr )
+                            { delete g_facade_ptr; }
+
                             ACE_Thread_Manager::instance()->join( dw_thread_id );
                             //unravel protocol stack
                             ACE_DEBUG ((LM_INFO,
@@ -58,10 +63,11 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                             ACE_DEBUG ((LM_DEBUG,
                                                   "(%P|%t) shutting down dispatch protocol stack coordinator...\n"));
 
+
                             ACE_Reactor::instance()->end_reactor_event_loop();
                             ACE_Proactor::instance()->proactor_end_event_loop();
 
-                            //_exit( 0  );
+                            _exit( 0  );
 
                     }
 
@@ -94,8 +100,17 @@ class HA_async_handler : public ACE_Task_Base
 
 //coordinator
 //------------------------------------------------------------------------
-extern "C" int bootstrap_default_coordinator( int argc , char* argv[] )
+extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* ptr )
 {
+
+                  g_facade_ptr = static_cast<cci_daemon_impl::cci_daemon_facade_ptr> ( ptr );
+                  if( g_facade_ptr )
+                  {
+                         syslog ( LOG_USER | LOG_INFO | LOG_PID ,
+                        "%s",
+                        "dynamic cast" );
+
+                  }
 
                   syslog ( LOG_USER | LOG_INFO | LOG_PID ,
                         "%s",

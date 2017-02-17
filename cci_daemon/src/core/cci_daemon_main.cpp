@@ -27,10 +27,9 @@ int main( int argc , char* argv[] )
                 const char* identity = "cci-daemon";
                 bool daemonize { true };
 
+                //run protocol stack , else run default daemon exec
                 if( cmd_option_exists( argv, argv+argc , "-a" ) )
                 { df->proc( service_proc::sp_default_coordinator ); }
-                else if( cmd_option_exists( argv, argv+argc , "-c" ) )
-                { df->proc( service_proc::sp_custom_coordinator ); }
                 //run from terminal
                 if( cmd_option_exists( argv, argv+argc , "-t" ) )
                 { daemonize = false; }
@@ -54,9 +53,7 @@ int main( int argc , char* argv[] )
                 switch( df->proc() )
                 {
                     case service_proc::sp_default_coordinator  :
-                        df->bootstrap_default_coordinator();
-                        break;
-                    case service_proc::sp_custom_coordinator :
+                        df->bootstrap_coordinator();
                         break;
                     case service_proc::sp_default_service :
                     default  :
