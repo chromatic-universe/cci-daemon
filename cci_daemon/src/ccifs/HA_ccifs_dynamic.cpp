@@ -2,9 +2,16 @@
 
 #include <HA_ccifs_dynamic.h>
 #include <cci_kernel_directives.h>
+#include <sstream>
 
 
 static std::string conf_path { "/etc/chromatic-universe/ha_ccifs.ini" };
+static std::string ccifs_user { "cci" };
+static std::string ccifs_prog { "ccifs" };
+static std::string ccifs_pt { "/ccifs_data" };
+
+
+static int ccifs_mount( const std::string& ccifs );
 
 //signal handles
 class proc_signal_handler : public ACE_Event_Handler
@@ -82,7 +89,7 @@ int HA_ccifs::init ( int argc , ACE_TCHAR *argv[] )
 
           ACE_Configuration_Section_Key dispatcher_section;
           if (config.open_section (config.root_section (),
-                                   ACE_TEXT ( "HA_ccifs" ),
+                                   ACE_TEXT ("HA_ccifs"),
                                    0,
                                    dispatcher_section) == -1)
             ACE_ERROR_RETURN ((LM_ERROR,
@@ -108,7 +115,15 @@ int HA_ccifs::init ( int argc , ACE_TCHAR *argv[] )
                                ACE_TEXT (" does not exist\n") ) ,
                               -1 );
 
+          //mount ccifs
+          if ( ccifs_mount( ccifs.c_str() ) == -1 )
+          {
 
+              ACE_ERROR_RETURN ((LM_ERROR,
+                                   ACE_TEXT ("HA_ccifs ccifs_mount")
+                                   ACE_TEXT (" could not mount ccifs\n") ) ,
+                                  -1 );
+          }
 
           ccifs_base_handler* hdlr = new ccifs_base_handler();
           ACE_Time_Value initial_delay( 3 );
@@ -119,7 +134,8 @@ int HA_ccifs::init ( int argc , ACE_TCHAR *argv[] )
                                                                 interval );
 
 
-           return 0;
+
+          return 0;
 }
 
 //------------------------------------------------------------------------------------------------
@@ -138,7 +154,7 @@ int  HA_ccifs::fini()
 int HA_ccifs::info( ACE_TCHAR **str , size_t len ) const
 {
 
-            ACE_Trace _( ACE_TEXT( "HA_ccifs::info" ) , __LINE__ );
+            ACE_Trace _( ACE_TEXT( "H _ccifs::info" ) , __LINE__ );
 
 
             ACE_TCHAR buf[BUFSIZ];
@@ -151,5 +167,35 @@ int HA_ccifs::info( ACE_TCHAR **str , size_t len ) const
 
             return static_cast<int>( ACE_OS::strlen (*str) );
 }
+
+//----------------------------------------------------------------------------------------------------
+int ccifs_mount( const std::string& ccifs )
+{
+          //mount file system
+          //run in this user context
+          ACE_Process_Options proc_options;
+          passwd* pw = ACE_OS::getpwnam( ccifs_user.c_str() );
+          proc_options.seteuid( pw->pw_uid );
+          //program name
+          proc_options.process_name( ccifs_prog.c_str() );
+          //params
+          std::ostringstream ostr;
+          ostr << ccifs.c_str()
+               << " "
+               << ccifs_pt.c_str();
+          proc_options.command_line( ostr.str().c_str() );
+          //spawn
+          ACE_Process process;
+          pid_t pid = process.spawn( proc_options );
+          if( pid == -1 )
+          {
+            ACE_ERROR_RETURN((LM_ERROR,
+            "%p\n", "...spawn ccifs file system..." ) , -1 );
+          }
+          else { ACE_DEBUG( ( LM_INFO ,  "%P %t ..spawned ccifs file system...\n" ) ); }
+
+          return 0;
+}
+
 
 
