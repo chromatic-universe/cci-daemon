@@ -1,7 +1,6 @@
 
 //cci_daemon.cpp    william k. johnson 2017
 #include <cci_daemon.h>
-#include <cci_daemon_kernel.h>
 //namespace
 using namespace cdi;
 
@@ -27,7 +26,8 @@ cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0
                                                                   m_str_pid_path { cci_daemon_facade::path_pid } ,
                                                                   m_backtrace { false } ,
                                                                   m_argc{ argc } ,
-                                                                  m_argv { argv }
+                                                                  m_argv { argv } ,
+                                                                  m_ptr_kernel { nullptr }
 {
       //
 }
@@ -35,7 +35,22 @@ cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0
 //---------------------------------------------------------------------------------------------------
 cci_daemon_facade::~cci_daemon_facade()
 {
-    _bt();
+        _bt();
+
+        std::cerr << "...kernel unloaded....\n" ;
+
+
+        if( m_ptr_kernel )
+        {
+            try
+            {
+                this->remove_kernel( m_ptr_kernel );
+                log_message( "...kernel unloaded...." );
+
+            }
+            catch( ... )
+            {  log_message( "...error in unloading kernel...." ); }
+        }
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -429,7 +444,9 @@ lib_handle_t cci_daemon_facade::load_lib( const std::string& lib )
             if( shared_object == nullptr )
             {
                 throw std::runtime_error( std::string( "could not load '")
-                                          + path_with_extension + "'");
+                                          + path_with_extension + "'"
+                                          + "..."
+                                          + dlerror() );
             }
 
             std::cerr << "...loaded library...."
@@ -466,19 +483,48 @@ void cci_daemon_facade::bootstrap_default_coordinator()
               }
           }
 
-          //load bootstrap lib explicitly
+          //load bootstrap lib and kernel explicitly
           //we're going through these gyrations
           //for  a good cause: isolate the daemon
           //proper from dependencies of the plugins
-          //and dynamic procs
+          //dynamic procs , and kernel
 
-          //library moniker
+          //library monikers
           std::string bootstrap { "cci_daemon_bootstrap" };
-          //function moniker
+          std::string kernel { "cci_daemon_kernel" };
+          //function monikers
           std::string bootstrap_str { "bootstrap_default_coordinator" };
+          std::string kernel_str { "make_kernel" };
+          std::string remove_kernel( "unmake_kernel" );
+;
 
           try
           {
+              //load the kernel
+              //load library  - this will throw if the load fails
+              syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...loading kernel...." );
+              auto bootstrap_kernel_lib = load_lib( kernel );
+              assert( bootstrap_kernel_lib );
+              //assign the kernel library address to our member attribute
+              kernel_function_address = get_function_pointer<kernel_function>
+                          ( bootstrap_kernel_lib , kernel_str );
+              if( kernel_function_address == nullptr )
+              {
+                  log_message( "could not retrieve kernel function addresss" );
+                  exit( 1 );
+              }
+              m_ptr_kernel = this->bootstrap_kernel();
+              assert( m_ptr_kernel );
+              remove_kernel_function_address = get_function_pointer<remove_kernel_function>
+                          ( bootstrap_kernel_lib , kernel_str );
+              //will be called in destructor
+              if( remove_kernel_function_address == nullptr )
+              {
+                  log_message( "could not retrieve remove kernel function addresss" );
+                  exit( 1 );
+              }
+              syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...kernel loaded...." );
+
               //load library  - this will throw if the load fails
               auto bootstrap_lib = load_lib( bootstrap );
               assert( bootstrap_lib );
@@ -492,6 +538,11 @@ void cci_daemon_facade::bootstrap_default_coordinator()
               {
                     //for debugging library symbols
                     int dw = this->bootstrap( this->m_argc , this->m_argv );
+                    if( dw == 0 )
+                    {
+                       syslog ( LOG_USER | LOG_INFO | LOG_PID , "%s", "...frazzle...." );
+
+                    }
               }
 
           }

@@ -31,12 +31,15 @@
 //cci
 #include <cci_stack_trace.h>
 #include <cci_shared_lib.h>
-#include <cci_daemon_kernel.h>
+#include <cci_kernel_directives.h>
+
+
 
 namespace cci_daemon_impl
 {
             //forward
             class cci_daemon_facade;
+
 
             //aliases
             using  cci_daemon_facade_ptr = cci_daemon_facade*;
@@ -74,7 +77,6 @@ namespace cci_daemon_impl
                     //function pointer prototype
                     typedef int (cci_daemon_facade::*ptr_to_proc)
                                 (  const std::string& str_params , const unsigned long dw_flags  );
-
 
                     //ctors
                     explicit cci_daemon_facade( int argc , char* argv[] ) ;
@@ -123,8 +125,16 @@ namespace cci_daemon_impl
 
                     //prototypes
                     typedef int bootstrap_function( int argc , char* argv[] );
+                    typedef cci_daemon_impl::cci_daemon_kernel_ptr kernel_function();
+                    typedef void remove_kernel_function( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr ) ;
+
                     //helpers
-                    bootstrap_function* bootstrap_function_address;
+                    bootstrap_function*      bootstrap_function_address;
+                    kernel_function*         kernel_function_address;
+                    remove_kernel_function*  remove_kernel_function_address;
+
+                    //kernel
+                    cci_daemon_impl::cci_daemon_kernel_ptr m_ptr_kernel;
 
                 public  :
 
@@ -134,8 +144,13 @@ namespace cci_daemon_impl
                     service_proc proc() const noexcept { return m_service_proc; }
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
+                    //functoroids
                     int bootstrap( int argc , char* argv[]  )
                     { return bootstrap_function_address( argc , argv ); }
+                    cci_daemon_impl::cci_daemon_kernel_ptr bootstrap_kernel()
+                    { return kernel_function_address(); }
+                    void remove_kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr )
+                    {  return remove_kernel_function_address( kernel_ptr ); }
 
 
                     //mutators

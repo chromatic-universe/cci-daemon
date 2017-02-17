@@ -25,25 +25,14 @@ add_library(cci_daemon_kernel   SHARED cci_daemon_kernel.cpp
                                        cci_daemon_utils.cpp
                                        cci_shared_lib.cpp
                                        )
-add_library(HA_daemon_kernel  SHARED   cci_daemon_kernel.cpp 
-                                       cci_daemon_plugin.cpp 
-                                       cci_daemon_utils.cpp
-                                       cci_shared_lib.cpp
-                                       HA_kernel_dynamic.cpp
-                                       )
-                                   
 
 #link libs
 target_link_libraries(cci_daemon_kernel  -lstdc++
                                          -lpthread 
                                          -ldl)
-set_target_properties(cci_daemon_kernel PROPERTIES
-                                        VERSION 1.1.2
-                                        SOVERSION 1)                                                   
 
 #install
 install_targets( /lib/ cci_daemon_kernel)
-install_targets( /lib/ HA_daemon_kernel)
 
 
 

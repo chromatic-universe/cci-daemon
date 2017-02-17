@@ -1,8 +1,7 @@
 //HA_dispatcher_protocol_dynamic.cpp   chromatic universe william k. johnson 2017
 
 #include <HA_dispatcher_protocol_dynamic.h>
-
-
+#include <cci_kernel_directives.h>
 
 static std::string conf_path { "/etc/chromatic-universe/ha_proc_ace_acceptor.ini" };
 unsigned long g_dw_finished = 0L;
@@ -44,7 +43,6 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
                ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
                ACE_DEBUG( ( LM_INFO ,  "%P %t proc_acceptor...\n" ) );
 
-
               //command line
               //-------------------------------------------------------------------------------
               static const ACE_TCHAR options[] = ACE_TEXT (":f:");
@@ -54,6 +52,7 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
               { return -1; }
 
               int option;
+
               ACE_TCHAR config_file[MAXPATHLEN];
               ACE_OS::strcpy ( config_file, ACE_TEXT ( conf_path.c_str() ) );
               while ( ( option = cmd_opts ()) != EOF)

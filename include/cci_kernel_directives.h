@@ -14,11 +14,11 @@
 #include <fcntl.h>
 //c++ contrib
 #include <json.h>
+#include <cci_daemon_kernel.h>
 
 
 namespace cci_daemon_impl
 {
-        //forward
 
         static size_t major_version   { 1 };
         static size_t minor_version   { 1 };

@@ -1,11 +1,14 @@
 //proc_ace_acceptor.h chromatic universe 2017 william k. johnson
 
+#pragma once
+
 //suppress from adaptive communication environment
 #pragma clang diagnostic ignored "-Wself-assign"
 #pragma clang diagnostic ignored "-Wconstant-logical-operand"
 
 
 #include <proc_ace.h>
+#include <cci_daemon_kernel.h>
 
 namespace proc_ace
 {
@@ -264,20 +267,21 @@ namespace proc_ace
 
                         private:
 
-                           proc_acceptor_ptr                m_proc_acceptor;
-                           map_of_commands                  m_command_map;
-                           std::ostringstream               m_ostr;
-                           std::string                      m_strComputerName;
-                           std::string                      m_strToken;
-                           std::string                      m_strCommand;
-                           proc_command                     m_current_command;
-                           proc_packet_error                m_proc_packet_error;
-                           long                             m_dwTimerToken;
-                           const ACE_Time_Value             m_maximumTimeToWait;
-                           set_map                          m_set_map;
-                           bool                             m_bSilent;
-                           ACE_Time_Value                   m_lastActivityTime;
-                           current_state                    m_currentState;
+                           proc_acceptor_ptr                                m_proc_acceptor;
+                           map_of_commands                                  m_command_map;
+                           std::ostringstream                               m_ostr;
+                           std::string                                      m_strComputerName;
+                           std::string                                      m_strToken;
+                           std::string                                      m_strCommand;
+                           proc_command                                     m_current_command;
+                           proc_packet_error                                m_proc_packet_error;
+                           long                                             m_dwTimerToken;
+                           const ACE_Time_Value                             m_maximumTimeToWait;
+                           set_map                                          m_set_map;
+                           bool                                             m_bSilent;
+                           ACE_Time_Value                                   m_lastActivityTime;
+                           current_state                                    m_currentState;
+                           cci_daemon_impl::cci_daemon_kernel_ptr           m_kernel_ptr;
 
 
                         protected:
@@ -332,6 +336,7 @@ namespace proc_ace
                           proc_command command() const noexcept  { return ( m_current_command ); }
                           proc_packet_error error_packet() const noexcept { return ( m_proc_packet_error ); }
                           std::string command_str() const noexcept { return ( ucase( m_strCommand ) ); }
+                          cci_daemon_impl::cci_daemon_kernel_ptr kernel() { return m_kernel_ptr; }
 
                           //mutators
                           void silent( bool bSilent ) { m_bSilent = bSilent; }
@@ -340,6 +345,7 @@ namespace proc_ace
                           void command( proc_command command ) { m_current_command = command; }
                           void command_str( const std::string& str_command ) { m_strCommand = str_command; }
                           void token( const std::string& str_token ) { m_strToken = str_token; }
+                          void kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel ) { m_kernel_ptr = kernel; }
 
 
                           //handlers

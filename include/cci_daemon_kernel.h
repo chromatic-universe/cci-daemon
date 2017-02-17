@@ -27,6 +27,7 @@ namespace cci_daemon_impl
           using supported_dictionary = std::map<std::string,std::string>;
           using cci_daemon_kernel_ptr = cci_daemon_kernel*;
 
+
           //enumerations
 
           ///core
@@ -113,7 +114,6 @@ namespace cci_daemon_impl
                     //
                     bool supported( const std::string& key )
                     { return m_dict_supported.find( key ) != m_dict_supported.end(); }
-                    static std::string version() noexcept { return version_string();  }
                     virtual void load_plugin( const std::string &config );
                     virtual void unload_plugin( const std::string& config );
                     size_t plugin_count() { return m_loaded_plugins->size(); }
@@ -124,6 +124,11 @@ namespace cci_daemon_impl
 
            };
 
+           //------------------------------------------------------------------------------------
+           extern "C" cci_daemon_kernel_ptr make_kernel();
+
+           //------------------------------------------------------------------------------------
+           extern "C" void unmake_kernel( cci_daemon_kernel_ptr kernel_ptr );
+
+
 }
-
-
