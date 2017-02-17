@@ -16,6 +16,7 @@ int main( int argc , char* argv[] )
 {
             cci_daemon_facade_ptr df  = nullptr;
 
+
             try
             {
                 df = new cci_daemon_facade( argc , argv );
