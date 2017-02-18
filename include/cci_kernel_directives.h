@@ -8,6 +8,8 @@
 #include <iostream>
 #include <utility>
 #include <sstream>
+#include <set>
+
 //c runtime
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,5 +47,10 @@ namespace cci_daemon_impl
                  return ostr.str();
         }
         static size_t supplicant_fifo_len { 64 };
+
+
+
+
 }
+
 

@@ -1,6 +1,8 @@
 
 //cci_daemon.cpp    william k. johnson 2017
 #include <cci_daemon.h>
+#include <stack>
+
 //namespace
 using namespace cdi;
 
@@ -28,7 +30,7 @@ cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0
                                                                   m_backtrace { false } ,
                                                                   m_argc{ argc } ,
                                                                   m_argv { argv } ,
-                                                                  m_ptr_kernel { nullptr }
+                                                                  m_ptr_kernel_context( new kernel_context )
 {
       //
 }
@@ -38,18 +40,18 @@ cci_daemon_facade::~cci_daemon_facade()
 {
         _bt();
 
-        std::cerr << "...kernel unloaded....\n" ;
-
-
-        if( m_ptr_kernel )
+        if( context() )
         {
-            try
+            if( context()->kernel_ref )
             {
-                //this->remove_kernel( m_ptr_kernel );
-                log_message( "...kernel unloaded...." );
+                try
+                {
+                    this->context()->unmake_kernel( context() );
+                    log_message( "...kernel unloaded...." );
+                }
+                catch( ... )
+                {  log_message( "...error in unloading kernel...." ); }
             }
-            catch( ... )
-            {  log_message( "...error in unloading kernel...." ); }
         }
 
 }
@@ -508,29 +510,11 @@ void cci_daemon_facade::bootstrap_coordinator()
               //load the kernel
               //load library  - this will throw if the load fails
               log_message( "...loading kernel" );
+              context()->lib_ref = load_lib( kernel );
+              assert(  context()->lib_ref  );
 
-              auto bootstrap_kernel_lib = load_lib( kernel );
-              assert( bootstrap_kernel_lib );
-              //assign the kernel library address to our member attribute
-              kernel_function_address = get_function_pointer<kernel_function>
-                          ( bootstrap_kernel_lib , kernel_str );
-              if( kernel_function_address == nullptr )
-              {
-                  log_message( "could not retrieve kernel function addresss" );
-                  exit( 1 );
-              }
-              m_ptr_kernel = static_cast<cci_daemon_impl::cci_daemon_kernel_ptr>( this->bootstrap_kernel() );
-              assert( m_ptr_kernel );
-              call_kernel_function_address = get_function_pointer<call_kernel_function>
-                          ( bootstrap_kernel_lib , mount_memory_cache_str );
-              if( call_kernel_function_address == nullptr )
-              {
-                  log_message( "could not mount memory cache addresss" );
-                  exit( 1 );
-              }
-              //mount memory cache
-              this->call_kernel( m_ptr_kernel );
-              log_message( "...kernel loaded....mounted memory cache..." );
+              //map the kernel stack
+              map_kernel();
 
               //load library  - this will throw if the load fails
               auto bootstrap_lib = load_lib( bootstrap );
@@ -556,6 +540,46 @@ void cci_daemon_facade::bootstrap_coordinator()
           catch( std::runtime_error& err )
           {
               log_message( err.what() );
+
+              exit( 1 );
           }
 
 }
+
+//---------------------------------------------------------------------------------------------------
+void cci_daemon_facade::map_kernel()
+{
+          std::string mk { "make_kernel" };
+          if( context()->lib_ref )
+          {
+
+                context()->pm.clear();
+                context()->make_kernel = get_function_pointer<call_kernel_function>
+                              ( context()->lib_ref , mk );
+                //runtime error , mismatched shared libs
+                if( ! context()->make_kernel )
+                { throw std::runtime_error( "...could not retrieve function addres=>:make_kernel..." ); }                                    //call
+                context()->make_kernel( context() );
+                if( ! context()->kernel_ref )
+                { throw std::runtime_error( "...kernel object instantiation failed..." ); }
+                //map rest of stack
+                context()->pm.clear();
+                context()->mount_memory_cache = get_function_pointer<call_kernel_function>
+                              ( context()->lib_ref , "mount_memory_cache" );
+                k_( context()->mount_memory_cache );
+                context()->pm.clear();
+                context()->unmake_kernel = get_function_pointer<call_kernel_function>
+                              ( context()->lib_ref , "unmake_kernel" );
+                k_( context()->unmake_kernel );
+
+          }
+          else
+          {
+              throw std::runtime_error( "...kernel mapping failed...library reference invalid..." );
+          }
+          log_message( "...mapped_kernel...." );
+
+}
+
+
+

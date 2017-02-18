@@ -1,4 +1,4 @@
-//william k, johnson Sept. 2015
+//cci_daemon.h       william k, johnson  2017
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -38,13 +38,15 @@
 namespace cci_daemon_impl
 {
             //forward
-            class cci_daemon_facade;
+            class  cci_daemon_facade;
+            struct kernel_context;
 
 
             //aliases
             using  cci_daemon_facade_ptr = cci_daemon_facade*;
             using  file_ptr = FILE*;
             using  lib_handle_t = void*;
+            using  kernel_context_ptr = kernel_context*;
 
 
             //enumerations
@@ -105,36 +107,36 @@ namespace cci_daemon_impl
                                              int whence ,
                                              int start ,
                                              int len );
+                    virtual void map_kernel();
                     void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
                     void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
                     lib_handle_t load_lib( const std::string& lib );
 
+                    //accessors-inspectors
+                    kernel_context_ptr context() { return m_ptr_kernel_context.get(); }
+                    void k_( call_kernel_function* ckf ) { if( ! ckf )
+                    { throw std::runtime_error( ".....could not retrieve function addres=>..." );} }
 
                 private :
 
                     //attributes
-                    unsigned long       m_dw_flags;
-                    file_ptr            m_log_fp;
-                    bool                m_b_opened;
-                    service_proc        m_service_proc;
-                    std::string         m_str_conf;
-                    std::string         m_str_pid_path;
-                    bool                m_backtrace;
-                    int                 m_argc;
-                    char**              m_argv;
+                    unsigned long                   m_dw_flags;
+                    file_ptr                        m_log_fp;
+                    bool                            m_b_opened;
+                    service_proc                    m_service_proc;
+                    std::string                     m_str_conf;
+                    std::string                     m_str_pid_path;
+                    bool                            m_backtrace;
+                    int                             m_argc;
+                    char**                          m_argv;
+                    std::unique_ptr<kernel_context> m_ptr_kernel_context;
 
                     //prototypes
                     typedef int bootstrap_function( int argc , char* argv[] , void* ptr );
-                    typedef cci_daemon_impl::cci_daemon_kernel_ptr kernel_function();
-                    typedef int call_kernel_function( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr ) ;
 
                     //helpers
                     bootstrap_function*      bootstrap_function_address;
-                    kernel_function*         kernel_function_address;
-                    call_kernel_function*    call_kernel_function_address;
 
-                    //kernel
-                    cci_daemon_impl::cci_daemon_kernel_ptr m_ptr_kernel;
 
                 public  :
 
@@ -148,14 +150,6 @@ namespace cci_daemon_impl
                     //kernel functoroids
                     int bootstrap( int argc , char* argv[] , void* ptr  )
                     { return bootstrap_function_address( argc , argv , ptr ); }
-                    cci_daemon_impl::cci_daemon_kernel_ptr bootstrap_kernel()
-                    { return kernel_function_address(); }
-                    int call_kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr )
-                    {  return call_kernel_function_address( kernel_ptr ); }
-
-
-
-
 
                     //mutators
                     void flags( const unsigned long dw_flags ) noexcept { m_dw_flags = dw_flags; }

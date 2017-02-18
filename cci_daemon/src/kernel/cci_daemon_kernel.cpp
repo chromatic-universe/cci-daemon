@@ -77,21 +77,25 @@ int cci_daemon_kernel::mount_memory_cache()
 }
 
 //----------------------------------------------------------------------------
-extern "C" cci_daemon_kernel_ptr make_kernel()
+extern "C" int make_kernel( kernel_context_ptr context_ptr )
 {
-        return new cci_daemon_kernel();
+        context_ptr->kernel_ref =  new cci_daemon_kernel();
+
+        return 0;
 }
 
 //-----------------------------------------------------------------------------
-extern "C" void unmake_kernel( cci_daemon_kernel_ptr kernel_ptr )
+extern "C" int unmake_kernel( kernel_context_ptr context_ptr  )
 {
-        if( kernel_ptr )
+        if( context_ptr->kernel_ref )
         {
-            delete kernel_ptr;
+            delete context_ptr->kernel_ref;
         }
+
+        return 0;
 }
 //-----------------------------------------------------------------------------
-extern "C" int mount_memory_cache( cci_daemon_kernel_ptr kernel_ptr )
+extern "C" int mount_memory_cache( kernel_context_ptr context_ptr  )
 {
           std::ostringstream ostr;
           ostr << "sudo mount "
