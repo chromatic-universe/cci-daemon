@@ -58,19 +58,52 @@ void cci_daemon_kernel::unload_plugin( const std::string& config )
             }
 }
 
+//--------------------------------------------------------------------------
+int cci_daemon_kernel::mount_memory_cache()
+{
+
+          std::ostringstream ostr;
+          ostr << "sudo mount "
+               << "-t"
+               << " tmpfs"
+               << " -o"
+               << " size=250M,"
+               << "mode=755"
+               << " ccifs"
+               << " /var/ccifs/cache";
+
+          return system( ostr.str().c_str() );
+
+}
+
 //----------------------------------------------------------------------------
 extern "C" cci_daemon_kernel_ptr make_kernel()
 {
         return new cci_daemon_kernel();
 }
 
-//------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 extern "C" void unmake_kernel( cci_daemon_kernel_ptr kernel_ptr )
 {
         if( kernel_ptr )
         {
             delete kernel_ptr;
         }
+}
+//-----------------------------------------------------------------------------
+extern "C" int mount_memory_cache( cci_daemon_kernel_ptr kernel_ptr )
+{
+          std::ostringstream ostr;
+          ostr << "sudo mount "
+               << "-t"
+               << " tmpfs"
+               << " -o"
+               << " size=250M,"
+               << "mode=755"
+               << " ccifs"
+               << " /var/ccifs/cache";
+
+          return system( ostr.str().c_str() );
 }
 
 

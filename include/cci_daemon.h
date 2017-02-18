@@ -126,12 +126,12 @@ namespace cci_daemon_impl
                     //prototypes
                     typedef int bootstrap_function( int argc , char* argv[] , void* ptr );
                     typedef cci_daemon_impl::cci_daemon_kernel_ptr kernel_function();
-                    typedef void remove_kernel_function( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr ) ;
+                    typedef int call_kernel_function( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr ) ;
 
                     //helpers
                     bootstrap_function*      bootstrap_function_address;
                     kernel_function*         kernel_function_address;
-                    remove_kernel_function*  remove_kernel_function_address;
+                    call_kernel_function*    call_kernel_function_address;
 
                     //kernel
                     cci_daemon_impl::cci_daemon_kernel_ptr m_ptr_kernel;
@@ -144,13 +144,17 @@ namespace cci_daemon_impl
                     service_proc proc() const noexcept { return m_service_proc; }
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
-                    //functoroids
+
+                    //kernel functoroids
                     int bootstrap( int argc , char* argv[] , void* ptr  )
                     { return bootstrap_function_address( argc , argv , ptr ); }
                     cci_daemon_impl::cci_daemon_kernel_ptr bootstrap_kernel()
                     { return kernel_function_address(); }
-                    void remove_kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr )
-                    {  return remove_kernel_function_address( kernel_ptr ); }
+                    int call_kernel( cci_daemon_impl::cci_daemon_kernel_ptr kernel_ptr )
+                    {  return call_kernel_function_address( kernel_ptr ); }
+
+
+
 
 
                     //mutators

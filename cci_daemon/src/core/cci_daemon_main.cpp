@@ -3,6 +3,7 @@
 #include <cci_daemon.h>
 #include <execinfo.h>
 #include <cxxabi.h>
+#include <sys/mount.h>
 
 using namespace cdi;
 
@@ -17,6 +18,21 @@ int main( int argc , char* argv[] )
             cci_daemon_facade_ptr df  = nullptr;
 
 
+        /*int m = system( "/cci/dev_t/bin/ccifs /cci/dev_docs/books /ccifs_data");
+         std::cerr << m << "\n";
+
+          std::ostringstream ostr;
+              ostr << "sudo mount "
+                   << "-t"
+                   << " tmpfs"
+                   << " -o"
+                   << " size=250M,"
+                   << "mode=755"
+                   << " ccifs"
+                   << " /var/ccifs/cache";
+              system( ostr.str().c_str() );
+
+            */
             try
             {
                 df = new cci_daemon_facade( argc , argv );

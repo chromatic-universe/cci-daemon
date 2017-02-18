@@ -115,7 +115,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                   syslog ( LOG_USER | LOG_INFO | LOG_PID ,
                         "%s",
                         "default cci-dispatcher coordinator initializing...." );
-                  ACE_LOG_MSG->open ( argv[0] , ACE_Log_Msg::SYSLOG, "cci-daemon-dispatcher" );
+                  //ACE_LOG_MSG->open ( argv[0] , ACE_Log_Msg::SYSLOG, "cci-daemon-dispatcher" );
                   ACE_LOG_MSG->set_flags ( ACE_Log_Msg::STDERR );
 
 

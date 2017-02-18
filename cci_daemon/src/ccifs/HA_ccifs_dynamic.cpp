@@ -3,10 +3,10 @@
 #include <HA_ccifs_dynamic.h>
 #include <cci_kernel_directives.h>
 #include <sstream>
-
+#include <sys/mount.h>
 
 static std::string conf_path { "/etc/chromatic-universe/ha_ccifs.ini" };
-static std::string ccifs_user { "cci" };
+static std::string ccifs_user { "wiljoh" };
 static std::string ccifs_prog { "ccifs" };
 static std::string ccifs_pt { "/ccifs_data" };
 
@@ -173,16 +173,34 @@ int ccifs_mount( const std::string& ccifs )
 {
           //mount file system
           //run in this user context
-          ACE_Process_Options proc_options;
+          /*ACE_Process_Options proc_options;
           passwd* pw = ACE_OS::getpwnam( ccifs_user.c_str() );
+          if( pw == 0 )
+            {
+                ACE_ERROR_RETURN((LM_ERROR,
+            " %p\n", "...ccifs file system..." ) , -1 );
+
+            }
           proc_options.seteuid( pw->pw_uid );
           //program name
-          proc_options.process_name( ccifs_prog.c_str() );
+          proc_options.process_name( "/cci/dev_t/bin/ccifs" );
           //params
           std::ostringstream ostr;
           ostr << ccifs.c_str()
                << " "
                << ccifs_pt.c_str();
+
+             std::ostringstream ostr;
+              ostr << "mount "
+                   << "-t"
+                   << " tmpfs"
+                   << " -o"
+                   << " size=250M,"
+                   << "mode=755"
+                   << " tmpfs"
+                   << " /var/ccifs/cache";
+              //system( ostr.str().c_str() );
+
           proc_options.command_line( ostr.str().c_str() );
           //spawn
           ACE_Process process;
@@ -193,6 +211,16 @@ int ccifs_mount( const std::string& ccifs )
             "%p\n", "...spawn ccifs file system..." ) , -1 );
           }
           else { ACE_DEBUG( ( LM_INFO ,  "%P %t ..spawned ccifs file system...\n" ) ); }
+
+          int m = ::mount( "tmpfs" ,
+                           "/var/ccifs/cache" ,
+                           "tmpfs" , 0 ,
+                           "size=250M,mode=0755" );
+          if( m == -1 )
+          {
+            ACE_ERROR_RETURN((LM_ERROR,
+            "%p\n", "...spawn ccifs file system..." ) , -1 );
+          }*/
 
           return 0;
 }

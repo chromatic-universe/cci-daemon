@@ -45,7 +45,7 @@ cci_daemon_facade::~cci_daemon_facade()
         {
             try
             {
-                this->remove_kernel( m_ptr_kernel );
+                //this->remove_kernel( m_ptr_kernel );
                 log_message( "...kernel unloaded...." );
             }
             catch( ... )
@@ -496,8 +496,11 @@ void cci_daemon_facade::bootstrap_coordinator()
           std::string kernel { "cci_daemon_kernel" };
           //function monikers
           std::string bootstrap_str { "bootstrap_default_coordinator" };
+
+
           std::string kernel_str { "make_kernel" };
-          std::string remove_kernel( "unmake_kernel" );
+          std::string remove_kernel_str( "unmake_kernel" );
+          std::string mount_memory_cache_str( "mount_memory_cache" );
 ;
 
           try
@@ -516,18 +519,18 @@ void cci_daemon_facade::bootstrap_coordinator()
                   log_message( "could not retrieve kernel function addresss" );
                   exit( 1 );
               }
-              log_message( "...registering kernel removal function...." );
-              m_ptr_kernel = this->bootstrap_kernel();
+              m_ptr_kernel = static_cast<cci_daemon_impl::cci_daemon_kernel_ptr>( this->bootstrap_kernel() );
               assert( m_ptr_kernel );
-              remove_kernel_function_address = get_function_pointer<remove_kernel_function>
-                          ( bootstrap_kernel_lib , kernel_str );
-              //will be called in destructor
-              if( remove_kernel_function_address == nullptr )
+              call_kernel_function_address = get_function_pointer<call_kernel_function>
+                          ( bootstrap_kernel_lib , mount_memory_cache_str );
+              if( call_kernel_function_address == nullptr )
               {
-                  log_message( "could not retrieve remove kernel function addresss" );
+                  log_message( "could not mount memory cache addresss" );
                   exit( 1 );
               }
-              log_message( "...kernel loaded...." );
+              //mount memory cache
+              this->call_kernel( m_ptr_kernel );
+              log_message( "...kernel loaded....mounted memory cache..." );
 
               //load library  - this will throw if the load fails
               auto bootstrap_lib = load_lib( bootstrap );

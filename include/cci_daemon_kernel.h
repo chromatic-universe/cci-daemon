@@ -120,6 +120,8 @@ namespace cci_daemon_impl
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
 
+                    int mount_memory_cache();
+
 
 
            };
@@ -129,6 +131,10 @@ namespace cci_daemon_impl
 
            //------------------------------------------------------------------------------------
            extern "C" void unmake_kernel( cci_daemon_kernel_ptr kernel_ptr );
+
+           //-----------------------------------------------------------------------------
+           extern "C" int mount_memory_cache( cci_daemon_kernel_ptr kernel_ptr );
+
 
 
 }
