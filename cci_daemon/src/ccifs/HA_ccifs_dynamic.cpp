@@ -153,7 +153,7 @@ int  HA_ccifs::fini()
 int HA_ccifs::info( ACE_TCHAR **str , size_t len ) const
 {
 
-            ACE_Trace _( ACE_TEXT( "H _ccifs::info" ) , __LINE__ );
+            ACE_Trace _( ACE_TEXT( "HA_ccifs::info" ) , __LINE__ );
 
 
             ACE_TCHAR buf[BUFSIZ];
@@ -171,9 +171,11 @@ int HA_ccifs::info( ACE_TCHAR **str , size_t len ) const
 //--------------------------------------------------------------------------------------
 void ccifs_func( void* ptr_instance )
 {
+               ACE_Trace _( ACE_TEXT( "HA_ccifs ccifs_func" ) , __LINE__ );
+
 
                ACE_DEBUG
-                  ((LM_DEBUG, ACE_TEXT ("(%t) ..ccifs notify thread..\n")));
+                  ((LM_DEBUG, ACE_TEXT ("(%D %t) ..ccifs notify thread..\n")));
 
                 HA_ccifs*  ccifs = static_cast<HA_ccifs*> ( ptr_instance );
                 if( ccifs )
@@ -182,7 +184,7 @@ void ccifs_func( void* ptr_instance )
                 }
 
                 ACE_DEBUG
-                  ((LM_DEBUG, ACE_TEXT ("(%t) ..ccifs notify thread exit..\n")));
+                  ((LM_DEBUG, ACE_TEXT ("%D (%t) ..ccifs notify thread exit..\n")));
 
 
 }
@@ -190,11 +192,16 @@ void ccifs_func( void* ptr_instance )
 //------------------------------------------------------------------------------------------------
 int HA_ccifs::ccifs_inotify()
 {
-                int inotify_fd, wd , j;
-                char buf[BUFSIZ] __attribute__ ((aligned(8)));
-                ssize_t numRead;
+                ACE_Trace _( ACE_TEXT( "HA_ccifs::ccifs_inotify" ) , __LINE__ );
+
+
+                static size_t BUF_LEN { 10 * (sizeof(struct inotify_event) + NAME_MAX + 1 ) };
+                int inotify_fd, wd;
+                char buf[BUF_LEN] __attribute__ ((aligned(8)));
+                ssize_t num_read;
                 char *p;
                 struct inotify_event *event;
+
 
                 //instantiate inotify interface
                 inotify_fd = inotify_init();
@@ -207,13 +214,56 @@ int HA_ccifs::ccifs_inotify()
                 }
 
                 ACE_DEBUG
-                  ((LM_DEBUG, ACE_TEXT ("%D (%t) ..initialized inotify interace..\n") ) );
+                  ((LM_NOTICE, ACE_TEXT ("%D (%t) ccifs:..initialized inotify interace..\n") ) );
+
+                wd = inotify_add_watch( inotify_fd ,
+                                        m_str_tmpfs.c_str() ,
+                                        IN_ALL_EVENTS );
+                if( wd == -1 )
+                {
+                      ACE_ERROR_RETURN ((LM_ERROR,
+                                       ACE_TEXT ( "ccifs: add notifiy watch...")
+                                       ACE_TEXT (" failed\n") ) ,
+                                      -1 );
+
+                }
+
+                ACE_DEBUG((LM_NOTICE , "%D(%t) ccifs added notify watch=>%s\n",
+                                            m_str_tmpfs.c_str() ) );
 
 
                 while( running() )
                 {
 
-                    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+                      num_read = read( inotify_fd ,
+                                       buf ,
+                                       BUF_LEN );
+                      if( num_read == 0 )
+                      {
+                             ACE_ERROR_RETURN ((LM_ERROR,
+                                       ACE_TEXT ( "ccifs: read() from inotify fd returned 0...")
+                                       ACE_TEXT (" failed\n") ) ,
+                                      -1 );
+                     }
+                     if( num_read == -1 )
+                     {
+
+                            ACE_ERROR_RETURN ((LM_ERROR,
+                                       ACE_TEXT ( "ccifs: read ")
+                                       ACE_TEXT (" failed...\n") ) ,
+                                      -1 );
+                     }
+
+                     //process elements in buffer
+                     for ( p = buf; p < buf + num_read; )
+                     {
+                        event = (struct inotify_event*) p;
+                        display_inotify_event( event );
+
+                        p += sizeof(struct inotify_event) + event->len;
+                     }
+
+                     std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
                 }
 
 
@@ -228,7 +278,7 @@ void display_inotify_event( struct inotify_event* ine )
                 if( ine->mask & IN_CREATE )
                 {
                     std::ostringstream ostr;
-                    ostr << "decriptor: "
+                    ostr << "<created> decriptor: "
                          << ine->wd
                          << " cookie:"
                          << ine->cookie

@@ -32,7 +32,7 @@ class ccifs_base_handler : public ACE_Event_Handler
                 int handle_timeout( const ACE_Time_Value &current_time,
                                     const void * = 0 )
                 {
-                    ACE_DEBUG( ( LM_INFO ,  "%D ccifs base handler...handle_timeout...\n" ) );
+                    ACE_DEBUG( ( LM_INFO ,  "%D cci-daemon-dispatcher...stack watchdog base handler...handle_timeout...\n" ) );
 
                     return 0;
                 };
@@ -157,8 +157,8 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                   }
 
                   ccifs_base_handler* hdlr = new ccifs_base_handler();
-                  ACE_Time_Value initial_delay( 3 );
-                  ACE_Time_Value interval( 1 );
+                  ACE_Time_Value initial_delay( 5 );
+                  ACE_Time_Value interval( 5 );
                   ccifs_timer_id = ACE_Reactor::instance()->schedule_timer( hdlr ,
                                                                         0 ,
                                                                         initial_delay ,
