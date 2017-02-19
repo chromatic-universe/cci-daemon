@@ -7,7 +7,9 @@
 using namespace proc_ace;
 
 static int  dw_thread_id;
+static int  ccifs_timer_id;
 static cci_daemon_impl::cci_daemon_facade_ptr g_facade_ptr;
+std::ofstream ofstr;
 
 //log callback
 //------------------------------------------------------------------------
@@ -21,6 +23,21 @@ class log_callback : public ACE_Log_Msg_Callback
             log_record.print ( "", ACE_Log_Msg::VERBOSE , cerr );
         }
 };
+
+//------------------------------------------------------------------------------------
+class ccifs_base_handler : public ACE_Event_Handler
+{
+           public:
+
+                int handle_timeout( const ACE_Time_Value &current_time,
+                                    const void * = 0 )
+                {
+                    ACE_DEBUG( ( LM_INFO ,  "%D ccifs base handler...handle_timeout...\n" ) );
+
+                    return 0;
+                };
+};
+
 
 //signal handles
 //------------------------------------------------------------------------
@@ -44,7 +61,7 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                             {
                                   ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigsegv received..\n" ) );
 
-                                  exit( 1  );
+                                  _exit( 1  );
                             }
                         case SIGINT :
                         case SIGTERM :
@@ -55,6 +72,8 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                             if( g_facade_ptr )
                             { delete g_facade_ptr; }
 
+                            ACE_Reactor::instance()->cancel_timer( ccifs_timer_id );
+
                             ACE_Thread_Manager::instance()->join( dw_thread_id );
                             //unravel protocol stack
                             ACE_DEBUG ((LM_INFO,
@@ -63,7 +82,7 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                             ACE_DEBUG ((LM_DEBUG,
                                                   "(%P|%t) shutting down dispatch protocol stack coordinator...\n"));
 
-
+                            ofstr.close();
                             ACE_Reactor::instance()->end_reactor_event_loop();
                             ACE_Proactor::instance()->proactor_end_event_loop();
 
@@ -104,19 +123,14 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
 {
 
                   g_facade_ptr = static_cast<cci_daemon_impl::cci_daemon_facade_ptr> ( ptr );
-                  if( g_facade_ptr )
-                  {
-                         syslog ( LOG_USER | LOG_INFO | LOG_PID ,
-                        "%s",
-                        "dynamic cast" );
-
-                  }
-
                   syslog ( LOG_USER | LOG_INFO | LOG_PID ,
                         "%s",
                         "default cci-dispatcher coordinator initializing...." );
-                  //ACE_LOG_MSG->open ( argv[0] , ACE_Log_Msg::SYSLOG, "cci-daemon-dispatcher" );
-                  ACE_LOG_MSG->set_flags ( ACE_Log_Msg::STDERR );
+                  ofstr.open ( "/var/log/cci-daemon/cci-daemon-dispatcher-trace.log",
+                               std::ofstream::out | std::ofstream::app );
+                  ACE_LOG_MSG->msg_ostream( &ofstr , 1 );
+                  ACE_LOG_MSG->set_flags( ACE_Log_Msg::OSTREAM ) ;
+                  ACE_LOG_MSG->set_flags( ACE_Log_Msg::STDERR );
 
 
                   //register signals
@@ -141,6 +155,15 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                       ACE_DEBUG ((LM_ERROR , "(%P|%t) ...unraveling protocol stack error..%d.\n" , dw )  );
                       ACE_ERROR_RETURN( ( LM_ERROR , "(%t) service config returned with errors..exiting\n"   ) , 1  );
                   }
+
+                  ccifs_base_handler* hdlr = new ccifs_base_handler();
+                  ACE_Time_Value initial_delay( 3 );
+                  ACE_Time_Value interval( 1 );
+                  ccifs_timer_id = ACE_Reactor::instance()->schedule_timer( hdlr ,
+                                                                        0 ,
+                                                                        initial_delay ,
+                                                                        interval );
+
                   //activate proactor
                   HA_async_handler a_handler;
                   dw_thread_id = a_handler.activate( THR_NEW_LWP | THR_JOINABLE |  THR_SUSPENDED );

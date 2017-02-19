@@ -1,17 +1,18 @@
 //HA_kernel_dynamic.cpp   chromatic universe william k. johnson 2017
 
 #include <HA_ccifs_dynamic.h>
-#include <cci_kernel_directives.h>
 #include <sstream>
 #include <sys/mount.h>
 
 static std::string conf_path { "/etc/chromatic-universe/ha_ccifs.ini" };
 static std::string ccifs_user { "wiljoh" };
 static std::string ccifs_prog { "ccifs" };
-static std::string ccifs_pt { "/ccifs_data" };
+static std::string ccifs_pt { "/var/ccifs/cache" };
 
 
-static int ccifs_mount( const std::string& ccifs );
+static int ccifs_inotify( const std::string& ccifs );
+static void display_inotify_event( struct inotify_event* ine );
+
 
 //signal handles
 class proc_signal_handler : public ACE_Event_Handler
@@ -76,66 +77,64 @@ int HA_ccifs::init ( int argc , ACE_TCHAR *argv[] )
 
                 ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ( "parse error.\n" ) ) ,
                                   - 1);
-          }
+              }
 
-          //configuration file
-          //-------------------------------------------------------------------------------
-          ACE_Configuration_Heap config;
-          config.open ();
-          ACE_Registry_ImpExp config_importer (config);
-          if ( config_importer.import_config (config_file) == -1 )
-          { ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ("%p\n") , config_file ) , -1 ); }
+              //configuration file
+              //-------------------------------------------------------------------------------
+              ACE_Configuration_Heap config;
+              config.open ();
+              ACE_Registry_ImpExp config_importer (config);
+              if ( config_importer.import_config (config_file) == -1 )
+              { ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ("%p\n") , config_file ) , -1 ); }
 
 
-          ACE_Configuration_Section_Key dispatcher_section;
-          if (config.open_section (config.root_section (),
-                                   ACE_TEXT ("HA_ccifs"),
-                                   0,
-                                   dispatcher_section) == -1)
-            ACE_ERROR_RETURN ((LM_ERROR,
-                               ACE_TEXT ("%p\n"),
-                               ACE_TEXT ( "can't open HA_ccifs section"  ) ) ,
-                              -1 );
-          //fifo
-          u_int dispatcher_port;
-          if (config.get_integer_value ( dispatcher_section,
-                                         ACE_TEXT ( "fifo" ) ,
-                                         dispatcher_port ) == -1 )
-          ACE_ERROR_RETURN ((LM_ERROR,
-                               ACE_TEXT ("HA_ccifs fifo")
-                               ACE_TEXT (" does not exist\n") ) ,
-                              -1 );
-          //ccifs
-          ACE_TString ccifs;
-          if (config.get_string_value (  dispatcher_section,
-                                         ACE_TEXT ( "ccifs_mount" ) ,
-                                         ccifs ) == -1 )
-          ACE_ERROR_RETURN ((LM_ERROR,
-                               ACE_TEXT ("HA_ccifs ccifs_mount")
-                               ACE_TEXT (" does not exist\n") ) ,
-                              -1 );
-
-          //mount ccifs
-          if ( ccifs_mount( ccifs.c_str() ) == -1 )
-          {
-
+              ACE_Configuration_Section_Key dispatcher_section;
+              if (config.open_section (config.root_section (),
+                                       ACE_TEXT ("HA_ccifs"),
+                                       0,
+                                       dispatcher_section) == -1)
+                ACE_ERROR_RETURN ((LM_ERROR,
+                                   ACE_TEXT ("%p\n"),
+                                   ACE_TEXT ( "can't open HA_ccifs section"  ) ) ,
+                                  -1 );
+              //fifo
+              u_int dispatcher_port;
+              if (config.get_integer_value ( dispatcher_section,
+                                             ACE_TEXT ( "fifo" ) ,
+                                             dispatcher_port ) == -1 )
+              ACE_ERROR_RETURN ((LM_ERROR,
+                                   ACE_TEXT ("HA_ccifs fifo")
+                                   ACE_TEXT (" does not exist\n") ) ,
+                                  -1 );
+              //ccifs
+              ACE_TString ccifs;
+              if (config.get_string_value (  dispatcher_section,
+                                             ACE_TEXT ( "ccifs_tmpfs_mount" ) ,
+                                             ccifs ) == -1 )
               ACE_ERROR_RETURN ((LM_ERROR,
                                    ACE_TEXT ("HA_ccifs ccifs_mount")
-                                   ACE_TEXT (" could not mount ccifs\n") ) ,
+                                   ACE_TEXT (" does not exist\n") ) ,
                                   -1 );
-          }
 
-          ccifs_base_handler* hdlr = new ccifs_base_handler();
-          ACE_Time_Value initial_delay( 3 );
-          ACE_Time_Value interval( 1 );
-          m_timer_id = ACE_Reactor::instance()->schedule_timer( hdlr ,
-                                                                0 ,
-                                                                initial_delay ,
-                                                                interval );
+              if( ACE_Thread_Manager::instance()->spawn( ACE_THR_FUNC (ccifs_func) ,
+                                                     (void*) this ,
+                                                     THR_NEW_LWP | THR_JOINABLE |  THR_SUSPENDED ,
+                                                     &m_thread_id ) )
+              {
+                  ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..spawned ccifs notify thread..\n")));
+
+              }
+              else
+              {
+                   ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..spawning ccifs notify failed..\n")));
+
+              }
 
 
 
-          return 0;
+              return 0;
 }
 
 //------------------------------------------------------------------------------------------------
@@ -144,8 +143,8 @@ int  HA_ccifs::fini()
 
             ACE_Trace _( ACE_TEXT( "HA_ccifs::fini" ) , __LINE__ );
 
-            ACE_Reactor::instance()->cancel_timer( m_timer_id );
-
+            m_b_running = false;
+            ACE_Thread_Manager::instance()->join( m_thread_id );
 
             return 0;
 }
@@ -168,62 +167,83 @@ int HA_ccifs::info( ACE_TCHAR **str , size_t len ) const
             return static_cast<int>( ACE_OS::strlen (*str) );
 }
 
-//----------------------------------------------------------------------------------------------------
-int ccifs_mount( const std::string& ccifs )
+
+//--------------------------------------------------------------------------------------
+void ccifs_func( void* ptr_instance )
 {
-          //mount file system
-          //run in this user context
-          /*ACE_Process_Options proc_options;
-          passwd* pw = ACE_OS::getpwnam( ccifs_user.c_str() );
-          if( pw == 0 )
-            {
-                ACE_ERROR_RETURN((LM_ERROR,
-            " %p\n", "...ccifs file system..." ) , -1 );
 
-            }
-          proc_options.seteuid( pw->pw_uid );
-          //program name
-          proc_options.process_name( "/cci/dev_t/bin/ccifs" );
-          //params
-          std::ostringstream ostr;
-          ostr << ccifs.c_str()
-               << " "
-               << ccifs_pt.c_str();
+               ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..ccifs notify thread..\n")));
 
-             std::ostringstream ostr;
-              ostr << "mount "
-                   << "-t"
-                   << " tmpfs"
-                   << " -o"
-                   << " size=250M,"
-                   << "mode=755"
-                   << " tmpfs"
-                   << " /var/ccifs/cache";
-              //system( ostr.str().c_str() );
+                HA_ccifs*  ccifs = static_cast<HA_ccifs*> ( ptr_instance );
+                if( ccifs )
+                {
+                    ccifs->ccifs_inotify();
+                }
 
-          proc_options.command_line( ostr.str().c_str() );
-          //spawn
-          ACE_Process process;
-          pid_t pid = process.spawn( proc_options );
-          if( pid == -1 )
-          {
-            ACE_ERROR_RETURN((LM_ERROR,
-            "%p\n", "...spawn ccifs file system..." ) , -1 );
-          }
-          else { ACE_DEBUG( ( LM_INFO ,  "%P %t ..spawned ccifs file system...\n" ) ); }
+                ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..ccifs notify thread exit..\n")));
 
-          int m = ::mount( "tmpfs" ,
-                           "/var/ccifs/cache" ,
-                           "tmpfs" , 0 ,
-                           "size=250M,mode=0755" );
-          if( m == -1 )
-          {
-            ACE_ERROR_RETURN((LM_ERROR,
-            "%p\n", "...spawn ccifs file system..." ) , -1 );
-          }*/
 
-          return 0;
 }
 
+//------------------------------------------------------------------------------------------------
+int HA_ccifs::ccifs_inotify()
+{
+                int inotify_fd, wd , j;
+                char buf[BUFSIZ] __attribute__ ((aligned(8)));
+                ssize_t numRead;
+                char *p;
+                struct inotify_event *event;
+
+                //instantiate inotify interface
+                inotify_fd = inotify_init();
+                if( inotify_fd == -1 )
+                {
+                    ACE_ERROR_RETURN ((LM_ERROR,
+                                       ACE_TEXT ( "HA_ccifs notify init")
+                                       ACE_TEXT (" failed\n") ) ,
+                                      -1 );
+                }
+
+                ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("%D (%t) ..initialized inotify interace..\n") ) );
+
+
+                while( running() )
+                {
+
+                    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+                }
+
+
+
+
+                return 0;
+}
+
+//------------------------------------------------------------------------------------------------
+void display_inotify_event( struct inotify_event* ine )
+{
+                if( ine->mask & IN_CREATE )
+                {
+                    std::ostringstream ostr;
+                    ostr << "decriptor: "
+                         << ine->wd
+                         << " cookie:"
+                         << ine->cookie
+                         << " ";
+                    if( ine->len > 0 )
+                    {
+                        ostr << "name="
+                            << ine->name;
+                    }
+
+                    ACE_DEBUG((LM_NOTICE , "%D(%t) ccifs=>%s\n",
+                                            ostr.str().c_str() ) );
+
+                }
+
+}
 
 

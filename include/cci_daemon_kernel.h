@@ -73,20 +73,12 @@ namespace cci_daemon_impl
 
 
                     //ctor
-                    explicit cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary ) ,
-                                                    m_b_cache_mapped { false }
-                    {
-                            mount_memory_cache();
-                    }
+                    explicit cci_daemon_kernel();
                     //todp
-                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) : m_loaded_plugins( std::move( pd ) )
-                    {}
+                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  );
 
                     //dtor
-                    virtual ~cci_daemon_kernel()
-                    {
-                            unmount_memory_cache();
-                    }
+                    virtual ~cci_daemon_kernel();
 
                     //can't copy a kernel
                     cci_daemon_kernel( const cci_daemon_kernel& ) = delete;
@@ -107,6 +99,7 @@ namespace cci_daemon_impl
                     //supported
                     static supported_dictionary             m_dict_supported;
                     bool                                    m_b_cache_mapped;
+                    bool                                    m_b_user_fs;
 
 
                 protected :
@@ -154,7 +147,6 @@ namespace cci_daemon_impl
                     int unmount_memory_cache();
 
 
-
            };
 
            //------------------------------------------------------------------------------------
@@ -165,6 +157,8 @@ namespace cci_daemon_impl
            extern "C" int mount_memory_cache( kernel_context_ptr context_ptr );
              //-----------------------------------------------------------------------------
            extern "C" int unmount_memory_cache( kernel_context_ptr context_ptr );
+               //-----------------------------------------------------------------------------
+
 
 
 

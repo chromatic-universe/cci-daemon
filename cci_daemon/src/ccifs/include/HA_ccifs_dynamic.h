@@ -2,27 +2,20 @@
 #pragma once
 
 
-
-#include <cci_daemon_kernel.h>
+#include <chrono>
+#include <thread>
 #include <proc_ace.h>
+#include <sys/inotify.h>
+#include <limits.h>
+
 #include "HACCIFS_export.h"
 
 static std::string nametag { "ccifs" };
 
-//------------------------------------------------------------------------------------
-class ccifs_base_handler : public ACE_Event_Handler
-{
-           public:
-
-                int handle_timeout( const ACE_Time_Value &current_time,
-                                    const void * = 0 )
-                {
-                    time_t epoch = ( (timespec_t) current_time).tv_sec;
-                    ACE_DEBUG( ( LM_INFO ,  "%D ccifs base handler...handle_timeout...\n" ) );
-
-                    return 0;
-                };
-};
+//--------------------------------------------------------------------------------------
+static void ccifs_func( void* ptr_instance );
+//--------------------------------------------------------------------------------------
+static void display_inotify_event( struct inotify_event* ine );
 
 
 //-------------------------------------------------------------------------------------
@@ -30,7 +23,9 @@ class HACCIFS_Export HA_ccifs : public ACE_Service_Object
 {
           public:
 
-                explicit HA_ccifs() : m_timer_id { 0 }
+                explicit HA_ccifs() : m_thread_id { 0 } ,
+                                      m_b_running { true } ,
+                                      m_str_tmpfs { "/var/ccifs/cache" }
                 {
 
                 }
@@ -43,14 +38,23 @@ class HACCIFS_Export HA_ccifs : public ACE_Service_Object
           private:
 
                 //attributes
-                long   m_timer_id;
+                ACE_thread_t   m_thread_id;
+                bool           m_b_running;
+                std::string    m_str_tmpfs;
 
 
           public :
 
                 //accessors-inspectors
+                bool running() const noexcept { return m_b_running; }
+                int ccifs_inotify();
+
+
 
 };
+
+
+
 
 ACE_FACTORY_DEFINE(HACCIFS , HA_ccifs)
 

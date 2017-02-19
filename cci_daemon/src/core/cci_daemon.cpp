@@ -513,6 +513,7 @@ void cci_daemon_facade::bootstrap_coordinator()
               context()->lib_ref = load_lib( kernel );
               assert(  context()->lib_ref  );
 
+
               //map the kernel stack
               map_kernel();
 

@@ -21,14 +21,9 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
                     $ENV{DEV}/lib/cci)
 
 #executable
-add_executable(ccifs    ccifs_log.c 
-                        ccifs.c)
 add_library(HA_ccifs SHARED HA_ccifs_dynamic.cpp)
 
 #link libs
-target_link_libraries(ccifs  -lfuse
-                             -lpthread 
-                             -ldl) 
 target_link_libraries(HA_ccifs -lstdc++ 
                                -lpthread 
                                -ldl
@@ -36,7 +31,6 @@ target_link_libraries(HA_ccifs -lstdc++
                          
 
 #install
-install_targets( /bin/ ccifs)
 install_targets( /lib/cci HA_ccifs)
 
 
