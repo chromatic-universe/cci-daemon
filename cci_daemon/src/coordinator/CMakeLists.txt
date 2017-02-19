@@ -10,7 +10,9 @@ include_directories(../../../include
                     $ENV{DEV}/include/cci
                     $ENV{ACE_ROOT})
 link_directories(${CCIDAEMON_SOURCE_DIR}
+                 $ENV{DEV}/lib
                  $ENV{DEV}/lib/cci)
+		
 
 #library
 if(WITH_ACE_COORDINATOR)
@@ -21,7 +23,6 @@ if(WITH_ACE_COORDINATOR)
     target_link_libraries(cci_daemon_bootstrap -lstdc++ 
                                                -lpthread 
                                                -ldl
-                                               -lcci_expansion
                                                -lACE)
     target_link_libraries(HA_proc_ace_acceptor -lstdc++ 
                                                -lpthread 

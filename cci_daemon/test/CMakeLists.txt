@@ -12,6 +12,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -Qunused-arguments  -DNDEBUG -std=
 #includes
 include_directories(../../include
                     $ENV{DEV}/include)
+link_directories($ENV{DEV}/lib/cci
+                 $ENV{DEV}/lib)
 
 #executable
 add_executable(cci_daemon_test_run  test_cci_daemon.cpp
