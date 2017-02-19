@@ -1,0 +1,95 @@
+
+bb_init()
+    conn:
+    proto_major = 7
+    proto_minor = 23
+    async_read = 1
+    max_write = 131072
+    max_readahead = 131072
+    capable = 00000ffb
+    want = 00000010
+    max_background = 0
+    congestion_threshold = 0
+    context:
+    fuse = 089fb370
+    uid = 0
+    gid = 0
+    pid = 0
+    private_data = 089fa008
+    logfile = 089fb020
+    rootdir = /cci/dev_t/data
+    umask = 00000
+
+bb_getattr(path="/.Trash", statbuf=0xb7518104)
+    bb_fullpath:  rootdir = "/cci/dev_t/data", path = "/.Trash", fpath = "/cci/dev_t/data/.Trash"
+    lstat returned -1
+    ERROR lstat: No such file or directory
+    si:
+    st_dev = 0
+    st_ino = 0
+    st_mode = 00
+    st_nlink = 0
+    st_uid = 0
+    st_gid = 0
+    st_rdev = 0
+    st_size = 0
+    st_blksize = 0
+    st_blocks = 0
+    st_atime = 0x00000000
+    st_mtime = 0x00000000
+    st_ctime = 0x00000000
+
+bb_getattr(path="/.Trash-1000", statbuf=0xb7518104)
+    bb_fullpath:  rootdir = "/cci/dev_t/data", path = "/.Trash-1000", fpath = "/cci/dev_t/data/.Trash-1000"
+    lstat returned -1
+    ERROR lstat: No such file or directory
+    si:
+    st_dev = 0
+    st_ino = 0
+    st_mode = 00
+    st_nlink = 0
+    st_uid = 0
+    st_gid = 0
+    st_rdev = 0
+    st_size = 0
+    st_blksize = 0
+    st_blocks = 0
+    st_atime = 0x00000000
+    st_mtime = 0x00000000
+    st_ctime = 0x00000000
+
+bb_getattr(path="/", statbuf=0xb75180f4)
+    bb_fullpath:  rootdir = "/cci/dev_t/data", path = "/", fpath = "/cci/dev_t/data/"
+    lstat returned 0
+    si:
+    st_dev = 2049
+    st_ino = 3055835
+    st_mode = 040755
+    st_nlink = 2
+    st_uid = 1003
+    st_gid = 1000
+    st_rdev = 0
+    st_size = 4096
+    st_blksize = 4096
+    st_blocks = 8
+    st_atime = 0x58a73e4a
+    st_mtime = 0x58a73e46
+    st_ctime = 0x58a789e8
+
+bb_statfs(path="/", statv=0xb6bdd0b4)
+    bb_fullpath:  rootdir = "/cci/dev_t/data", path = "/", fpath = "/cci/dev_t/data/"
+    statvfs returned 0
+    sv:
+    f_bsize = 4096
+    f_frsize = 4096
+    f_blocks = 107952352
+    f_bfree = 17352734
+    f_bavail = 11863314
+    f_files = 27426816
+    f_ffree = 26696882
+    f_favail = 26696882
+    f_fsid = -80181086
+    f_flag = 0x00001000
+    f_namemax = 255
+
+bb_destroy(userdata=0x089fa008)
