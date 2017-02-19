@@ -29,7 +29,7 @@ namespace cci_daemon_impl
           using cci_daemon_kernel_ptr = cci_daemon_kernel*;
           using param_map = std::map<std::string,std::string>;
 
-          //kernel structure
+          //kernel structure - home brew kernel process struct
           typedef struct kernel_context
           {
                 //atttributes
@@ -45,6 +45,8 @@ namespace cci_daemon_impl
                 int ( *make_kernel ) ( kernel_context* context_ptr );
                 int ( *unmake_kernel ) ( kernel_context* context_ptr );
                 int ( *mount_memory_cache ) ( kernel_context* context_ptr );
+                int ( *unmount_memory_cache ) ( kernel_context* context_ptr );
+
 
            } kernel_context;
            typedef kernel_context* kernel_context_ptr;
@@ -71,13 +73,20 @@ namespace cci_daemon_impl
 
 
                     //ctor
-                    explicit cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary )
-                    {}
+                    explicit cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary ) ,
+                                                    m_b_cache_mapped { false }
+                    {
+                            mount_memory_cache();
+                    }
+                    //todp
                     explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) : m_loaded_plugins( std::move( pd ) )
                     {}
 
                     //dtor
-                    virtual ~cci_daemon_kernel() = default;
+                    virtual ~cci_daemon_kernel()
+                    {
+                            unmount_memory_cache();
+                    }
 
                     //can't copy a kernel
                     cci_daemon_kernel( const cci_daemon_kernel& ) = delete;
@@ -97,6 +106,7 @@ namespace cci_daemon_impl
                     publish_and_subscribe_server            m_pb_server;
                     //supported
                     static supported_dictionary             m_dict_supported;
+                    bool                                    m_b_cache_mapped;
 
 
                 protected :
@@ -141,6 +151,7 @@ namespace cci_daemon_impl
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
 
                     int mount_memory_cache();
+                    int unmount_memory_cache();
 
 
 
@@ -152,6 +163,10 @@ namespace cci_daemon_impl
            extern "C" int unmake_kernel( kernel_context_ptr context_ptr );
            //-----------------------------------------------------------------------------
            extern "C" int mount_memory_cache( kernel_context_ptr context_ptr );
+             //-----------------------------------------------------------------------------
+           extern "C" int unmount_memory_cache( kernel_context_ptr context_ptr );
+
+
 
 
 

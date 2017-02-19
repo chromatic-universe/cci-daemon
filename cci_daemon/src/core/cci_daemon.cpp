@@ -516,6 +516,7 @@ void cci_daemon_facade::bootstrap_coordinator()
               //map the kernel stack
               map_kernel();
 
+
               //load library  - this will throw if the load fails
               auto bootstrap_lib = load_lib( bootstrap );
               assert( bootstrap_lib );
@@ -549,6 +550,19 @@ void cci_daemon_facade::bootstrap_coordinator()
 //---------------------------------------------------------------------------------------------------
 void cci_daemon_facade::map_kernel()
 {
+          //this is also a desiged entry point for mocks and tests
+          //among other things the kernel is only
+          //am array of fucntion pointers
+          //to the application level  all deletions and allocations
+          //are made by the shared library , so the pointers
+          //( and the kernel itself) can be removed or replaced in real time
+          //also note , nothing is is operating as a priviliged
+          //account. except for a todo=workaround using shell fto
+          //mount the cache. plans were to have the ccifs mounted from
+          //the service maanger , but this could not be made to work.
+          //pontificated with the idea of using some objdump/readelf
+          //hijinks to do this mapping transparently but talked myself
+          //out of it
           std::string mk { "make_kernel" };
           if( context()->lib_ref )
           {
@@ -571,6 +585,11 @@ void cci_daemon_facade::map_kernel()
                 context()->unmake_kernel = get_function_pointer<call_kernel_function>
                               ( context()->lib_ref , "unmake_kernel" );
                 k_( context()->unmake_kernel );
+                context()->pm.clear();
+                context()->unmount_memory_cache = get_function_pointer<call_kernel_function>
+                              ( context()->lib_ref , "unmount_memory_cache" );
+                k_( context()->unmount_memory_cache );
+
 
           }
           else

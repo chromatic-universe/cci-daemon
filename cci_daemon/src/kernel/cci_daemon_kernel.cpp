@@ -61,6 +61,7 @@ void cci_daemon_kernel::unload_plugin( const std::string& config )
 //--------------------------------------------------------------------------
 int cci_daemon_kernel::mount_memory_cache()
 {
+          if( m_b_cache_mapped ) { return 0; }
 
           std::ostringstream ostr;
           ostr << "sudo mount "
@@ -72,9 +73,29 @@ int cci_daemon_kernel::mount_memory_cache()
                << " ccifs"
                << " /var/ccifs/cache";
 
-          return system( ostr.str().c_str() );
+           int dw = system( ostr.str().c_str() );
+           dw == 0 ? m_b_cache_mapped = true : m_b_cache_mapped = false;
+
+           return dw;
 
 }
+
+//--------------------------------------------------------------------------
+int cci_daemon_kernel::unmount_memory_cache()
+{
+          if( ! m_b_cache_mapped ) { return -1; }
+
+          std::ostringstream ostr;
+          ostr << "sudo umount "
+               << " /var/ccifs/cache";
+
+           int dw = system( ostr.str().c_str() );
+           dw == 0 ? m_b_cache_mapped = false : m_b_cache_mapped = true;
+
+           return dw;
+
+}
+
 
 //----------------------------------------------------------------------------
 extern "C" int make_kernel( kernel_context_ptr context_ptr )
@@ -88,27 +109,28 @@ extern "C" int make_kernel( kernel_context_ptr context_ptr )
 extern "C" int unmake_kernel( kernel_context_ptr context_ptr  )
 {
         if( context_ptr->kernel_ref )
-        {
-            delete context_ptr->kernel_ref;
-        }
+        { delete context_ptr->kernel_ref; }
 
         return 0;
 }
+
 //-----------------------------------------------------------------------------
 extern "C" int mount_memory_cache( kernel_context_ptr context_ptr  )
 {
-          std::ostringstream ostr;
-          ostr << "sudo mount "
-               << "-t"
-               << " tmpfs"
-               << " -o"
-               << " size=250M,"
-               << "mode=755"
-               << " ccifs"
-               << " /var/ccifs/cache";
 
-          return system( ostr.str().c_str() );
+        if( context_ptr->kernel_ref )
+        { return context_ptr->kernel_ref->mount_memory_cache(); }
 }
+
+//-----------------------------------------------------------------------------
+extern "C" int unmount_memory_cache( kernel_context_ptr context_ptr  )
+{
+
+        if( context_ptr->kernel_ref )
+        { return context_ptr->kernel_ref->unmount_memory_cache(); }
+
+}
+
 
 
 
