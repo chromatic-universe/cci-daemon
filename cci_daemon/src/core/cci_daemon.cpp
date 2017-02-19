@@ -18,7 +18,11 @@ const std::string cci_daemon_facade::path_config = "/etc/chromatic-universe/cci-
 const std::string cci_daemon_facade::log_path = "/var/log/cci-daemon/cci-daemon.log";
 const std::string cci_daemon_facade::path_pid = "/var/run/cci-daemon.pid";
 
-
+//--------------------------------------------------------------------------------------
+cci_daemon_intf::~cci_daemon_intf()
+{
+    //
+}
 
 //--------------------------------------------------------------------------------------
 cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0L } ,
