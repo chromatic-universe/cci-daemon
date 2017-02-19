@@ -70,8 +70,23 @@ namespace cci_daemon_impl
                 sp_custom_coordinator
             };
 
+
+            //interfaces
+            class cci_daemon_intf
+            {
+                public :
+
+                    virtual void map_kernel() = 0;
+                    virtual void bootstrap_coordinator() = 0;
+                    virtual int daemonize() = 0;
+                    virtual int daemon_default_exec( const std::string& str_params ,
+                                                     const unsigned long dw_flags ) = 0;
+                    virtual ~cci_daemon_intf() = 0;
+
+            };
+
             //services
-            class cci_daemon_facade
+            class cci_daemon_facade : public cci_daemon_intf
             {
                 public :
 
@@ -107,7 +122,7 @@ namespace cci_daemon_impl
                                              int whence ,
                                              int start ,
                                              int len );
-                    virtual void map_kernel();
+                    void map_kernel();
                     void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
                     void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
                     lib_handle_t load_lib( const std::string& lib );

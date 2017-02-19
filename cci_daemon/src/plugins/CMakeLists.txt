@@ -17,7 +17,6 @@ add_library(ps_kafka_facade SHARED ps_kafka_facade.cpp)
 target_link_libraries(ps_kafka_facade -lstdc++ 
                                       -lpthread 
                                       -ldl)
-                                      
 
 #install
 install_targets( /lib/cci ps_kafka_facade)
