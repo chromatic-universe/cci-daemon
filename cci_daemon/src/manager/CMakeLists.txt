@@ -28,6 +28,6 @@ if(WITH_ACE_AUTH)
                                                -lACE)
 
     #install
-    install_targets( /lib/cci HA_auth_mgr_acceptor)
+    install_targets( /lib HA_auth_mgr_acceptor)
 endif()
 

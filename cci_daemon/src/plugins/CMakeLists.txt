@@ -19,5 +19,5 @@ target_link_libraries(ps_kafka_facade -lstdc++
                                       -ldl)
 
 #install
-install_targets( /lib/cci ps_kafka_facade)
+install_targets( /lib ps_kafka_facade)
 

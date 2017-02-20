@@ -32,7 +32,7 @@ if(WITH_ACE_COORDINATOR)
 
 
     #install
-    install_targets( /lib/cci cci_daemon_bootstrap)
-    install_targets( /lib/cci HA_proc_ace_acceptor)
+    install_targets( /lib cci_daemon_bootstrap)
+    install_targets( /lib HA_proc_ace_acceptor)
 endif()
 

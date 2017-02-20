@@ -31,7 +31,7 @@ target_link_libraries(HA_ccifs -lstdc++
                          
 
 #install
-install_targets( /lib/cci HA_ccifs)
+install_targets( /lib HA_ccifs)
 
 
 

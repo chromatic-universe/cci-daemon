@@ -46,6 +46,6 @@ target_link_libraries(proc-ace-harness  -lstdc++
                                     
 
 #install
-install_targets( /lib/cci proc_ace_acceptor)
+install_targets( /lib proc_ace_acceptor)
 install_targets( /bin proc-ace-harness)
 
