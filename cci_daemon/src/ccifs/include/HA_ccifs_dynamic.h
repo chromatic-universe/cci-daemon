@@ -27,7 +27,11 @@ class HACCIFS_Export HA_ccifs : public ACE_Service_Object
                                       m_b_running { true } ,
                                       m_str_tmpfs { "/var/ccifs/cache" }
                 {
+                                   }
 
+                ~HA_ccifs()
+                {
+                    ACE_Trace _( ACE_TEXT( "HA_ccifs::destructor" ) , __LINE__ );
                 }
 
                 //upcalls
@@ -47,6 +51,12 @@ class HACCIFS_Export HA_ccifs : public ACE_Service_Object
 
                 //accessors-inspectors
                 bool running() const noexcept { return m_b_running; }
+                std::string fs() const noexcept { return m_str_tmpfs; }
+
+                //mutators
+                void fs( const std::string& target ) { m_str_tmpfs = target; }
+
+                //services
                 int ccifs_inotify();
 
 

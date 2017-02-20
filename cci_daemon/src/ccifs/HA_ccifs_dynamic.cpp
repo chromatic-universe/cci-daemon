@@ -118,7 +118,7 @@ int HA_ccifs::init ( int argc , ACE_TCHAR *argv[] )
 
               if( ACE_Thread_Manager::instance()->spawn( ACE_THR_FUNC (ccifs_func) ,
                                                      (void*) this ,
-                                                     THR_NEW_LWP | THR_JOINABLE |  THR_SUSPENDED ,
+                                                     THR_NEW_LWP  ,
                                                      &m_thread_id ) )
               {
                   ACE_DEBUG
@@ -143,8 +143,14 @@ int  HA_ccifs::fini()
 
             ACE_Trace _( ACE_TEXT( "HA_ccifs::fini" ) , __LINE__ );
 
-            m_b_running = false;
-            ACE_Thread_Manager::instance()->join( m_thread_id );
+            if( m_b_running ) { m_b_running = false; }
+            //std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
+            int t = ACE_Thread_Manager::instance()->cancel( m_thread_id );
+            t = ACE_Thread_Manager::instance()->testcancel( m_thread_id );
+
+            ACE_DEBUG((LM_NOTICE , "%D(%t) ccifs=>notify thread test cancel=%d\n",
+                                            t ) );
+
 
             return 0;
 }
@@ -263,7 +269,7 @@ int HA_ccifs::ccifs_inotify()
                         p += sizeof(struct inotify_event) + event->len;
                      }
 
-                     std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
+                     //std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
                 }
 
 

@@ -143,7 +143,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                   ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
 
                   //daemonizing has switched us to the root directory
-                  int dw = ::chdir( "/dev_t/bin" );
+                  int dw = ::chdir( "/cci/dev_t/bin" );
                   if( dw != 0 )
                   {
                     ACE_ERROR_RETURN( ( LM_ERROR , "%D (%t) could not chdir to working directory..exiting\n"   ) , 1  );
