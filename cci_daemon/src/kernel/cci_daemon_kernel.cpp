@@ -17,7 +17,7 @@ cci_daemon_kernel::cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionar
                                            m_b_cache_mapped { false } ,
                                            m_b_user_fs { false }
 {
-              mount_memory_cache();
+              //mount_memory_cache();
 }
 
 //todo
@@ -30,7 +30,7 @@ cci_daemon_kernel::cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) :
 //------------------------------------------------------------------------
 cci_daemon_kernel::~cci_daemon_kernel()
 {
-            unmount_memory_cache();
+            //unmount_memory_cache();
 }
 
 //------------------------------------------------------------------------
@@ -100,7 +100,7 @@ int cci_daemon_kernel::mount_memory_cache()
            {
                ostr.str( "" );
                ostr << "sudo "
-                    << "chown wiljoh:wiljoh "
+                    << "chown ubuntu:ubuntu"
                     << "/var/ccifs/cache";
                dw = system( ostr.str().c_str() );
            }
