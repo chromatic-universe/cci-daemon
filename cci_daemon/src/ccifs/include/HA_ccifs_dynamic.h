@@ -7,6 +7,7 @@
 #include <proc_ace.h>
 #include <sys/inotify.h>
 #include <limits.h>
+#include <cci_daemon_kernel.h>
 
 #include "HACCIFS_export.h"
 
@@ -45,6 +46,7 @@ class HACCIFS_Export HA_ccifs : public ACE_Service_Object
                 ACE_thread_t   m_thread_id;
                 bool           m_b_running;
                 std::string    m_str_tmpfs;
+
 
 
           public :

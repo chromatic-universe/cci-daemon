@@ -18,6 +18,7 @@ const std::string cci_daemon_facade::path_config = "/etc/chromatic-universe/cci-
 const std::string cci_daemon_facade::log_path = "/var/log/cci-daemon/cci-daemon.log";
 const std::string cci_daemon_facade::path_pid = "/var/run/cci-daemon.pid";
 
+
 //--------------------------------------------------------------------------------------
 cci_daemon_intf::~cci_daemon_intf()
 {
@@ -34,7 +35,8 @@ cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0
                                                                   m_backtrace { false } ,
                                                                   m_argc{ argc } ,
                                                                   m_argv { argv } ,
-                                                                  m_ptr_kernel_context( new kernel_context )
+                                                                  m_ptr_kernel_context( new kernel_context ) ,
+                                                                  m_chroot_dir { "/" }
 {
       //
 }
@@ -519,6 +521,8 @@ void cci_daemon_facade::bootstrap_coordinator()
 
 
               //map the kernel stack
+              //we just have a library pointer
+              //we have to query for symbosls by design
               map_kernel();
 
 
@@ -557,7 +561,7 @@ void cci_daemon_facade::map_kernel()
 {
           //this is also a desiged entry point for mocks and tests
           //among other things the kernel is only
-          //am array of fucntion pointers
+          //am array of function pointers
           //to the application level  all deletions and allocations
           //are made by the shared library , so the pointers
           //( and the kernel itself) can be removed or replaced in real time
@@ -581,6 +585,30 @@ void cci_daemon_facade::map_kernel()
                 context()->make_kernel( context() );
                 if( ! context()->kernel_ref )
                 { throw std::runtime_error( "...kernel object instantiation failed..." ); }
+                //all other servcie swill be loaded into
+                //this address space. a global
+                //kernel pointer is not made available  here
+                //but other objects will have to populate
+                //their own kernel structures for their own
+                //ends because there is only runtime linkage
+                //we're essentially trying for a python like
+                //unbound object arena. the kernel in any library
+                //is a singleton , meaning different kernels can loaded
+                //but only one of each. since the functions are unbound,
+                //this is the reason for the context structure, which may
+                //appear soemwhat recursive , but is still more
+                //straigjforward than metaprogramming , which becomes
+                //bynzantine complex with memory allocations out of libraries
+                //and trying to swap objects in andout of memory, The C
+                //calling convention allows us the simplicity of justt using a context
+                //structure , while inside the library itself we can do
+                //whatever c++ magic we wish , since the library is
+                //doing all the allocations
+                //
+                //the only interface promise the kernel advertises is that a
+                //advertiseed kernel string well result in a callable function
+                //poiner.
+
                 //map rest of stack
                 context()->pm.clear();
                 context()->mount_memory_cache = get_function_pointer<call_kernel_function>

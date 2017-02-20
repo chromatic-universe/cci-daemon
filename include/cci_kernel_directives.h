@@ -23,7 +23,6 @@ namespace cci_daemon_impl
 {
 
 
-
         static size_t major_version   { 1 };
         static size_t minor_version   { 1 };
         static size_t release_version { 2 };
@@ -37,6 +36,11 @@ namespace cci_daemon_impl
                      << release_version;
                 return ostr.str();
         }
+        static std::set<std::string> kernel_strings = {  "make_kernel" ,
+                                                         "unnmake_kernel" ,
+                                                         "mount_memroy_cache" ,
+                                                         "unmount_memorry_cache"
+                                                      };
         static std::string kernel_fifo{ "/etc/chromatic-universe/fifo" };
         static std::string supplicant_fifo( const std::string& supplicant )
         {

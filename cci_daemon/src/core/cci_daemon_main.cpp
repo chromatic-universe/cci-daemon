@@ -3,7 +3,7 @@
 #include <cci_daemon.h>
 #include <execinfo.h>
 #include <cxxabi.h>
-#include <sys/mount.h>
+#include <linux/limits.h>
 
 using namespace cdi;
 
@@ -23,6 +23,8 @@ int main( int argc , char* argv[] )
             {
                 df = new cci_daemon_facade( argc , argv );
                 df->backtrace( false );
+                char working_dir[PATH_MAX];
+                df->chroot_dir( ::getcwd( working_dir , PATH_MAX ) );
 
                 std::string str_default( "cci-daemon-default" );
                 int options = 0;

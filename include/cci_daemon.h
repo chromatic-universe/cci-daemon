@@ -144,6 +144,7 @@ namespace cci_daemon_impl
                     bool                            m_backtrace;
                     int                             m_argc;
                     char**                          m_argv;
+                    std::string                     m_chroot_dir;
                     std::unique_ptr<kernel_context> m_ptr_kernel_context;
 
                     //prototypes
@@ -161,6 +162,7 @@ namespace cci_daemon_impl
                     service_proc proc() const noexcept { return m_service_proc; }
                     std::string config_path() const noexcept { return m_str_conf; }
                     std::string pid_path() const noexcept { return m_str_pid_path; }
+                    std::string chroot_dir() const noexcept { return m_chroot_dir; }
 
                     //kernel functoroids
                     int bootstrap( int argc , char* argv[] , void* ptr  )
@@ -172,6 +174,7 @@ namespace cci_daemon_impl
                     void config_path( const std::string& path ) { m_str_conf = path; }
                     void pid_path( const std::string& path ) { m_str_pid_path = path; }
                     void proc( service_proc sp ) { m_service_proc = sp; }
+                    void chroot_dir( const std::string& chr ) { m_chroot_dir = chr; }
 
                     //stream
                     friend std::ostream& operator<< ( std::ostream& o , const cci_daemon_facade& df );
