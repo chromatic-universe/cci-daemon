@@ -33,8 +33,5 @@ target_link_libraries(cci-daemon-dispatcher  -lstdc++
 install_targets( /bin/ cci-daemon-dispatcher)
 install (DIRECTORY ../../../include/ 
          DESTINATION include/cci )
-install(FILES  ${CMAKE_SOURCE_DIR}/ldd
-        PERMISSIONS WORLD_EXECUTE WORLD_WRITE WORLD_READ
-        DESTINATION bin)
 
 
