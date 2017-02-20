@@ -8,6 +8,7 @@
 #include <utility>
 #include <chrono>
 #include <thread>
+#include <mutex>
 //cci
 #include <cci_daemon_generic.h>
 #include <cci_daemon_plugin.h>
@@ -72,14 +73,30 @@ namespace cci_daemon_impl
                 public :
 
 
-                    //ctor
-                    explicit cci_daemon_kernel();
-                    //todp
-                    explicit cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  );
+                    //instance - kernel singleton
+                    static cci_daemon_kernel_ptr  instance()
+                    {
+                        //double checked lock
+                        if( ! m_instance )
+                        {
+                            std::lock_guard<std::mutex> lg( m_mutex );
+                            if( ! m_instance )
+                            {  m_instance = new cci_daemon_kernel(); }
+                        }
+
+                        return  m_instance;
+                    }
+
+                    //dispose instance
+                    static void dispose_instance()
+                    {
+                        delete m_instance;
+                        m_instance = nullptr;
+                    }
+
 
                     //dtor
                     virtual ~cci_daemon_kernel();
-
                     //can't copy a kernel
                     cci_daemon_kernel( const cci_daemon_kernel& ) = delete;
                     //no assign
@@ -98,8 +115,14 @@ namespace cci_daemon_impl
                     publish_and_subscribe_server            m_pb_server;
                     //supported
                     static supported_dictionary             m_dict_supported;
-                    bool                                    m_b_cache_mapped;
-                    bool                                    m_b_user_fs;
+
+                    static cci_daemon_kernel_ptr            m_instance;
+                    static std::mutex                       m_mutex;
+
+
+                    //ctor
+                    cci_daemon_kernel()
+                    {}
 
 
                 protected :
@@ -148,6 +171,8 @@ namespace cci_daemon_impl
 
 
            };
+
+
 
            //------------------------------------------------------------------------------------
            extern "C" int make_kernel( kernel_context_ptr context_ptr );

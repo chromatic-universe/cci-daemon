@@ -43,7 +43,7 @@ int main( int argc , char* argv[] )
             try
             {
                 std::string plug( "ps_kafka_facade" );
-                auto cci_kernel( std::make_unique<cci_daemon_kernel>() );
+                auto cci_kernel = cci_daemon_kernel::instance();
                 cci_kernel->load_plugin( plug );
                 std::cerr << "...loaded plugin...."
                           << plug
@@ -63,6 +63,8 @@ int main( int argc , char* argv[] )
                 std::cerr << e.what()
                           << "\n";
             }
+
+            cci_daemon_kernel::dispose_instance();
 
 
             return 0;

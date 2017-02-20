@@ -175,6 +175,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                                         a_handler.grp_id() ) );
                   a_handler.resume();
 
+
                   ACE_DEBUG( ( LM_INFO , "%D (%t) opened coordinator....\n" ) );
                   ACE_DEBUG( ( LM_INFO , "%D (%t) starting event reactor....\n" ) );
                   ACE_Reactor::instance()->run_reactor_event_loop();

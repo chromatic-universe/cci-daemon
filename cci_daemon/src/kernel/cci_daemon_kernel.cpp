@@ -11,26 +11,14 @@ supported_dictionary cci_daemon_kernel::m_dict_supported = { { "publish_subscrib
 
     "{ \"moniker\" : \"publish_and_subscibe\"" } };
 
+cci_daemon_kernel_ptr cci_daemon_kernel::m_instance;
+std::mutex cci_daemon_kernel::m_mutex;
 
-//------------------------------------------------------------------------
-cci_daemon_kernel::cci_daemon_kernel()  : m_loaded_plugins( new plugin_dictionary ) ,
-                                           m_b_cache_mapped { false } ,
-                                           m_b_user_fs { false }
-{
-              //mount_memory_cache();
-}
-
-//todo
-//------------------------------------------------------------------------
-cci_daemon_kernel::cci_daemon_kernel( std::unique_ptr<plugin_dictionary> pd  ) : m_loaded_plugins( std::move( pd ) )
-{
-             //
-}
 
 //------------------------------------------------------------------------
 cci_daemon_kernel::~cci_daemon_kernel()
 {
-            //unmount_memory_cache();
+            //
 }
 
 //------------------------------------------------------------------------
@@ -84,58 +72,29 @@ void cci_daemon_kernel::unload_plugin( const std::string& config )
 //--------------------------------------------------------------------------
 int cci_daemon_kernel::mount_memory_cache()
 {
-          if( m_b_cache_mapped ) { return 0; }
 
-          std::ostringstream ostr;
-          ostr << "sudo mount "
-               << "-t"
-               << " tmpfs"
-               << " -o"
-               << " size=250M,"
-               << "mode=755"
-               << " ccifs"
-               << " /var/ccifs/cache";
-           int dw = system( ostr.str().c_str() );
-           if( dw == 0 )
-           {
-               ostr.str( "" );
-               ostr << "sudo "
-                    << "chown ubuntu:ubuntu"
-                    << "/var/ccifs/cache";
-               dw = system( ostr.str().c_str() );
-           }
-           dw == 0 ? m_b_cache_mapped = true : m_b_cache_mapped = false;
-
-           return dw;
+           return 0;
 
 }
 
 //--------------------------------------------------------------------------
 int cci_daemon_kernel::unmount_memory_cache()
 {
-          if( ! m_b_cache_mapped ) { return -1; }
 
-          std::ostringstream ostr;
-          ostr << "sudo umount "
-               << " /var/ccifs/cache";
-
-           int dw = system( ostr.str().c_str() );
-           dw == 0 ? m_b_cache_mapped = false : m_b_cache_mapped = true;
-
-           return dw;
+           return 0;
 
 }
 
 
 //----------------------------------------------------------------------------
 extern "C" int make_kernel( kernel_context_ptr context_ptr )
-{ context_ptr->kernel_ref =  new cci_daemon_kernel();
+{ context_ptr->kernel_ref =  context_ptr->kernel_ref->instance();
   return 0;
 }
 //-----------------------------------------------------------------------------
 extern "C" int unmake_kernel( kernel_context_ptr context_ptr  )
 { if( context_ptr->kernel_ref )
-  { delete context_ptr->kernel_ref; }
+  { context_ptr->kernel_ref->dispose_instance(); }
   return 0;
 }
 //-----------------------------------------------------------------------------
