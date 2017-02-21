@@ -1,4 +1,4 @@
-//cci_daemon_bootstrap.cpp  chromatic unvierse william k. johnson 2017
+//cci_daemon_bootstrap.cpp  chromatic unviverse    william k. johnson 2017
 
 
 #include <cci_daemon_bootstrap.h>
@@ -142,13 +142,16 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
 
                   ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
 
-                  //daemonizing has switched us to the root directory
+                  //if daemonized , we're in the machine root directory
+                  //move back to working directory
                   int dw = ::chdir( g_facade_ptr->chroot_dir().c_str() );
                   if( dw != 0 )
                   {
                     ACE_ERROR_RETURN( ( LM_ERROR , "%D (%t) could not chdir to working directory..exiting\n"   ) , 1  );
                   }
                   ACE_DEBUG( ( LM_INFO , "%D (%t) changed directory to working directory....\n" ) );
+
+                  //bring up the stack
                   dw = ACE_Service_Config::open( argc , argv );
                   if( dw != 0 )
                   {
@@ -156,6 +159,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                       ACE_ERROR_RETURN( ( LM_ERROR , "(%t) service config returned with errors..exiting\n"   ) , 1  );
                   }
 
+                  //watchdong and utlity thread
                   ccifs_base_handler* hdlr = new ccifs_base_handler();
                   ACE_Time_Value initial_delay( 5 );
                   ACE_Time_Value interval( 5 );
@@ -164,7 +168,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                                                                         initial_delay ,
                                                                         interval );
 
-                  //activate proactor
+                  //activate proactor async services
                   HA_async_handler a_handler;
                   dw_thread_id = a_handler.activate( THR_NEW_LWP | THR_JOINABLE |  THR_SUSPENDED );
                   ACE_ASSERT( dw_thread_id == 0 );

@@ -1,4 +1,4 @@
-//cci_daemon_bootstrap.h  chromatic unvierse william k. johnson 2017
+//cci_daemon_bootstrap.h  chromatic unviverse william k. johnson 2017
 
 #pragma once
 
