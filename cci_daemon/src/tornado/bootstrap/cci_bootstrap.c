@@ -11,11 +11,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <errno.h>
 #include <time.h>
 #include <fcntl.h>
 #include <wchar.h>
 #include <unistd.h>
+
+static FILE* ostream_fd;
+static int silent = 0 ;
 
 
 //iinline
@@ -36,6 +40,12 @@ int cci = 0;
 
 //------------------------------------------------------------------------
 static void stream_out_usage( const char* binary );
+//------------------------------------------------------------------------
+static int build_py_env();
+//------------------------------------------------------------------------
+static void cci_logger ( const char* msg  );
+//------------------------------------------------------------------------
+static void trace( char* atom );
 /*static int  dir_exists(char *filename );
 //------------------------------------------------------------------------
 static int  file_exists( const char *filename );
@@ -45,8 +55,6 @@ static void trace( char* atom );
 static void chk( int py_chk );
 // environment
 static void set_py_env();
-//------------------------------------------------------------------------
-static int build_py_env();
 //------------------------------------------------------------------------
 static int py_env_out();
 // services
@@ -131,162 +139,218 @@ int do_main( int argc , char** argv )
 
 
 
-      char *env_argument = NULL;
-      char *env_entrypoint = NULL;
-      char *env_logname = NULL;
-      char entrypoint[ENTRYPOINT_MAXLEN];
-      int ret = 0;
-      FILE *fd;
-      int use_default_env = 0;
-      int opt = 0;
+              char *env_argument = NULL;
+              char *env_entrypoint = NULL;
+              char *env_logname = NULL;
+              char entrypoint[ENTRYPOINT_MAXLEN];
+              int ret = 0;
+              FILE *fd;
+              int use_default_env = 0;
+              int opt = 0;
 
 
 
-      //chk( become_daemon( 0 ) );
 
-      //trace( "....cci-bootstrap...chromatic universe 2016..." );
+              while ( ( opt = getopt( argc ,
+                                      argv ,
+                                      "sevh" ) ) != -1 )
+              {
+                         switch( opt )
+                         {
 
-      while ( ( opt = getopt( argc ,
-                              argv ,
-                              ":i:evh" ) ) != -1 )
-      {
-                 switch( opt )
-                 {
-                    case 'i' :
-                     {
-                       char* id = optarg;
-                       if ( strlen( argv[0] ) >= strlen( id ) )
-                       {
-                             strcpy( argv[0] , id );
-                            //if( strcmp( trinity , id ) == 0 ) cci = 0; else cci = 1;
-                       }
-                     }
-                     break;
-                    case 'e':
-                        use_default_env = 0;
-                        break;
-                    case 'v':
-                        fprintf( stderr , "\033[22;32mcci-bootstrap version 0.5 william k. johnson 2016\n\033[0m" );
-                        exit( 0 );
-                    case 'h' :
-                    default :
-                    {
-                        //executable moniker as arg
-                        stream_out_usage( argv[0] );
+                            case 'e':
+                                use_default_env = 0;
+                                break;
+                            case 's':
+                                silent = 1;
+                                break;
+                            case 'v':
+                                fprintf( stderr , "\033[22;32mcci-bootstrap version 0.8 william k. johnson 20176\n\033[0m" );
+                                exit( 0 );
+                            case 'h' :
+                            default :
+                            {
+                                //executable moniker as arg
+                                stream_out_usage( argv[0] );
 
-                        exit( 0 );
-                    }
-                 }
-      }
+                                exit( 0 );
+                            }
+                         }
+              }
 
+              ostream_fd = fopen( "cci-bootstrap.log" , "wr" );
+              if( fd == NULL )
+              {
+                  trace( "...could not open log file for writing..." );
 
-
-      /*set_py_env();
+                  exit( 1 );
+              }
+              trace( "...opened log file for writing..." );
 
 
-      trace( "initialize python...cci.." );
-      env_argument = getenv( "ANDROID_ARGUMENT" );
-      env_entrypoint = getenv( "ANDROID_ENTRYPOINT" );
-      env_logname = getenv( "PYTHON_NAME") ;
-
-      if (env_logname == NULL )
-      {
-        env_logname = "python";
-        setenv( "PYTHON_NAME" ,
-                "python" ,
-                1 );
-      }
-
-      LOGP("changing directory to the one provided by ANDROID_ARGUMENT");
-      LOGP(env_argument );
-      chdir( env_argument ) ;
+              set_py_env();
 
 
-      Py_SetProgramName( "android_python" );
-      trace( "Py_SetProgramName...cci..." ) ;
+              /*trace( "initialize python...cci.." );
+              env_argument = getenv( "ANDROID_ARGUMENT" );
+              env_entrypoint = getenv( "ANDROID_ENTRYPOINT" );
+              env_logname = getenv( "PYTHON_NAME") ;
 
-      trace( " Py_GetPath...cci..." ) ;
-      //fprintf( stderr ,  Py_GetPath() );
-      fprintf( stderr , "\n" );
+              if (env_logname == NULL )
+              {
+                env_logname = "python";
+                setenv( "PYTHON_NAME" ,
+                        "python" ,
+                        1 );
+              }
 
-      // instance will abort on failure
-      trace( "...Py_Initialize..." );
-      Py_Initialize();
-      //trace( " Py_SetPath...cci..okdoky..." ) ;
+              LOGP("changing directory to the one provided by ANDROID_ARGUMENT");
+              LOGP(env_argument );
+              chdir( env_argument ) ;
 
-      trace( "initialized python"   );
 
-#if PY_MAJOR_VERSION < 3
-      PySys_SetArgv( argc, argv );
-#endif
+              Py_SetProgramName( "android_python" );
+              trace( "Py_SetProgramName...cci..." ) ;
 
-      LOGP( "initialized python" );
+              trace( " Py_GetPath...cci..." ) ;
+              //fprintf( stderr ,  Py_GetPath() );
+              fprintf( stderr , "\n" );
 
-      // ensure threads will work
-      LOGP("AND: Init threads");
-      trace( "...PyEval_InitThreads()..." );
+              // instance will abort on failure
+              trace( "...Py_Initialize..." );
+              Py_Initialize();
+              //trace( " Py_SetPath...cci..okdoky..." ) ;
 
-      PyEval_InitThreads();
-      trace( "...py threads ok..." );
+              trace( "initialized python"   );
 
 #if PY_MAJOR_VERSION < 3
-      trace( "... initandroidembed();..." );
-      initandroidembed();
+              PySys_SetArgv( argc, argv );
 #endif
-      int py = PyRun_SimpleString( "import androidembed\nandroidembed.log('testing python "
-                           "print redirection')" ) ;
-      chk( py );
-      trace( "... PyRun_SimpleString...ok...import androidembed.." );
 
-      // inject our bootstrap code to redirect python stdin/stdout
-      // replace sys.path with our path
-      py = PyRun_SimpleString( "import sys, posix\n" );
-      chk( py );
+              LOGP( "initialized python" );
 
-      LOGP( "setting up python from private environment..." );
-      trace( "... PyRun_SimpleString...ok...import sys , posix modules.." );
+              // ensure threads will work
+              LOGP("AND: Init threads");
+              trace( "...PyEval_InitThreads()..." );
 
-      trace( "... build_py_env()..." );
-      chk( build_py_env() );
-      trace( "... py_env_out()..." );
-      chk( py_env_out() );
+              PyEval_InitThreads();
+              trace( "...py threads ok..." );
 
-      trace( "... validate_entry_point()..." );
-      chk( validate_entry_point( env_entrypoint ) );
+#if PY_MAJOR_VERSION < 3
+              trace( "... initandroidembed();..." );
+              initandroidembed();
+#endif
+              int py = PyRun_SimpleString( "import androidembed\nandroidembed.log('testing python "
+                                   "print redirection')" ) ;
+              chk( py );
+              trace( "... PyRun_SimpleString...ok...import androidembed.." );
+
+              // inject our bootstrap code to redirect python stdin/stdout
+              // replace sys.path with our path
+              py = PyRun_SimpleString( "import sys, posix\n" );
+              chk( py );
+
+              LOGP( "setting up python from private environment..." );
+              trace( "... PyRun_SimpleString...ok...import sys , posix modules.." );
+
+              trace( "... build_py_env()..." );
+              chk( build_py_env() );
+              trace( "... py_env_out()..." );
+              chk( py_env_out() );
+
+              trace( "... validate_entry_point()..." );
+              chk( validate_entry_point( env_entrypoint ) );
 
 
-      trace( "... open_entry_point()...ok..." );
+              trace( "... open_entry_point()...ok..." );
 
 
-      trace( "... open_entry_point()..." );
-      chk( open_entry_point( env_entrypoint ) );
+              trace( "... open_entry_point()..." );
+              chk( open_entry_point( env_entrypoint ) );
 
 
-      trace( "...fini..." );
+              trace( "...fini..." );
 
-      Py_Finalize();*/
+              Py_Finalize();*/
 
 
-	  return 0;
+              return 0;
 }
 
 
-/*
+
+//-------------------------------------------------------------------------
+void cci_logger ( const char* msg  )
+{
+            struct timeval tv;
+            gettimeofday( &tv, NULL );
+
+            fprintf( ostream_fd ,
+                     "\033[22;32m%u.%03u CCIPYTHONBOOTSTRAP-\033[0m: %s\n" ,
+                     (int) tv.tv_sec ,
+                     (int) ( tv.tv_usec / 1000 ) ,
+                     msg );
+
+}
+
+
+//----------------------------------------------------------------------
+int build_py_env()
+{
+             //LOGP( "setting up python from " );
+             return PyRun_SimpleString(   "private = posix.environ['CCI_PRIVATE']\n"
+                                           "argument = posix.environ['CCI_PRIVATE_PYTHON']\n"
+                                           "sys.path[:] = [ \n"
+                                           //"    private + '/lib/python36.zip', \n"
+                                           "    private + '/lib/python/3.6', \n"
+                                           "    private + '/lib/python3.6/lib-dynload/', \n"
+                                           "    private + '/lib/python3.6/site-packages/', \n"
+                                           "    argument ]\n"
+                                       );
+
+}
+
+//------------------------------------------------------------------------
+void stream_out_usage( const char* binary )
+{
+             //stream , small subset of options
+             fprintf(   stderr ,
+                        "\033[22;32m%s\nusage:\n\t\t-esvh\n" \
+                        "binary: %s\n" \
+                        "\n\033[0m" \
+                        " options:\n" \
+                        "  -e  use default settings , ignore environment\n" \
+                        ") -s  silent\n" \
+                        "  -v  version\n"\
+                        "  -h  help\n\n" \
+                        "\n" \
+                        "\n" ,
+                        "synopsis :\n"\
+                            "\n\t\t bootstrapper for python - cci-daemon-dispatcher\n"\
+                        "\t\t chromatic universe 2017\n" ,
+                        binary
+                    );
+}
+
 //----------------------------------------------------------------------
 void trace( char* atom )
 {
-     // calendar time
-     time_t ltime;
-     //get current cal time
-     ltime = time( NULL );
 
-     fprintf( stderr ,
-             "%s  %s\n" ,
-             asctime( localtime( &ltime ) ) python libdyn-load,
-             atom );
+             if( silent ) { return; }
+
+             // calendar time
+             time_t ltime;
+             //get current cal time
+             ltime = time( NULL );
+
+             fprintf( stderr ,
+                     "trace=> %s  %s\n" ,
+                     asctime( localtime( &ltime ) ) ,
+                     atom );
+             cci_logger( atom );
 }
 
-
+/*
 //----------------------------------------------------------------------
 int build_py_env()
 {
@@ -479,27 +543,5 @@ int open_entry_point( char* entry )
       }
 
 }*/
-
-//------------------------------------------------------------------------
-void stream_out_usage( const char* binary )
-{
-     //stream , small subset of options
-     fprintf(   stderr ,
-                "\033[22;32m%s\nusage:\n\t\t-evh\n" \
-                "binary: %s\n" \
-                "\n\033[0m" \
-                " options:\n" \
-                "  -e  use default settings , ignore environment\n" \
-                "  -v  version\n"\
-                "  -h  help\n\n" \
-                "\n" \
-                "\n" ,
-                "synopsis :\n"\
-                    "\n\t\t bootstrapper for python - cci-daemon-dispatcher\n"\
-                "\t\t chromatic universe 2017\n" ,
-                binary
-            );
-}
-
 
 
