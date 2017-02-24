@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 
-//inline
+//iinline
 #define ENTRYPOINT_MAXLEN 128
 
 char* default_sys_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app";
@@ -34,7 +34,8 @@ char* vulture = "chromatic universe~cci-vulture";
 int cci = 0;
 
 
-// helpers
+//------------------------------------------------------------------------
+static void stream_out_usage( const char* binary );
 /*static int  dir_exists(char *filename );
 //------------------------------------------------------------------------
 static int  file_exists( const char *filename );
@@ -48,8 +49,6 @@ static void set_py_env();
 static int build_py_env();
 //------------------------------------------------------------------------
 static int py_env_out();
-//------------------------------------------------------------------------
-static void stream_out_usage( const char* binary );
 // services
 static int validate_entry_point( char* entry );
 //------------------------------------------------------------------------
@@ -173,7 +172,8 @@ int do_main( int argc , char** argv )
                     default :
                     {
                         //executable moniker as arg
-                        //stream_out_usage( argv[0] );
+                        stream_out_usage( argv[0] );
+
                         exit( 0 );
                     }
                  }
@@ -478,7 +478,7 @@ int open_entry_point( char* entry )
         if ( PyFile_WriteString( "\n", f ) ) { PyErr_Clear(); }
       }
 
-}
+}*/
 
 //------------------------------------------------------------------------
 void stream_out_usage( const char* binary )
@@ -495,12 +495,11 @@ void stream_out_usage( const char* binary )
                 "\n" \
                 "\n" ,
                 "synopsis :\n"\
-                    "\n\t\t bootstrapper for python for android \n" ,
+                    "\n\t\t bootstrapper for python - cci-daemon-dispatcher\n"\
+                "\t\t chromatic universe 2017\n" ,
                 binary
             );
 }
-
-*/
 
 
 
