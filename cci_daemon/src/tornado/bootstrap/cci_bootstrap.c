@@ -4,7 +4,7 @@
 
 #include <Python.h>
 
-// c runtime
+//c runtime
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 
-// inline
+//inline
 #define ENTRYPOINT_MAXLEN 128
 
 char* default_sys_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app";
