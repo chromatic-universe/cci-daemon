@@ -20,7 +20,7 @@
 #include <linux/limits.h>
 
 static FILE* ostream_fd;
-static int silent = 0 ;
+int silent = 0 ;
 
 
 //iinline
@@ -49,12 +49,14 @@ static void cci_logger ( const char* msg  );
 static void trace( char* atom );
 //------------------------------------------------------------------------
 static void chk( int py_chk );
+//
 //environment
 //..----------------------------------------------------------------------
 static void set_py_env();
-
-
-/*static int  dir_exists(char *filename );
+//------------------------------------------------------------------------
+static int py_env_out();
+//..----------------------------------------------------------------------
+static int  dir_exists(char *filename );
 //------------------------------------------------------------------------
 static int  file_exists( const char *filename );
 //------------------------------------------------------------------------
@@ -66,7 +68,7 @@ static int py_env_out();
 // services
 static int validate_entry_point( char* entry );
 //------------------------------------------------------------------------
-static int open_entry_point( char* entry );*/
+int open_entry_point( char* entry );
 
 
 // py api
@@ -83,6 +85,8 @@ int main( int argc , char** argv )
 static PyObject *cci_log( PyObject *self , PyObject *args )
 {
 
+          //utility function to check
+          //if everything actually works
           char *logstr = NULL;
 
           if ( !PyArg_ParseTuple( args , "s", &logstr) )
@@ -90,13 +94,15 @@ static PyObject *cci_log( PyObject *self , PyObject *args )
             return NULL;
           }
 
+          trace( logstr ) ;
 
 
           Py_RETURN_NONE;
 
 }
 
-
+//one module  with  one method
+//
 //-------------------------------------------------------------------------------
 static PyMethodDef cci_methods[] = {
                                                { "log" ,
@@ -160,6 +166,7 @@ int do_main( int argc , char** argv )
                                       argv ,
                                       "sevh" ) ) != -1 )
               {
+                         //process options
                          switch( opt )
                          {
 
@@ -192,23 +199,28 @@ int do_main( int argc , char** argv )
               }
               trace( "...opened log file for writing..." );
 
-
+              //explicitly set python environment to
+              //our private pythone environemnt
               set_py_env();
 
-
+              //specify python stack args
               trace( "initialize python...cci.." );
               env_argument = getenv( "CCI_PRIVATE_PYTHON" );
               env_entrypoint = getenv( "CCI_ENTRYPOINT" );
 
-              trace( "changing directory to the one provided by CCI_PRIVATE_PYTHHON");
+              //change directory to our application directory
+              //provided by the envrionemnt variable
+              trace( "changing directory to the one provided by CCI_PRIVATE_PYTHON");
               ret = chdir( env_argument ) ;
               if( ret == -1 ) { trace( "...change directory failed..." ); }
               else{ trace( env_argument ); }
 
 
+              //the prigram name , not important
               Py_SetProgramName( "cci_python" );
               trace( "Py_SetProgramName...cci..." ) ;
 
+              //initialize stack
               //instance will abort on failure
               trace( "...Py_Initialize..." );
               Py_Initialize();
@@ -221,7 +233,7 @@ int do_main( int argc , char** argv )
 
               trace( "initialized python" );
 
-              // ensure threads will work
+              //ensure threads will work
               trace( "...PyEval_InitThreads()..." );
 
               PyEval_InitThreads();
@@ -231,39 +243,43 @@ int do_main( int argc , char** argv )
               trace( "... init_cci_private();..." );
               init_cci_private();
 #endif
-              /*
-              int py = PyRun_SimpleString( "import androidembed\nandroidembed.log('testing python "
+
+              //test run our runtime module
+              int py = PyRun_SimpleString( "import cciprivate\ncciprivate.log('testing python "
                                    "print redirection')" ) ;
               chk( py );
-              trace( "... PyRun_SimpleString...ok...import androidembed.." );
+              trace( "... PyRun_SimpleString...ok...import cciprivate.." );
 
-              // inject our bootstrap code to redirect python stdin/stdout
-              // replace sys.path with our path
+              //import our privately configured sys environment
+              trace( "setting up python from private environment..." );
+              trace( "... PyRun_SimpleString...ok...import sys , posix modules.." );
               py = PyRun_SimpleString( "import sys, posix\n" );
               chk( py );
 
-              LOGP( "setting up python from private environment..." );
-              trace( "... PyRun_SimpleString...ok...import sys , posix modules.." );
 
               trace( "... build_py_env()..." );
               chk( build_py_env() );
               trace( "... py_env_out()..." );
+              //test run our nodule in oython
               chk( py_env_out() );
 
+              //validate the entry point , i,e. , the python program to be run
               trace( "... validate_entry_point()..." );
               chk( validate_entry_point( env_entrypoint ) );
 
-
-              trace( "... open_entry_point()...ok..." );
-
-
+              //open and run the entry point
               trace( "... open_entry_point()..." );
               chk( open_entry_point( env_entrypoint ) );
 
 
+              //fini
               trace( "...fini..." );
 
-              Py_Finalize();*/
+              //trigger python's garbage collectro
+              Py_Finalize();
+
+              //close file handle
+              if( ostream_fd ) { close( ostream_fd );  }
 
 
               return 0;
@@ -293,10 +309,9 @@ int build_py_env()
              return PyRun_SimpleString(   "private = posix.environ['CCI_PRIVATE']\n"
                                            "argument = posix.environ['CCI_PRIVATE_PYTHON']\n"
                                            "sys.path[:] = [ \n"
-                                           //"    private + '/lib/python36.zip', \n"
                                            "    private + '/lib/python/3.6', \n"
                                            "    private + '/lib/python3.6/lib-dynload/', \n"
-                                            "    private + '/bin/', \n"
+                                           "    private + '/bin/', \n"
                                            "    private + '/lib/python3.6/site-packages/', \n"
                                            "    argument ]\n"
                                        );
@@ -396,127 +411,119 @@ void set_py_env()
 
              }
 
-
 }
-
-
-/*
-
-//---------------------------------------------------------------------------
-int dir_exists(char *filename)
-{
-      struct stat st;
-      if ( stat( filename , &st ) == 0 )
-      {
-        if ( S_ISDIR( st.st_mode ) ) { return 1; }
-      }
-
-      return 0;
-}
-
-//---------------------------------------------------------------------------
-int file_exists( const char *filename )
-{
-      FILE *file;
-      if ( file = fopen( filename , "r" ) )
-      {
-        fclose( file );
-
-        return 1;
-      }
-
-      return 0;
-}
-
-
-
-
 
 //---------------------------------------------------------------------------
 int py_env_out()
 {
 
-      return PyRun_SimpleString(
-          "class LogFile(object):\n"
-          "    def __init__(self):\n"
-          "        self.buffer = ''\n"
-          "    def write(self, s):\n"
-          "        s = self.buffer + s\n"
-          "        lines = s.split(\"\\n\")\n"
-          "        for l in lines[:-1]:\n"
-          "            androidembed.log(l)\n"
-          "        self.buffer = lines[-1]\n"
-          "    def flush(self):\n"
-          "        return\n"
-          "sys.stdout = sys.stderr = LogFile()\n"
-          "print('Android path', sys.path)\n"
-          "import os\n"
-          "print('os.environ is', os.environ)\n"
-          "print('cci bootstrap done. __name__ is', __name__)");
+              return PyRun_SimpleString(
+                  "class log_file(object):\n"
+                  "    def __init__(self):\n"
+                  "        self.buffer = ''\n"
+                  "    def write(self, s):\n"
+                  "        s = self.buffer + s\n"
+                  "        lines = s.split(\"\\n\")\n"
+                  "        for l in lines[:-1]:\n"
+                  "            cciprivate.log(l)\n"
+                  "        self.buffer = lines[-1]\n"
+                  "    def flush(self):\n"
+                  "        return\n"
+                  "sys.stdout = sys.stderr = log_file()\n"
+                  "print('cci path', sys.path)\n"
+                  "import os\n"
+                  "print('os.environ is', os.environ)\n"
+                  "print('cci bootstrap done. __name__ is', __name__)");
 
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+int dir_exists(char *filename)
+{
+              struct stat st;
+              if ( stat( filename , &st ) == 0 )
+              {
+                if ( S_ISDIR( st.st_mode ) ) { return 1; }
+              }
+
+              return 0;
+}
+
+//---------------------------------------------------------------------------
+int file_exists( const char *filename )
+{
+              FILE *file;
+              if ( file = fopen( filename , "r" ) )
+              {
+                fclose( file );
+
+                return 1;
+              }
+
+              return 0;
+}
+
+//-------------------------------------------------------------------------
 int validate_entry_point( char* env_entrypoint )
 {
-      char entrypoint[ENTRYPOINT_MAXLEN];
+              char entrypoint[ENTRYPOINT_MAXLEN];
 
-      char *dot = strrchr( env_entrypoint , '.' );
-      if ( dot <= 0 )
-      {
-        LOGP( "invalid entrypoint, abort." );
-        return -1;
-      }
+              char *dot = strrchr( env_entrypoint , '.' );
+              if ( dot <= 0 )
+              {
+                    trace( "invalid entrypoint, abort." );
+                    return -1;
+              }
 
-      if ( strlen( env_entrypoint ) > ENTRYPOINT_MAXLEN - 2)
-      {
-          LOGP( "entrypoint path is too long, try increasing ENTRYPOINT_MAXLEN." );
-          return -1;
-      }
+              if ( strlen( env_entrypoint ) > ENTRYPOINT_MAXLEN - 2)
+              {
+                  trace( "entrypoint path is too long, try increasing ENTRYPOINT_MAXLEN." );
+                  return -1;
+              }
 
-      if ( !strcmp (dot, ".pyo" ) )
-      {
-        if ( !file_exists( env_entrypoint ) )
-        {
-          //fallback on .py
-          strcpy( entrypoint , env_entrypoint );
-          entrypoint[strlen(env_entrypoint) - 1] = '\0';
-          LOGP( entrypoint );
-          if ( !file_exists( entrypoint ) )
-          {
-            LOGP( "Entrypoint not found (.pyo, fallback on .py), abort" );
-            return -1;
-          }
-        }
-        else
-        {
-          strcpy( entrypoint, env_entrypoint );
-        }
-      }
-      else if (!strcmp(dot, ".py") )
-      {
-        //if .py is passed, check the pyo version first
-        strcpy(entrypoint, env_entrypoint);
-        entrypoint[strlen(env_entrypoint) + 1] = '\0';
-        entrypoint[strlen(env_entrypoint)] = 'o';
-        if (!file_exists( entrypoint ) )
-        {
-          // fallback on pure python version
-          if ( !file_exists(env_entrypoint) )
-          {
-            LOGP( "Entrypoint not found (.py), abort.");
-            return -1;
-          }
-          strcpy( entrypoint , env_entrypoint );
-        }
-      }
-      else
-      {
-        LOGP( "Entrypoint have an invalid extension (must be .py or .pyo), abort.");
-        return -1;
-      }
+              if ( !strcmp (dot, ".pyo" ) )
+              {
+                if ( !file_exists( env_entrypoint ) )
+                {
+                  //fallback on .py
+                  strcpy( entrypoint , env_entrypoint );
+                  entrypoint[strlen(env_entrypoint) - 1] = '\0';
+                  trace( entrypoint );
+                  if ( !file_exists( entrypoint ) )
+                  {
+                    trace( "Entrypoint not found (.pyo, fallback on .py), abort" );
+                    return -1;
+                  }
+                }
+                else
+                {
+                  strcpy( entrypoint, env_entrypoint );
+                }
+              }
+              else if (!strcmp(dot, ".py") )
+              {
+                //if .py is passed, check the pyo version first
+                strcpy(entrypoint, env_entrypoint);
+                entrypoint[strlen(env_entrypoint) + 1] = '\0';
+                entrypoint[strlen(env_entrypoint)] = 'o';
+                if (!file_exists( entrypoint ) )
+                {
+                  // fallback on pure python version
+                  if ( !file_exists(env_entrypoint) )
+                  {
+                    trace( "entrypoint not found (.py), abort." );
+                    return -1;
+                  }
+                  strcpy( entrypoint , env_entrypoint );
+                }
+              }
+              else
+              {
+                trace( "entrypoint has an invalid extension (must be .py or .pyo), abort." );
+                return -1;
+              }
 
-      return 0;
+              return 0;
 
 }
 
@@ -524,29 +531,29 @@ int validate_entry_point( char* env_entrypoint )
 //------------------------------------------------------------------------------------
 int open_entry_point( char* entry )
 {
-      trace( entry );
+              trace( entry );
 
-      FILE *fd;
+              FILE *fd;
 
-      fd = fopen( entry , "r" );
-      if ( fd == NULL )
-      {
-        LOGP( "ppen the entrypoint failed" );
-        LOGP( entry );
+              fd = fopen( entry , "r" );
+              if ( fd == NULL )
+              {
+                trace( "ppen the entrypoint failed" );
+                trace( entry );
 
-        return -1;
-      }
+                return -1;
+              }
 
-      int ret = PyRun_SimpleFile( fd , entry );
-      if ( PyErr_Occurred() != NULL )
-      {
-        ret = 1;
-        // this exits with the right code if sys exit
-        PyErr_Print();
-        PyObject *f = PySys_GetObject( "stderr" );
-        if ( PyFile_WriteString( "\n", f ) ) { PyErr_Clear(); }
-      }
+              int ret = PyRun_SimpleFile( fd , entry );
+              if ( PyErr_Occurred() != NULL )
+              {
+                ret = 1;
+                // this exits with the right code if sys exit
+                PyErr_Print();
+                PyObject *f = PySys_GetObject( "stderr" );
+                if ( PyFile_WriteString( "\n", f ) ) { PyErr_Clear(); }
+              }
 
-}*/
+}
 
 
