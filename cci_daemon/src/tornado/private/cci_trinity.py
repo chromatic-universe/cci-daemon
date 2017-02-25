@@ -1,14 +1,13 @@
 # cci-trinity.py    william k. johnson  2017
 #
 import sys
-# we're being bootstrapped by qpython , so we have to explicitly
-# add our site packages here, since they may or may not exist
-# in qpython's runtime environment
-sys.path.append( '/data/data/com.chromaticuniverse.cci_trinity/files/lib/python2.7/site-packages' )
-
 import os
-'''
-from StringIO import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO 
+
 import logging
 
 from flask import Flask , request , send_file , render_template , url_for
@@ -17,10 +16,8 @@ from flask import redirect , Response
 from flask_restful import Resource, Api
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 import subprocess as proc
-#import sqlite3
 import time
 import signal
-import Queue
 import base64
 import time
 import requests
@@ -36,19 +33,19 @@ from tornado import gen
 from tornado.queues import Queue
 
 
-import kafka
+#import kafka
 
 #cci
-from application import app ,\
-	                    mongo_no_resource_exception , \
-						kafka_no_resource_exception , \
-	                    _logger
-from streams import tr_mongo_rest , \
-					tr_bimini , \
-					tr_trinity , \
-					tr_utils , \
-					tr_sqlite , \
-					tr_kafka_rest
+#from application import app ,\
+#	                    mongo_no_resource_exception , \
+#						kafka_no_resource_exception , \
+#	                    _logger
+#from streams import tr_mongo_rest , \
+#					tr_bimini , \
+#					tr_trinity , \
+#					tr_utils , \
+#					tr_sqlite , \
+#					tr_kafka_rest
 
 max_wait_seconds_before_shutdown  = 3
 
@@ -57,7 +54,7 @@ http_server = None
 
 const_per_page = 20
 
-
+'''
 class query_session_form( Form ) :
     session_id = StringField( 'session_id:' )
     submit = SubmitField('Submit')

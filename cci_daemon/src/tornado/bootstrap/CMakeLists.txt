@@ -14,16 +14,17 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -rdynamic -O9 -DRELEASE -std=c99")
 
 
 # includes
-include_directories(/usr/include/python2.7 )
+include_directories($ENV{CCI_PRIVATE}/include/python3.6m 
+                    ${CPR_INCLUDE_DIRS})
 
 # link
-link_directories($ENV{DEV}/lib)
+link_directories($ENV{CCI_PRIVATE}/lib)
                 
 #binary
 add_executable(cci-bootstrap cci_bootstrap.c)
 
 #link libs
-target_link_libraries(cci-bootstrap -lpython2.7)
+target_link_libraries(cci-bootstrap -lpython3.6m)
 #install
 install_targets(/bin cci-bootstrap)
 

@@ -26,13 +26,6 @@ int silent = 0 ;
 //iinline
 #define ENTRYPOINT_MAXLEN 128
 
-char* default_sys_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app";
-char* default_python_home = "/data/data/com.chromaticuniverse.cci_trinity/files";
-char* default_python_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python27.zip:"
-                            "/data/data/com.chromaticuniverse.cci_trinity/files/app/python2.7/:"
-                            "/data/data/com.chromaticuniverse.cci_trinity/lib/:"
-                            "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python2.7/lib-dynload/:"
-                            "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python2.7/site-packages/";
 char* trinity = "cci_trinity.py";
 char* vulture = "cci_trinity_async.py";
 int cci = 0;
@@ -217,7 +210,8 @@ int do_main( int argc , char** argv )
 
 
               //the prigram name , not important
-              Py_SetProgramName( "cci_python" );
+              wchar_t* w_name = L"cci-python";
+              Py_SetProgramName( w_name );
               trace( "Py_SetProgramName...cci..." ) ;
 
               //initialize stack
@@ -279,7 +273,7 @@ int do_main( int argc , char** argv )
               Py_Finalize();
 
               //close file handle
-              if( ostream_fd ) { close( ostream_fd );  }
+              if( ostream_fd ) { fclose( ostream_fd );  }
 
 
               return 0;
@@ -453,7 +447,8 @@ int dir_exists(char *filename)
 int file_exists( const char *filename )
 {
               FILE *file;
-              if ( file = fopen( filename , "r" ) )
+              file = fopen( filename , "r" );
+              if( file )
               {
                 fclose( file );
 
@@ -553,6 +548,9 @@ int open_entry_point( char* entry )
                 PyObject *f = PySys_GetObject( "stderr" );
                 if ( PyFile_WriteString( "\n", f ) ) { PyErr_Clear(); }
               }
+
+
+              return 0;
 
 }
 
