@@ -1,10 +1,8 @@
-//HA_dispatcher_protocol_dynamic.cpp   chromatic universe william k. johnson 2017
+//HA_python_bootstrap.cpp   chromatic universe william k. johnson 2017
 
-#include <HA_dispatcher_protocol_dynamic.h>
+#include <HA_python_bootstrap.h>
 #include <cci_kernel_directives.h>
 
-static std::string conf_path { "/etc/chromatic-universe/ha_proc_ace_acceptor.ini" };
-unsigned long g_dw_finished = 0L;
 
 
 //signal handles
@@ -20,7 +18,7 @@ class proc_signal_handler : public ACE_Event_Handler
                                     ucontext_t * = 0 )
                 {
 
-    	            ACE_Trace _( ACE_TEXT( "proc_signal_handler..HA_proc_ace_acceptor.." ) , __LINE__ );
+    	            ACE_Trace _( ACE_TEXT( "proc_signal_handler..HA_python_bootstrap.." ) , __LINE__ );
 
                     switch( signum )
                     {
@@ -37,15 +35,14 @@ class proc_signal_handler : public ACE_Event_Handler
 };
 
 //---------------------------------------------------------------------------------------------
-int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
+int HA_python_bootstrap::init ( int argc , ACE_TCHAR *argv[] )
 {
 
-               ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::init" ) , __LINE__ );
-               ACE_DEBUG( ( LM_INFO ,  "%P %t proc_acceptor...\n" ) );
+               ACE_Trace _( ACE_TEXT( "HA_python_bootstrap::init" ) , __LINE__ );
 
               //command line
               //-------------------------------------------------------------------------------
-              static const ACE_TCHAR options[] = ACE_TEXT (":f:");
+              static const ACE_TCHAR options[] = ACE_TEXT (":<F11>f:");
               ACE_Get_Opt cmd_opts (argc, argv, options, 0);
               if (cmd_opts.long_option
                   (ACE_TEXT ( "config" ), 'f', ACE_Get_Opt::ARG_REQUIRED) == -1)
@@ -84,12 +81,12 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 
               ACE_Configuration_Section_Key dispatcher_section;
               if (config.open_section (config.root_section (),
-                                       ACE_TEXT ( "HA_proc_ace_acceptor" ),
+                                       ACE_TEXT ( "HA_python_bootstrap" ),
                                        0,
                                        dispatcher_section) == -1)
                 ACE_ERROR_RETURN ((LM_ERROR,
                                    ACE_TEXT ("%p\n"),
-                                   ACE_TEXT ( "can't open HA_proc_ace_acceptor section"  ) ) ,
+                                   ACE_TEXT ( "can't open HA_python_bootstrap section"  ) ) ,
                                   -1 );
               //listen port
               u_int dispatcher_port;
@@ -97,7 +94,7 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
                                              ACE_TEXT ( "listen_port" ) ,
                                              dispatcher_port ) == -1 )
                 ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("HA_proc_ace_acceptor listen_port ")
+                                   ACE_TEXT ("HA_python_bootstrap listen_port ")
                                    ACE_TEXT (" does not exist\n") ) ,
                                   -1 );
               data_()->port( dispatcher_port );
@@ -128,7 +125,7 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 }
 
 //------------------------------------------------------------------------------------------------
-int  HA_proc_ace_acceptor::fini()
+int  HA_python_bootstrap::fini()
 {
 
             ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::fini" ) , __LINE__ );
@@ -140,7 +137,7 @@ int  HA_proc_ace_acceptor::fini()
 }
 
 //------------------------------------------------------------------------------------------------
-int HA_proc_ace_acceptor::info( ACE_TCHAR **str , size_t len ) const
+int HA_python_bootstrap::info( ACE_TCHAR **str , size_t len ) const
 {
 
             ACE_Trace _( ACE_TEXT( "HA_proc_acceptor::info" ) , __LINE__ );
@@ -155,7 +152,7 @@ int HA_proc_ace_acceptor::info( ACE_TCHAR **str , size_t len ) const
             else
             {  ACE_OS::strncpy (*str, buf, len); }
 
-            return static_cast<int>( ACE_OS::strlen (*str) );
+           return static_cast<int>( ACE_OS::strlen (*str) );
 }
 
 
