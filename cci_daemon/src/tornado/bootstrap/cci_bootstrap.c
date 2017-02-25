@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <wchar.h>
 #include <unistd.h>
+#include <linux/limits.h>
 
 static FILE* ostream_fd;
 static int silent = 0 ;
@@ -26,18 +27,18 @@ static int silent = 0 ;
 #define ENTRYPOINT_MAXLEN 128
 
 char* default_sys_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app";
-char* default_andr_arg_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app";
 char* default_python_home = "/data/data/com.chromaticuniverse.cci_trinity/files";
 char* default_python_path = "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python27.zip:"
                             "/data/data/com.chromaticuniverse.cci_trinity/files/app/python2.7/:"
                             "/data/data/com.chromaticuniverse.cci_trinity/lib/:"
                             "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python2.7/lib-dynload/:"
                             "/data/data/com.chromaticuniverse.cci_trinity/files/app/lib/python2.7/site-packages/";
-char* trinity = "chromatic universe~cci-trinity";
-char* vulture = "chromatic universe~cci-vulture";
+char* trinity = "cci_trinity.py";
+char* vulture = "cci_trinity_async.py";
 int cci = 0;
 
 
+//helpers
 //------------------------------------------------------------------------
 static void stream_out_usage( const char* binary );
 //------------------------------------------------------------------------
@@ -46,6 +47,13 @@ static int build_py_env();
 static void cci_logger ( const char* msg  );
 //------------------------------------------------------------------------
 static void trace( char* atom );
+//------------------------------------------------------------------------
+static void chk( int py_chk );
+//environment
+//..----------------------------------------------------------------------
+static void set_py_env();
+
+
 /*static int  dir_exists(char *filename );
 //------------------------------------------------------------------------
 static int  file_exists( const char *filename );
@@ -53,8 +61,6 @@ static int  file_exists( const char *filename );
 static void trace( char* atom );
 //------------------------------------------------------------------------
 static void chk( int py_chk );
-// environment
-static void set_py_env();
 //------------------------------------------------------------------------
 static int py_env_out();
 // services
@@ -84,7 +90,6 @@ static PyObject *cci_log( PyObject *self , PyObject *args )
             return NULL;
           }
 
-          //LOG( getenv( "PYTHON_NAME" ) , logstr );
 
 
           Py_RETURN_NONE;
@@ -191,55 +196,42 @@ int do_main( int argc , char** argv )
               set_py_env();
 
 
-              /*trace( "initialize python...cci.." );
-              env_argument = getenv( "ANDROID_ARGUMENT" );
-              env_entrypoint = getenv( "ANDROID_ENTRYPOINT" );
-              env_logname = getenv( "PYTHON_NAME") ;
+              trace( "initialize python...cci.." );
+              env_argument = getenv( "CCI_PRIVATE_PYTHON" );
+              env_entrypoint = getenv( "CCI_ENTRYPOINT" );
 
-              if (env_logname == NULL )
-              {
-                env_logname = "python";
-                setenv( "PYTHON_NAME" ,
-                        "python" ,
-                        1 );
-              }
-
-              LOGP("changing directory to the one provided by ANDROID_ARGUMENT");
-              LOGP(env_argument );
-              chdir( env_argument ) ;
+              trace( "changing directory to the one provided by CCI_PRIVATE_PYTHHON");
+              ret = chdir( env_argument ) ;
+              if( ret == -1 ) { trace( "...change directory failed..." ); }
+              else{ trace( env_argument ); }
 
 
-              Py_SetProgramName( "android_python" );
+              Py_SetProgramName( "cci_python" );
               trace( "Py_SetProgramName...cci..." ) ;
 
-              trace( " Py_GetPath...cci..." ) ;
-              //fprintf( stderr ,  Py_GetPath() );
-              fprintf( stderr , "\n" );
-
-              // instance will abort on failure
+              //instance will abort on failure
               trace( "...Py_Initialize..." );
               Py_Initialize();
-              //trace( " Py_SetPath...cci..okdoky..." ) ;
 
-              trace( "initialized python"   );
+
 
 #if PY_MAJOR_VERSION < 3
               PySys_SetArgv( argc, argv );
 #endif
 
-              LOGP( "initialized python" );
+              trace( "initialized python" );
 
               // ensure threads will work
-              LOGP("AND: Init threads");
               trace( "...PyEval_InitThreads()..." );
 
               PyEval_InitThreads();
               trace( "...py threads ok..." );
 
 #if PY_MAJOR_VERSION < 3
-              trace( "... initandroidembed();..." );
-              initandroidembed();
+              trace( "... init_cci_private();..." );
+              init_cci_private();
 #endif
+              /*
               int py = PyRun_SimpleString( "import androidembed\nandroidembed.log('testing python "
                                    "print redirection')" ) ;
               chk( py );
@@ -304,11 +296,25 @@ int build_py_env()
                                            //"    private + '/lib/python36.zip', \n"
                                            "    private + '/lib/python/3.6', \n"
                                            "    private + '/lib/python3.6/lib-dynload/', \n"
+                                            "    private + '/bin/', \n"
                                            "    private + '/lib/python3.6/site-packages/', \n"
                                            "    argument ]\n"
                                        );
 
 }
+
+//-------------------------------------------------------------------------
+void chk( int py_chk )
+{
+             if( py_chk == 0 ) { trace( "...py stack call ok..." ); }
+             else if( py_chk == -1 )
+             {
+                 trace( "....error in py stack...exiting..." );
+                 exit( 1 );
+             }
+             else{ exit( 1 ); }
+}
+
 
 //------------------------------------------------------------------------
 void stream_out_usage( const char* binary )
@@ -350,23 +356,51 @@ void trace( char* atom )
              cci_logger( atom );
 }
 
-/*
-//----------------------------------------------------------------------
-int build_py_env()
+//--------------------------------------------------------------------------
+void set_py_env()
 {
-     LOGP( "setting up python from ANDROID_PRIVATE" );
-     return PyRun_SimpleString(   "private = posix.environ['ANDROID_APP_PATH']\n"
-                                   "argument = posix.environ['ANDROID_ARGUMENT']\n"
-                                   "sys.path[:] = [ \n"
-                                   "    private + '/lib/python27.zip', \n"
-                                   "    private + '/lib/python2.7/', \n"
-                                   "    private + '/lib/python2.7/lib-dynload/', \n"
-                                   "    private + '/lib/python2.7/site-packages/', \n"
-                                   "    '/data/data/com.chromaticuniverse.cci_trinity/lib/', \n"
-                                   "    argument ]\n"
-                               );
+
+             char path_buf[PATH_MAX];
+             char path_entry[1024];
+
+             char* p_path;
+             p_path = getenv ( "CCI_PRIVATE" );
+             if ( p_path != NULL )
+             {
+                trace( "..setting python path...." );
+                sprintf( path_entry , "%s/lib/python3.6/lib-dynload/:" , p_path );
+                strcat( path_buf , path_entry );
+                memset( path_entry , '\0' , strlen( path_entry ) );
+                sprintf( path_entry , "%s/lib/python3.6/lib/:" , p_path );
+                strcat( path_buf , path_entry );
+                memset( path_entry , '\0' , strlen( path_entry ) );
+                sprintf( path_entry , "%s/lib/python3.6/site-packages/:" , p_path );
+                strcat( path_buf , path_entry );
+                memset( path_entry , '\0' , strlen( path_entry ) );
+                sprintf( path_entry , "%s/bin/:" , p_path );
+                strcat( path_buf , path_entry );
+
+                p_path = getenv ( "CCI_PRIVATE_PYTHON" );
+                if ( p_path != NULL )
+                {
+                    strcat( path_buf , p_path );
+                }
+
+                trace( "... setenv..PYTHONPATH" );
+                chk( setenv( "PYTHONPATH"  , path_buf , 1 ) );
+                trace( path_buf );
+
+
+                trace( "... setenv..CCI_ENTRYPOINT" );
+                chk( setenv( "CCI_ENTRYPOINT" , trinity , 1 ) );
+
+             }
+
 
 }
+
+
+/*
 
 //---------------------------------------------------------------------------
 int dir_exists(char *filename)
@@ -394,36 +428,7 @@ int file_exists( const char *filename )
       return 0;
 }
 
-//-------------------------------------------------------------------------
-void chk( int py_chk )
-{
-     if( py_chk == 0 ) { trace( "...py stack call ok..." ); }
-     else if( py_chk == -1 )
-     {
-         trace( "....error in py stack...exiting..." );
-         exit( 1 );
-     }
-     else{ exit( 1 ); }
-}
 
-//--------------------------------------------------------------------------
-void set_py_env()
-{
-
-     trace( "... setenv..PYTHONPATH" );
-     chk( setenv( "PYTHONPATH"  , default_python_path , 1 ) );
-     trace( "... setenv..PYTHONHOME" );
-     chk( setenv( "PYTHONHOME"  , default_python_home , 1 ) );
-     trace( "... setenv..ANDROID_APP_PATH" );
-     chk( setenv( "ANDROID_APP_PATH" , default_sys_path  , 1 ) );
-     trace( "... setenv..ANDROID_ARGUMENT" );
-     chk( setenv( "ANDROID_ARGUMENT" , default_andr_arg_path  , 1 ) );
-     trace( "... setenv..ANDROID_ENTRYPOINT" );
-     chk( setenv( "ANDROID_ENTRYPOINT" , "cci_trinity_async.py" , 1 ) );
-
-
-
-}
 
 
 
