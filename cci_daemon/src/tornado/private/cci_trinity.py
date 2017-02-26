@@ -224,6 +224,7 @@ if __name__ == "__main__"  :
 				 signal.signal( signal.SIGINT, sig_handler )
 
 				 # write pid
+              cci_trinity.py
 				 with open( 'pid' , 'w' ) as pidfile :
 					 pidfile.write( str( os.getpid() ) + '\n'  )
 
@@ -248,12 +249,11 @@ if __name__ == "__main__"  :
 # ------------------------------------------------------------------------------
 if __name__ == "__main__"  :
 
-                from time import sleep
 
                 print( 'cci-daemon-dispatcher...at last!' )
-                while True :
-                    sleep( 2 )
-                    
+                
+                with open( 'skippy' , 'w' ) as f :
+                    f.write( 'the original corny snaps!...\n' )
 
 
 

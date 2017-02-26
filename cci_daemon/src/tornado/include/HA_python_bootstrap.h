@@ -48,6 +48,10 @@ class HAPYTHONBOOTSTRAP_Export HA_python_bootstrap : public ACE_Service_Object
 
                 //helpers
                 void set_py_env();
+                int validate_entry_point( const std::string& entry );
+                int file_exists( const std::string& filename );
+                int open_entry_point( const std::string&  entry );
+
 
           public :
 

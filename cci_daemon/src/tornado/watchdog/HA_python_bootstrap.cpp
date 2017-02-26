@@ -177,8 +177,23 @@ int HA_python_bootstrap::init ( int argc , ACE_TCHAR *argv[] )
               }*/
 
 
+              if( validate_entry_point( HA_python_bootstrap::cci_trinity_app_moniker ) == -1 )
+              {
+
+                       ACE_ERROR_RETURN ((LM_ERROR,
+                                   ACE_TEXT ("...open entry point...")
+                                   ACE_TEXT (" fatal exception\n" ) ) ,
+                                  -1 );
+
+              }
 
 
+              py =  open_entry_point( HA_python_bootstrap::cci_trinity_app_moniker );
+              if( py != -1 )
+              {
+                  ACE_DEBUG
+                  ( ( LM_DEBUG, ACE_TEXT ("(%t) ..python entry point bootstrapped...\n" ) ) );
+              }
 
 
               return 0;
@@ -205,6 +220,70 @@ void HA_python_bootstrap::set_py_env()
                  setenv( "CCI_ENTRYPOINT" ,
                          HA_python_bootstrap::cci_trinity_app_moniker.c_str() ,
                          1 );
+
+}
+
+
+//------------------------------------------------------------------------------------------------
+int  HA_python_bootstrap::validate_entry_point( const std::string& entry )
+{
+            ACE_Trace _( ACE_TEXT( ":HA_python_bootstrap::validate_entry_point" ) , __LINE__ );
+
+            std::string::size_type idx = entry.find( "." );
+            if( idx == std::string::npos ) { return  -1; }
+            //file type
+            std::string str( entry.substr( ++idx , std::string::npos )  );
+            //pyo
+            if( str.compare( "pyo" ) != 0 )
+            //try py
+            { if( str.compare( "py" ) != 0 ) { return -1; }  }
+
+            //lazy man stat
+            return file_exists( entry );
+
+}
+
+
+//------------------------------------------------------------------------------------------------
+int  HA_python_bootstrap::file_exists( const std::string& filename )
+{
+              FILE *file;
+              file = fopen( filename.c_str() , "r" );
+              if( file )
+              {
+                fclose( file );
+
+                return 1;
+              }
+
+              return 0;
+}
+
+
+//------------------------------------------------------------------------------------------------
+int  HA_python_bootstrap::open_entry_point( const std::string&  entry )
+{
+
+              FILE *fd;
+
+              fd = fopen( entry.c_str() , "r" );
+              if ( fd == NULL )
+              {
+                 return -1;
+              }
+
+              int ret = PyRun_SimpleFile( fd , entry.c_str() );
+              if ( PyErr_Occurred() != NULL )
+              {
+                ret = 1;
+                // this exits with the right code if sys exit
+                PyErr_Print();
+                PyObject *f = PySys_GetObject( "stderr" );
+                if ( PyFile_WriteString( "\n", f ) ) { PyErr_Clear(); }
+              }
+
+
+              return ret;
 
 }
 
