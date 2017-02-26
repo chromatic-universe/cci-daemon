@@ -248,9 +248,12 @@ if __name__ == "__main__"  :
 # ------------------------------------------------------------------------------
 if __name__ == "__main__"  :
 
-            print( 'cci-daemon-dispatcher...at last!' )
+                from time import sleep
 
-
+                print( 'cci-daemon-dispatcher...at last!' )
+                while True :
+                    sleep( 2 )
+                    
 
 
 

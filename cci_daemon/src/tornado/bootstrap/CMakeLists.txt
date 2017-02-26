@@ -14,8 +14,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -rdynamic -O9 -DRELEASE -std=c99")
 
 
 # includes
-include_directories($ENV{CCI_PRIVATE}/include/python3.6m 
-                    ${CPR_INCLUDE_DIRS})
+include_directories($ENV{CCI_PRIVATE}/include/python3.6m) 
+                    
 
 # link
 link_directories($ENV{CCI_PRIVATE}/lib)

@@ -46,8 +46,6 @@ static void chk( int py_chk );
 //environment
 //..----------------------------------------------------------------------
 static void set_py_env();
-//------------------------------------------------------------------------
-static int py_env_out();
 //..----------------------------------------------------------------------
 static int  dir_exists(char *filename );
 //------------------------------------------------------------------------
@@ -73,66 +71,6 @@ int main( int argc , char** argv )
 }
 
 
-// services
-//-------------------------------------------------------------------------
-static PyObject *cci_log( PyObject *self , PyObject *args )
-{
-
-          //utility function to check
-          //if everything actually works
-          char *logstr = NULL;
-
-          if ( !PyArg_ParseTuple( args , "s", &logstr) )
-          {
-            return NULL;
-          }
-
-          trace( logstr ) ;
-
-
-          Py_RETURN_NONE;
-
-}
-
-//one module  with  one method
-//
-//-------------------------------------------------------------------------------
-static PyMethodDef cci_methods[] = {
-                                               { "log" ,
-                                                   cci_log ,
-                                                   METH_VARARGS ,
-                                                   "cci log"
-                                                } ,
-                                                { NULL ,
-                                                  NULL ,
-                                                  0 ,
-                                                  NULL
-                                                }
-                                           };
-
-
-
-//-------------------------------------------------------------------------------
-#if PY_MAJOR_VERSION >= 3
-    static struct PyModuleDef cciprivate = {
-                                               PyModuleDef_HEAD_INIT ,
-                                               "cciprivate" ,
-                                               "" ,
-                                               -1 ,
-                                               cci_methods
-                                              };
-    //--------------------------------------------------------------------------
-    PyMODINIT_FUNC init_cci_private( void )
-    {
-          return PyModule_Create( &cciprivate );
-    }
-#else
-//---------------------------------------------------------------------------
-    PyMODINIT_FUNC init_cci_private( void )
-    {
-          (void) Py_InitModule( "cciprivate" , cci_methods );
-    }
-#endif
 
 
 
@@ -221,33 +159,10 @@ int do_main( int argc , char** argv )
 
 
 
-#if PY_MAJOR_VERSION < 3
-              PySys_SetArgv( argc, argv );
-#endif
-
-              trace( "initialized python" );
-
-              //ensure threads will work
-              trace( "...PyEval_InitThreads()..." );
-
-              PyEval_InitThreads();
-              trace( "...py threads ok..." );
-
-#if PY_MAJOR_VERSION < 3
-              trace( "... init_cci_private();..." );
-              init_cci_private();
-#endif
-
-              //test run our runtime module
-              int py = PyRun_SimpleString( "import cciprivate\ncciprivate.log('testing python "
-                                   "print redirection')" ) ;
-              chk( py );
-              trace( "... PyRun_SimpleString...ok...import cciprivate.." );
-
               //import our privately configured sys environment
               trace( "setting up python from private environment..." );
               trace( "... PyRun_SimpleString...ok...import sys , posix modules.." );
-              py = PyRun_SimpleString( "import sys, posix\n" );
+              int py = PyRun_SimpleString( "import sys, logging , os , posix\n" );
               chk( py );
 
 
@@ -255,7 +170,7 @@ int do_main( int argc , char** argv )
               chk( build_py_env() );
               trace( "... py_env_out()..." );
               //test run our nodule in oython
-              chk( py_env_out() );
+              //chk( py_env_out() );
 
               //validate the entry point , i,e. , the python program to be run
               trace( "... validate_entry_point()..." );
@@ -300,10 +215,10 @@ void cci_logger ( const char* msg  )
 int build_py_env()
 {
              //LOGP( "setting up python from " );
-             return PyRun_SimpleString(   "private = posix.environ['CCI_PRIVATE']\n"
-                                           "argument = posix.environ['CCI_PRIVATE_PYTHON']\n"
+             return PyRun_SimpleString(   "private = os.getenv('CCI_PRIVATE')\n"
+                                           "argument = os.getenv('CCI_PRIVATE_PYTHON')\n"
                                            "sys.path[:] = [ \n"
-                                           "    private + '/lib/python/3.6', \n"
+                                           "    private + '/lib/python3.6/', \n"
                                            "    private + '/lib/python3.6/lib-dynload/', \n"
                                            "    private + '/bin/', \n"
                                            "    private + '/lib/python3.6/site-packages/', \n"
@@ -380,7 +295,7 @@ void set_py_env()
                 sprintf( path_entry , "%s/lib/python3.6/lib-dynload/:" , p_path );
                 strcat( path_buf , path_entry );
                 memset( path_entry , '\0' , strlen( path_entry ) );
-                sprintf( path_entry , "%s/lib/python3.6/lib/:" , p_path );
+                sprintf( path_entry , "%s/lib/python3.6/:" , p_path );
                 strcat( path_buf , path_entry );
                 memset( path_entry , '\0' , strlen( path_entry ) );
                 sprintf( path_entry , "%s/lib/python3.6/site-packages/:" , p_path );
@@ -404,30 +319,6 @@ void set_py_env()
                 chk( setenv( "CCI_ENTRYPOINT" , trinity , 1 ) );
 
              }
-
-}
-
-//---------------------------------------------------------------------------
-int py_env_out()
-{
-
-              return PyRun_SimpleString(
-                  "class log_file(object):\n"
-                  "    def __init__(self):\n"
-                  "        self.buffer = ''\n"
-                  "    def write(self, s):\n"
-                  "        s = self.buffer + s\n"
-                  "        lines = s.split(\"\\n\")\n"
-                  "        for l in lines[:-1]:\n"
-                  "            cciprivate.log(l)\n"
-                  "        self.buffer = lines[-1]\n"
-                  "    def flush(self):\n"
-                  "        return\n"
-                  "sys.stdout = sys.stderr = log_file()\n"
-                  "print('cci path', sys.path)\n"
-                  "import os\n"
-                  "print('os.environ is', os.environ)\n"
-                  "print('cci bootstrap done. __name__ is', __name__)");
 
 }
 

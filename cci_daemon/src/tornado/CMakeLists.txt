@@ -6,4 +6,4 @@ cmake_minimum_required(VERSION 2.8)
 # project
 project(cci_bootstrap)
 
-add_subdirectory(bootstrap)
+add_subdirectory(watchdog)
