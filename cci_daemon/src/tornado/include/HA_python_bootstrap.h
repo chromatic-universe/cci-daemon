@@ -44,14 +44,6 @@ class HAPYTHONBOOTSTRAP_Export HA_python_bootstrap : public ACE_Service_Object
                 std::string      m_str_home;
 
 
-          protected :
-
-                //helpers
-                void set_py_env();
-                int validate_entry_point( const std::string& entry );
-                int file_exists( const std::string& filename );
-                int open_entry_point( const std::string&  entry );
-
 
           public :
 
@@ -70,6 +62,11 @@ class HAPYTHONBOOTSTRAP_Export HA_python_bootstrap : public ACE_Service_Object
                 void home( const std::string& hm ) { m_str_home = hm; }
 
 
+                //services
+                int open_entry_point( const std::string&  entry );
+                void set_py_env();
+                int validate_entry_point( const std::string& entry );
+                int file_exists( const std::string& filename );
 
                 //immutable
                 static std::string cci_trinity_app_moniker;

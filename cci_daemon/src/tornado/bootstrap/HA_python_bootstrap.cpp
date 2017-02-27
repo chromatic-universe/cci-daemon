@@ -122,45 +122,10 @@ int HA_python_bootstrap::init ( int argc , ACE_TCHAR *argv[] )
                                    ACE_TEXT ("HA_python_bootstrap cci private_python")
                                    ACE_TEXT (" does not exist\n") ) ,
                                   -1 );
-              if( chdir( cci_private.c_str() ) == -1 )
-              {
-                  ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("...change directory failed...")
-                                   ACE_TEXT (" python bootstrap\n") ) ,
-                                  -1 );
-
-              }
-
-              set_py_env();
-
-              //the program name , not important
-              wchar_t w_name[] = { L"cci-python" };
-              Py_SetProgramName( w_name );
-
-              try
-              {
-                    Py_Initialize();
-              }
-              catch( ... )
-              {
-                       ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("...Py_Initialize...")
-                                   ACE_TEXT (" fatal exception\n" ) ) ,
-                                  -1 );
-
-              }
-
-              int py = PyRun_SimpleString( "import sys, logging , os , posix\n" );
-              if( py != -1 )
-              {
-                     ACE_DEBUG
-                  ((LM_DEBUG, ACE_TEXT ("(%t) ..PyRun_SimpleString...ok...import sys , posix modules...\n")));
-
-              }
+              home( cci_private.c_str() );
 
 
-
-              /*if( ACE_Thread_Manager::instance()->spawn( ACE_THR_FUNC (python_bootstrap_func) ,
+              if( ACE_Thread_Manager::instance()->spawn( ACE_THR_FUNC (python_bootstrap_func) ,
                                                      (void*) this ,
                                                      THR_NEW_LWP  ,
                                                      &m_thread_id ) )
@@ -174,25 +139,6 @@ int HA_python_bootstrap::init ( int argc , ACE_TCHAR *argv[] )
                    ACE_DEBUG
                   ((LM_DEBUG, ACE_TEXT ("(%t) ..spawning of python bootstrap failed..\n")));
 
-              }*/
-
-
-              if( validate_entry_point( HA_python_bootstrap::cci_trinity_app_moniker ) == -1 )
-              {
-
-                       ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("...open entry point...")
-                                   ACE_TEXT (" fatal exception\n" ) ) ,
-                                  -1 );
-
-              }
-
-
-              py =  open_entry_point( HA_python_bootstrap::cci_trinity_app_moniker );
-              if( py != -1 )
-              {
-                  ACE_DEBUG
-                  ( ( LM_DEBUG, ACE_TEXT ("(%t) ..python entry point bootstrapped...\n" ) ) );
               }
 
 
@@ -336,25 +282,57 @@ void python_bootstrap_func( void* ptr_instance )
 
                HA_python_bootstrap*  boot = static_cast<HA_python_bootstrap*> ( ptr_instance );
 
-               ACE_Process_Options options;
-               std::ostringstream ostr;
-               ostr << boot->prv().c_str()
-                    << "/cci/dev_t//bin/cci-bootstrap "
-                    << "-e &";
-               options.command_line( ostr.str().c_str() );
-               ACE_Process process;
-               pid_t pid = process.spawn( options );
+              if( chdir( boot->home().c_str() ) == -1 )
+              {
+                  ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..chdir..spawning of python bootstrap failed..\n")));
+                  return;
 
-               if( pid != -1 )
-               {
-                ACE_DEBUG
-                  ((LM_DEBUG, ACE_TEXT ("%D (%t) ..python bootstrap succeeded..\n")));
-               }
+              }
 
-               for( ;; )
-               {
-                   std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-               }
+              boot->set_py_env();
+
+              //the program name , not important
+              wchar_t w_name[] = { L"cci-python" };
+              Py_SetProgramName( w_name );
+
+              try
+              {
+                    Py_Initialize();
+              }
+              catch( ... )
+              {
+                     ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..py_initialize..\n")));
+                     return;
+
+              }
+
+              int py = PyRun_SimpleString( "import sys, logging , os , posix\n" );
+              if( py != -1 )
+              {
+                     ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..PyRun_SimpleString...ok...import sys , posix modules...\n")));
+
+              }
+              else { return; }
+
+
+              if( boot->validate_entry_point( HA_python_bootstrap::cci_trinity_app_moniker ) == -1 )
+              {
+
+                     ACE_DEBUG
+                  ((LM_DEBUG, ACE_TEXT ("(%t) ..validate entry point failed...\n")));
+                  return;
+
+              }
+
+              py =  boot->open_entry_point( HA_python_bootstrap::cci_trinity_app_moniker );
+              if( py == -1 )
+              {
+                  ACE_DEBUG
+                  ( ( LM_DEBUG, ACE_TEXT ("(%t) ..python entry point could not be bootstrapped...\n" ) ) );
+              }
 
 
 }

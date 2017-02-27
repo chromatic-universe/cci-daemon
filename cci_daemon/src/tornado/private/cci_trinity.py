@@ -32,6 +32,26 @@ from tornado.ioloop import IOLoop
 from tornado import gen
 from tornado.queues import Queue
 
+from time import sleep
+
+
+# --------------------------------------------------------------------------------------
+def sig_handler( sig , frame ) :
+                """
+
+                :param sig:
+                :param frame:
+                :return:
+                """
+#_logger.warning('...caught signal: %s', sig )
+#tornado.ioloop.IOLoop.instance().add_callback( shutdown )
+                print( "...tornado signal handler..."  )
+                #with open( 'goofy' , 'w' ) as f :
+                #  f.write( 'the original corny snaps!...\n' )
+
+                exit( 0 )
+
+
 
 #import kafka
 
@@ -249,11 +269,17 @@ if __name__ == "__main__"  :
 # ------------------------------------------------------------------------------
 if __name__ == "__main__"  :
 
+                #signal.signal( signal.SIGTERM , sig_handler )
+                #signal.signal( signal.SIGINT , sig_handler )
 
                 print( 'cci-daemon-dispatcher...at last!' )
-                
+
                 with open( 'skippy' , 'w' ) as f :
                     f.write( 'the original corny snaps!...\n' )
+                while( True ) :
+                    print( "...tornado speaking here...." )
+                    sleep( 10 )  
+
 
 
 
