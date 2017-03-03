@@ -26,6 +26,7 @@ namespace cci_daemon_impl
 
 
           //immutable
+          //
           static const std::string ldd_moniker { "ldd" };
           static const std::string nm_moniker { "nm" };
 
