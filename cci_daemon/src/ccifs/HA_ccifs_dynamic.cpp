@@ -12,7 +12,8 @@ static std::string ccifs_pt { "/var/ccifs/cache" };
 
 static int ccifs_inotify( const std::string& ccifs );
 static void display_inotify_event( struct inotify_event* ine );
-
+//
+//
 
 //signal handles
 class proc_signal_handler : public ACE_Event_Handler
