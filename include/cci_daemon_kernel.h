@@ -154,6 +154,7 @@ namespace cci_daemon_impl
                 public :
 
                     //accessors-inspectors
+                    //
                     publish_and_subscribe_server&   get_pb_server() { return m_pb_server; }
 
                     //services
