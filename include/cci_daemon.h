@@ -1,4 +1,4 @@
-//cci_daemon.h       william k, johnson  2017
+//cci_daemon.h      chromatic universe  william k, johnson  2017
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
