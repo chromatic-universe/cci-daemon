@@ -1,4 +1,4 @@
-#cmake cci_daemon  william k. johnson 2016
+#cmake cci_daemon  william k. johnson 2017
 
 #version
 cmake_minimum_required(VERSION 2.82)

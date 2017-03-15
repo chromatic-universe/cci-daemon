@@ -40,7 +40,7 @@ namespace cci_daemon_impl
         static std::set<std::string> kernel_strings = {  "make_kernel" ,
                                                          "unnmake_kernel" ,
                                                          "mount_memroy_cache" ,
-                                                         "unmount_memorry_cache"
+                                                         "unmount_memory_cache"
                                                       };
         static std::string kernel_fifo{ "/etc/chromatic-universe/fifo" };
         static std::string supplicant_fifo( const std::string& supplicant )
