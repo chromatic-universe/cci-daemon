@@ -1,4 +1,4 @@
-//cci_daaemon_kernel.h     william k. johnson 2017
+//cci_daaemon_kernel.h      chromatic universe william k. johnson 2017
 
 #pragma once
 
