@@ -1,5 +1,5 @@
 //cci_kernel_directives.h    william k. johnson 2017
-//
+
 
 #pragma once
 
