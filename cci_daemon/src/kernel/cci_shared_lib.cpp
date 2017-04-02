@@ -1,5 +1,5 @@
 //cci_shared_lib.cpp    william k. johnson 2017
-//
+
 
 #include <iostream>
 #include <cci_shared_lib.h>
