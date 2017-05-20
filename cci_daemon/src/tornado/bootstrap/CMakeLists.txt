@@ -16,7 +16,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -rdynamic -O3 -DRELEASE -std=c++14")
 # includes
 include_directories($ENV{CCI_PRIVATE}/include/python3.6m 
                     $ENV{ACE_ROOT}
-                    $ENV{CCI_PRIVATE}/include/python3.6m
                     ../../../../include
                     ../include)
                     

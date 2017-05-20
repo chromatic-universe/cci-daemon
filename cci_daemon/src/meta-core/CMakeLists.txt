@@ -16,19 +16,17 @@ include_directories(../../../include
 link_directories(${CCIDAEMON_SOURCE_DIR}
                     $ENV{DEV}/lib)
 
-#executable
-add_executable(cci-meta-daemon  cci_meta_daemon.cpp 
-                                cci_meta_daemon_main.cpp)
 
+#executable
+add_executable(cci-meta-daemon-dispatcher cci_meta_daemon.cpp 
+                                	  cci_meta_daemon_main.cpp)
 #link libs
-target_link_libraries(cci-meta-daemon -lstdc++
-                             	      -lpthread 
-			              -lACE
-                                      -ldl) 
+target_link_libraries(cci-meta-daemon-dispatcher -lstdc++
+                             	      		 -lpthread 
+			              		 -lACE
+                                      		 -ldl) 
 
 #install
-install_targets( /bin/ cci-meta-daemon)
-install (DIRECTORY ../include/ 
-         DESTINATION include )
+install_targets( /bin/ cci-meta-daemon-dispatcher)
 
 
