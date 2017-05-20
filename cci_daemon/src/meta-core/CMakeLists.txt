@@ -7,8 +7,8 @@ project(CCIDAEMON)
 
 
 #cpp flags
-set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DNDEBUG -std=c++14")
+set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DACE_NTRACE=0 -DDEBUG -std=c++14")
+set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DACE_NTRACE=1 -DNDEBUG -std=c++14")
 
 #includes
 include_directories(../../../include

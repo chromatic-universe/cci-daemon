@@ -5,15 +5,19 @@
 
 using namespace cci_policy;
 
-
 int main( int argc , char** argv )
 {
+	
 	try
 	{
-		std::cerr << "cci-gk  william k. johnson 2017"
+		std::cerr << "cci-meta-daemon-dispatcher william k. johnson 2017"
 		  	  << "\n";	
 		//auto config_buffer = std::make_unique<std::string>( "<xml></xml>" );
-		auto ddd = std::make_unique<default_daemon_dispatcher>();
+		
+		auto cci = std::make_unique<default_daemon_dispatcher>();
+		//daemonize
+		cci->daemonize();
+	        		
 	}
 	catch( std::exception& e )	
 	{

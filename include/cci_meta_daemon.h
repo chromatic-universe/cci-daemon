@@ -1,4 +1,4 @@
-//gk.h  :q  william k. johnson   2017
+//cci_meta_daemon  william k. johnson   2017
 
 //c++ standard
 #include <iostream>
@@ -7,6 +7,8 @@
 #include <sstream>
 #include <exception>
 
+//contrib
+#include "ace/Log_Msg.h"
 
 namespace cci_policy
 {
@@ -135,7 +137,7 @@ namespace cci_policy
 
 			void configure_environment()
 			{
-				//
+			   ACE_TRACE("defailt_environment_context::configure_environment_context");
 			}
 
 		protected :
@@ -190,20 +192,33 @@ namespace cci_policy
 	};
 	//
 	template<typename T>
-	class framework_logging_context
+	class ace_framework_logging_context
 	{
 		public :
-			
+		
+			//ctora
+			ace_framework_logging_context() : m_str_arg( "cci-meta-daemon-dispatcher" )
+			{}
+				
 
 			void configure_logging_context()
 			{
-				//
+
+				ACE_LOG_MSG->open ( m_str_arg.c_str() );
+				//output to default destination (stderr)
+				ACE_TRACE ("ace_framework_logging_context::configure_logging_context");				
 			}
+		
+		private :
+			
+			//attributes
+			std::string 	m_str_arg;
+
 
 		protected :
 			
 			//dtor
-			~framework_logging_context()
+			~ace_framework_logging_context()
 			{}
 
 
@@ -243,7 +258,6 @@ namespace cci_policy
 	template<typename T>
 	class custom_sys_init
 	{
-
 		private :
 
 			//attributes
@@ -335,9 +349,12 @@ namespace cci_policy
 
 		public :
 
+
 			//ctors
 			explicit cci_daemon_dispatcher()
-			{}
+			{
+			  ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
+			}  
 
 			//dtor
 			~cci_daemon_dispatcher() = default;			
@@ -351,13 +368,15 @@ namespace cci_policy
 
 			virtual void daemonize()
 			{
+				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
+
 				
+				//logging
+				this->configure_logging_context();
 				//descriptors and streams
 				this->configure_descriptors();
 				//environment and directory root context
 				this->configure_environment();
-				//logging
-				this->configure_logging_context();
 				//systen init and signals
 				this->configure_init();
 				//
@@ -370,7 +389,7 @@ namespace cci_policy
 	};
 	using default_daemon_dispatcher = cci_daemon_dispatcher<close_all_descriptors ,
 	                                                        default_environment_context ,
-								framework_logging_context ,
+								ace_framework_logging_context ,
 								runtime_sys_init ,
 								default_daemon_procedure>;
 	//
