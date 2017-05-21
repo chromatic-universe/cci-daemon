@@ -52,13 +52,15 @@ namespace cci_policy
 		  template <class> class environment_policy,
 		  template <class> class logging_policy ,
 		  template <class> class init_policy ,
-		  template <class> class daemon_proc_policy
+		  template <class> class daemon_proc_policy ,
+		  template <class> class command_line_policy 
 		>
 	class cci_daemon_dispatcher : public descriptor_policy<placeholder> ,
 	                              public environment_policy<placeholder> ,
 				      public logging_policy<placeholder> ,
 				      public init_policy<placeholder> ,
-				      public daemon_proc_policy<placeholder>
+				      public daemon_proc_policy<placeholder> ,
+				      public command_line_policy<placeholder>
 	{
 
 		public :
@@ -79,7 +81,9 @@ namespace cci_policy
 			//no assign
 			const cci_daemon_dispatcher& operator= ( const cci_daemon_dispatcher& cdd ) = delete;
 
-
+			
+			//services
+			//-------------------------------------------------------------------------------
 			virtual void daemonize()
 			{
 				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
@@ -97,6 +101,11 @@ namespace cci_policy
 				//procedure
 				this->proc_init();				;
 			}
+			//-----------------------------------------------------------------------------
+			virtual void cli()
+			{
+				ACE_TRACE ("cci_daemon_dispatcher::cli");
+			}
 
 
 
@@ -105,7 +114,8 @@ namespace cci_policy
 	                                                        default_environment_context ,
 								ace_framework_logging_context ,
 								runtime_sys_init ,
-								default_daemon_procedure>;
+								default_daemon_procedure ,
+								default_command_line>;
 	//
 	//cci_daemon_mgr host
 	//
