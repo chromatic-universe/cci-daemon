@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DAC
 
 #includes
 include_directories(../../../include
+		    ./policies
                     $ENV{DEV}/include)
 link_directories(${CCIDAEMON_SOURCE_DIR}
                     $ENV{DEV}/lib)
