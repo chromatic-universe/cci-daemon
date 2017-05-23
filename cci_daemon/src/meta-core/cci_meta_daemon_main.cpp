@@ -12,8 +12,6 @@ int main( int argc , char** argv )
 	{
 		std::cerr << "cci-meta-daemon-dispatcher william k. johnson 2017"
 		  	  << "\n";	
-		//auto config_buffer = std::make_unique<std::string>( "<xml></xml>" );
-		
 		auto cci = std::make_unique<default_daemon_dispatcher>();
 		//daemonize
 		cci->daemonize();

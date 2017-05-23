@@ -80,7 +80,14 @@ namespace cci_policy
 			cci_daemon_dispatcher( const cci_daemon_dispatcher& ) = delete;
 			//no assign
 			const cci_daemon_dispatcher& operator= ( const cci_daemon_dispatcher& cdd ) = delete;
+			
 
+		private :
+
+			//
+
+
+		public :
 			
 			//services
 			//-------------------------------------------------------------------------------
