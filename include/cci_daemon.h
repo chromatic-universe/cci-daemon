@@ -31,7 +31,7 @@
 #include <cci_stack_trace.h>
 #include <cci_shared_lib.h>
 #include <cci_kernel_directives.h>
-
+#include <cci_daemonize.h>
 
 
 namespace cci_daemon_impl
@@ -48,20 +48,7 @@ namespace cci_daemon_impl
             using  kernel_context_ptr = kernel_context*;
 
 
-            //enumerations
-            enum class daemon_proc : unsigned long
-            {
-                dp_fork_background_proc = 0 ,
-                dp_fork_no_session_leader ,
-                dp_make_session_leader ,
-                dp_clear_file_create_mask ,
-                dp_change_to_root_dir ,
-                dp_close_all_open_files ,
-                dp_reopen_streams_dev_null ,
-                dp_daemonized ,
-                dp_error
-            };
-
+           
             enum class service_proc : unsigned long
             {
                 sp_default_service = 0 ,

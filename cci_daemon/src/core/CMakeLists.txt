@@ -23,6 +23,7 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
 add_executable(cci-daemon-dispatcher   cci_stack_trace.cpp 
                                        cci_daemon.cpp 
                                        cci_daemon_main.cpp
+				       cci_daemonize.cpp
                                        cci_daemon_engine.cpp)
 
 #link libs
