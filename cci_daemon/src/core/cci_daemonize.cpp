@@ -8,7 +8,7 @@ using namespace cci_daemonize;
 
 
 //-----------------------------------------------------------------------------------------
-int daemonize( const unsigned long flags )
+int daemonize_( const unsigned long flags )
 {
 	
     int maxfd , fd;
@@ -123,4 +123,10 @@ int daemonize( const unsigned long flags )
     return ( dp != daemon_proc::dp_error ? 0 : -1 );
 }
 
+//--------------------------------------------------------------------------------------
+daemon_proc make_session_leader()
+{
+	 //become leader of new session
+         return setsid() == -1 ? daemon_proc::dp_error : daemon_proc::dp_success;	
+}
 

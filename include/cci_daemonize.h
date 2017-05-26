@@ -40,23 +40,31 @@ namespace cci_daemonize
                 	dp_close_all_open_files ,
                 	dp_reopen_streams_dev_null ,
                 	dp_daemonized ,
-                	dp_error
+                	dp_error ,
+			dp_success
             	};
-
-		//services
-		static int daemonize( const unsigned long flags );
+		
 
 		//immutable
 		static const unsigned bd_no_chdir = 01;
-                ///< don't close all open files
-                static const unsigned bd_no_close_files = 02;
-                ///< don;t reopen stdin , stderr and std:out to to /dev_null
-                static const unsigned bd_no_reopen_std_fds = 04;
-                ///< don't do a umask( 0 )
-                static const unsigned bd_no_umask_0 = 010;
-                ///< maximum file descriptors to close if sysconf is indeterminate
-                static const unsigned bd_max_handles = 8192;
+               	///< don't close all open files
+               	static const unsigned bd_no_close_files = 02;
+         	///< don;t reopen stdin , stderr and std:out to to /dev_null
+               	static const unsigned bd_no_reopen_std_fds = 04;
+               	///< don't do a umask( 0 )
+               	static const unsigned bd_no_umask_0 = 010;
+               	///< maximum file descriptors to close if sysconf is indeterminate
+               	static const unsigned bd_max_handles = 8192;
 
 
 }
-
+//-----------------------------------------------------------------------------------------
+extern "C"
+{
+	//-------------------------------------------------------
+	//daemonize
+	int daemonize_( const unsigned long flags );
+	//-------------------------------------------------------
+	//seesion console leader
+	cci_daemonize::daemon_proc make_session_leader();
+}

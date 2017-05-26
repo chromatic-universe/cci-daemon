@@ -173,18 +173,6 @@ namespace cci_daemon_impl
                     virtual int daemonize();
 
                     //immutable
-                    ///< constant bitmask arguments for daemonize call
-                    ///don't change directory to root("/")
-                    static const unsigned bd_no_chdir;
-                    ///< don't close all open files
-                    static const unsigned bd_no_close_files;
-                    ///< don;t reopen stdin , stderr and std:out to to /dev_null
-                    static const unsigned bd_no_reopen_std_fds;
-                    ///< don't do a umask( 0 )
-                    static const unsigned bd_no_umask_0;
-                    ///< maximum file descriptors to close if sysconf is indeterminate
-                    static const unsigned bd_max_handles;
-                    ///< log
                     //
                     //
                     static const std::string log_path;

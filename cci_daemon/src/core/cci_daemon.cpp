@@ -8,11 +8,6 @@ using namespace cdi;
 using namespace cci_daemonize;
 
 //immutable
-const unsigned cci_daemon_facade::bd_no_chdir = 01;
-const unsigned cci_daemon_facade::bd_no_close_files = 02;
-const unsigned cci_daemon_facade::bd_no_reopen_std_fds = 04;
-const unsigned cci_daemon_facade::bd_no_umask_0 = 010;
-const unsigned cci_daemon_facade::bd_max_handles = 8192;
 const unsigned cci_daemon_facade::buffer_size = 1024;
 const unsigned cci_daemon_facade::cpf_cloexec = 1;
 const std::string cci_daemon_facade::path_config = "/etc/chromatic-universe/cci-daemon.conf";
@@ -67,7 +62,7 @@ cci_daemon_facade::~cci_daemon_facade()
 int cci_daemon_facade::daemonize()
 {
  
-    return ( cci_daemonize::daemonize( flags() ) );
+    return ( daemonize_( flags() ) );
 }
 
 //---------------------------------------------------------------------------------------------------
