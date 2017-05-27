@@ -20,15 +20,15 @@ cci_daemon_plugin::cci_daemon_plugin( const std::string& filename ) :  m_shared_
 
             try
             {
-                get_engine_version_address = cci_shared_lib::get_function_pointer<get_engine_version_function>
+                get_engine_version_address = get_function_pointer<get_engine_version_function>
                         ( m_shared_lib , "get_engine_version" );
                 if( get_engine_version_address == nullptr )
                 { std::cerr << "could not retrieve version function addresss\n";                }
-                register_plugin_address = cci_shared_lib::get_function_pointer<register_plugin_function>
+                register_plugin_address = get_function_pointer<register_plugin_function>
                         ( m_shared_lib , "register_plugin" );
                 if( register_plugin_address == nullptr )
                 { std::cerr << "could not retrieve register function address\n"; }
-                clear_context_address = cci_shared_lib::get_function_pointer<clear_context_function>
+                clear_context_address = get_function_pointer<clear_context_function>
                         ( m_shared_lib , "clear_context" );
                 if( clear_context_address == nullptr )
                 { std::cerr << "could not retrieve clear context function address\n"; }
