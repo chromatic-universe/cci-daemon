@@ -55,7 +55,49 @@ int HA_proc_ace_acceptor::init ( int argc , ACE_TCHAR *argv[] )
 
               ACE_TCHAR config_file[MAXPATHLEN];
               ACE_OS::strcpy ( config_file, ACE_TEXT ( conf_path.c_str() ) );
+              while ( ( option
+              ACE_Get_Opt cmd_opts (argc, argv, options, 0);
+              if (cmd_opts.long_option
+                  (ACE_TEXT ( "config" ), 'f', ACE_Get_Opt::ARG_REQUIRED) == -1)
+              { return -1; }
+
+              int option;
+
+              ACE_TCHAR config_file[MAXPATHLEN];
+              ACE_OS::strcpy ( config_file, ACE_TEXT ( conf_path.c_str() ) );
               while ( ( option = cmd_opts ()) != EOF)
+              switch ( option )
+              {
+                  case 'f' :
+
+                    ACE_OS::strncpy (config_file , cmd_opts.opt_arg () , MAXPATHLEN );
+                    break;
+
+                  case ':':
+
+                    ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ( "-%c requires an argument\n" )  ,
+                                       cmd_opts.opt_opt ()) , -1 );
+                  default:
+
+                    ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ( "parse error.\n" ) ) ,
+                                      - 1);
+              }
+
+              //configuration file
+              //-------------------------------------------------------------------------------
+              ACE_Configuration_Heap config;
+              config.open ();
+              ACE_Registry_ImpExp config_importer (config);
+              if ( config_importer.import_config (config_file) == -1 )
+              { ACE_ERROR_RETURN ( ( LM_ERROR , ACE_TEXT ("%p\n") , config_file ) , -1 ); }
+
+
+              ACE_Configuration_Section_Key dispatcher_section;
+              if (config.open_section (config.root_section (),
+                                       ACE_TEXT ( "HA_proc_ace_acceptor" ),
+                                       0,
+                                       dispatcher_section) == -1)
+                ACE_ERROR_RETURN ((LM_ERROR, = cmd_opts ()) != EOF)
               switch ( option )
               {
                   case 'f' :
