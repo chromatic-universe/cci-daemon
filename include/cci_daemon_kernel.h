@@ -15,6 +15,7 @@
 #include <cci_pub_and_sub.h>
 #include <cci_kernel_directives.h>
 
+
 namespace cci_daemon_impl
 {
 

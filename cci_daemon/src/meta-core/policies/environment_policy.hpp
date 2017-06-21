@@ -17,7 +17,7 @@ namespace cci_policy
 
 			void configure_environment()
 			{
-			   ACE_TRACE("defailt_environment_context::configure_environment_context");
+			   ACE_TRACE("default_environment_context::configure_environment_context");
 			}
 
 		protected :
