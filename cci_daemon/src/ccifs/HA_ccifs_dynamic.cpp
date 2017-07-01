@@ -4,6 +4,7 @@
 #include <sstream>
 #include <sys/mount.h>
 
+
 static std::string conf_path { "/etc/chromatic-universe/ha_ccifs.ini" };
 static std::string ccifs_user { "wiljoh" };
 static std::string ccifs_prog { "ccifs" };
