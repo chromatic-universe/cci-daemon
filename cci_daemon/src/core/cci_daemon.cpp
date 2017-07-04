@@ -265,7 +265,7 @@ int cci_daemon_facade::daemon_default_exec( const std::string& params , const un
               m_b_opened = open_log();
               if( m_b_opened == true )
               {
-                std::string msg( "cci_daemon.....using default module.....william k. johnson 2016" );
+                std::string msg( "cci_daemon.....using default module.....william k. johnson 2017" );
                 log_message( msg );
                 read_config_file( config_path() );
 
