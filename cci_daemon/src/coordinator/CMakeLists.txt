@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -fPIC -Wall -O3  -rdynamic -Qunu
 include_directories(../../../include
                     $ENV{DEV}/include
                     ./include
-                    $ENV{DEV}/include/cci
+q                    $ENV{DEV}/include/cci
                     $ENV{ACE_ROOT})
 link_directories(${CCIDAEMON_SOURCE_DIR}
                  $ENV{DEV}/lib
