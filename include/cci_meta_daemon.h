@@ -1,4 +1,4 @@
-//cci_meta_daemon  william k. johnson   2017
+//cci_meta_daemon   chromatic universe  2017 william k. johnson   
 
 //c++ standard
 #include <iostream>
