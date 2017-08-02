@@ -1,4 +1,4 @@
-//cci_shared_lib.cpp    william k. johnson 2017
+//cci_shared_lib.cpp    chromatic universe william k. johnson 2017
 //
 
 
