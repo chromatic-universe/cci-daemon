@@ -7,8 +7,8 @@ project(CCIDAEMON)
 
 
 #cpp flags
-set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DACE_NTRACE=0 -DDEBUG -std=c++14")
-set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DACE_NTRACE=1 -DNDEBUG -std=c++14")
+set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DACE_NTRACE=0 -DDEBUG -std=c++1z")
+set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DACE_NTRACE=1 -DNDEBUG -std=c++1z")
 
 #includes
 include_directories(../../../include
@@ -24,6 +24,7 @@ add_executable(cci-meta-daemon-dispatcher cci_meta_daemon.cpp
 #link libs
 target_link_libraries(cci-meta-daemon-dispatcher -lstdc++
                              	      		 -lpthread 
+						 cci-daemon-core
 			              		 -lACE
                                       		 -ldl) 
 
