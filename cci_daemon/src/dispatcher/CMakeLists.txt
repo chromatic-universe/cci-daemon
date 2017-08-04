@@ -1,7 +1,7 @@
 #cmake cci_daemon  william k. johnson 2017
 
 #version
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 2.82)
 #project
 project(CCIDAEMON)
 
@@ -20,16 +20,16 @@ link_directories(${CCIDAEMON_SOURCE_DIR}
                     $ENV{DEV}/lib/cci)
 
 #executable
-add_library(cci-daemon-core SHARED  cci_stack_trace.cpp 
-                                    cci_daemon.cpp 
-                                    cci_daemonize.cpp
-                                    cci_daemon_engine.cpp)
-set_target_properties(cci-daemon-core PROPERTIES
-                                      VERSION 1.0.0
-                                      SOVERSION 1)   
+add_executable(cci-daemon-dispatcher   cci_daemon_main.cpp)
+
+#link libs
+target_link_libraries(cci-daemon-dispatcher  -lstdc++
+                                             -lpthread 
+					     cci-daemon-core 
+                                             -ldl) 
 
 #install
-install_targets( /lib/ cci-daemon-core)
+install_targets( /bin/ cci-daemon-dispatcher)
 install (DIRECTORY ../../../include/ 
          DESTINATION include/cci )
 
