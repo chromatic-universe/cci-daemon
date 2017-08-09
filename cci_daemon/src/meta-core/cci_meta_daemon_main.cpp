@@ -10,17 +10,20 @@ int main( int argc , char** argv )
 	
 	try
 	{
-		std::cerr << "cci-meta-daemon-dispatcher william k. johnson 2017"
-		  	  << "\n";	
+		ACE_DEBUG(( LM_INFO , "%D (%P) cci-meta-daemon-dispatcher william k. johnson 2017\n" ) );
+	
+		auto json_str = std::make_unique<std::string> ( "{}" );
 		auto cci = std::make_unique<default_daemon_dispatcher>();
+		//config
+		cci->runtime_data( json_str );
 		//daemonize
 		cci->daemonize();
 	        		
 	}
 	catch( std::exception& e )	
 	{
-		std::cerr << e.what()
-			  << "\n";
+		ACE_DEBUG(( LM_ERROR , "%D (%P) cci-meta-daemon-dispatcher exception...%s." ,
+        		        e.what() ) );
 	}
 
 	return 0;

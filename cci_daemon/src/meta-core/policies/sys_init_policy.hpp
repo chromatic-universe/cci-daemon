@@ -18,6 +18,7 @@ namespace cci_policy
 	class runtime_sys_init
 	{
 
+
 		private :
 
 			//attributes
@@ -34,10 +35,16 @@ namespace cci_policy
 			//accessors-inspctiors
 			std::string runtime_data() const noexcept { return *m_runtime_data.get(); }
 
+			//mutators
+			void runtime_data( std::unique_ptr<std::string>& data ) 
+			{
+				m_runtime_data = std::move( data );
+			}
+
 			//services
 			void configure_init()
 			{
-				//
+				ACE_TRACE ("runtime_sys_init::configure_init");				
 			}
 
 

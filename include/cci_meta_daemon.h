@@ -9,6 +9,10 @@
 
 //contrib
 #include "ace/Log_Msg.h"
+#include <ace/Trace.h>
+#include <json.hpp>
+
+
 //policies
 #include <stream_handles_policy.hpp>
 #include <creator_policy.hpp>
@@ -17,6 +21,10 @@
 #include <sys_init_policy.hpp>
 #include <daemon_procedure_policy.hpp>
 #include <command_line_policy.hpp>
+
+//cci
+#include <cci_daemonize.h>
+
 
 namespace cci_policy
 {
@@ -33,7 +41,7 @@ namespace cci_policy
 	//utils
 	//
 	
-;	//
+	//
 	//services
 	//
 	class placeholder
@@ -67,9 +75,9 @@ namespace cci_policy
 
 
 			//ctors
-			explicit cci_daemon_dispatcher()
+			explicit cci_daemon_dispatcher()  
 			{
-			  ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
+			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
 			}  
 
 			//dtor
@@ -106,7 +114,7 @@ namespace cci_policy
 				this->configure_init();
 				//
 				//procedure
-				this->proc_init();				;
+				this->proc_init();				
 			}
 			//-----------------------------------------------------------------------------
 			virtual void cli()

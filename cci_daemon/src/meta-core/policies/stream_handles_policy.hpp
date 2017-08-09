@@ -17,7 +17,7 @@ namespace cci_policy
 
 				void configure_descriptors()
 				{
-					//
+					ACE_TRACE ("close_all_descriptors::configure_descriptors");
 				}
 
 
