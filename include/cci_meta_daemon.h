@@ -99,8 +99,43 @@ namespace cci_policy
 			
 			//services
 			//-------------------------------------------------------------------------------
-			virtual void daemonize()
+			virtual void daemonize();
+			//-----------------------------------------------------------------------------
+			virtual void cli()
 			{
+				ACE_TRACE ("cci_daemon_dispatcher::cli");
+			}
+
+
+
+	};
+	using default_daemon_dispatcher = cci_daemon_dispatcher<placeholder* , 
+							        close_all_descriptors ,
+	                                                        default_environment_context ,
+								ace_framework_logging_context ,
+								runtime_sys_init ,
+								default_daemon_procedure ,
+								default_command_line>;
+
+	//-----------------------------------------------------------------------------------------------
+	template<
+		  typename T ,
+		  template <class> class descriptor_policy ,
+		  template <class> class environment_policy,
+		  template <class> class logging_policy ,
+		  template <class> class init_policy ,
+		  template <class> class daemon_proc_policy ,
+		  template <class> class command_line_policy 
+		>
+	void cci_daemon_dispatcher<T ,
+				    descriptor_policy ,
+				    environment_policy,
+				    logging_policy ,
+				    init_policy ,
+				    daemon_proc_policy ,
+				    command_line_policy>::daemonize()
+ 
+ 	{
 				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
 
 				cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_fork_background_proc;
@@ -151,25 +186,9 @@ namespace cci_policy
 
 								
 				}
+			
+	}
 
-		 
-			}
-			//-----------------------------------------------------------------------------
-			virtual void cli()
-			{
-				ACE_TRACE ("cci_daemon_dispatcher::cli");
-			}
-
-
-
-	};
-	using default_daemon_dispatcher = cci_daemon_dispatcher<placeholder* , 
-							        close_all_descriptors ,
-	                                                        default_environment_context ,
-								ace_framework_logging_context ,
-								runtime_sys_init ,
-								default_daemon_procedure ,
-								default_command_line>;
 	//
 	//cci_daemon_mgr host
 	//
