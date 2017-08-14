@@ -62,7 +62,7 @@ namespace cci_policy
 				
 				for( ;; )
 				{
-					std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+					std::this_thread::sleep_for( std::chrono::seconds( 5 ) );
 
 					_t()->color( stamp_color::green );
 	 				_t()->null_stamp();

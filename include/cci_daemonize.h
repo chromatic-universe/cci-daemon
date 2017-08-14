@@ -67,6 +67,19 @@ extern "C"
 	//-------------------------------------------------------
 	//seesion console leader
 	cci_daemonize::daemon_proc make_session_leader();
-	//fork daemon fork
+	//fork daemon 
 	cci_daemonize::daemon_proc make_into_background();
+	//fork session leader
+	cci_daemonize::daemon_proc make_fork_no_session_leader();
+	//clear create mask
+	cci_daemonize::daemon_proc clear_file_create_mask( const int flags );
+	//close open files
+	cci_daemonize::daemon_proc close_all_open_files( const int flags );
+	//reopen to /dev/null
+	cci_daemonize::daemon_proc reopen_streams_to_dev_null( const int flags );
+	//change to rott directory
+	cci_daemonize::daemon_proc cd_to_root( const int flags );
+	
+	
 }
+

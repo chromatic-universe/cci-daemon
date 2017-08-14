@@ -8,6 +8,7 @@
 
 //cci
 #include <cci_time_utils.h>
+#include <cci_daemonize.h>
 
 using namespace cpp_real_stream;
 
@@ -115,14 +116,20 @@ namespace cci_policy
 			{
 			}
 
-			void configure_environment()
+			cci_daemonize::daemon_proc configure_environment()
 			{
 			    ACE_TRACE("default_environment_context::configure_environment_context");
 			    //signals
 			    ACE_DEBUG( ( LM_INFO , "%D (%P) ...registering signals....\n" ) );
 
+			    int flags { 0 };
+
 			    handler.register_handler (SIGTERM, &h1);
 			    handler.register_handler (SIGINT,  &h2);
+			    
+			    ACE_DEBUG( ( LM_INFO , "%D (%P) ...changing directory to root dir....\n" ) );
+
+			    return cd_to_root( flags );
 
 			}
 

@@ -18,8 +18,7 @@ int main( int argc , char** argv )
 		//config
 		cci->runtime_data( json_str );
 		//daemonize
-		cci->daemonize();
-	        		
+	        cci->daemonize();	
 	}
 	catch( std::exception& e )	
 	{

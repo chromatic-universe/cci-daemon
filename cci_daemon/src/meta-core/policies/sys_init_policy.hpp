@@ -1,5 +1,7 @@
 //sys_init_policy.hpp    william k. johnon    2017
 
+#pragma clang diagnostic ignored "-Wswitch"
+
 
 #include <memory>
 #include <string>
@@ -60,25 +62,61 @@ namespace cci_policy
 
 
 			//services
-			cci_daemonize::daemon_proc configure_init()
+			void configure_init()
 			{
 				
-				_t()->color( stamp_color::green );
-	 			_t()->null_stamp();
-
-				cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_error;
+				
+				cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_fork_background_proc;
 
 				ACE_TRACE ("runtime_sys_init::configure_init");	
-				dp =  make_into_background();
- 				if( dp == cci_daemonize::daemon_proc::dp_error )
-				{ 
-					ACE_DEBUG(( LM_ERROR , "%D (%P) ...could not fork into background.....\n" ) ); 
-				}
-						
-				_t()->clear_color();
+				
+				while( dp != cci_daemonize::daemon_proc::dp_error )
+				{
+					switch( dp  )
+					{
+	  
+					    case cci_daemonize::daemon_proc::dp_fork_background_proc :
+					    {
 
-				return dp;
-
+						//become background process
+						switch( fork() )
+						{
+						    case -1 :
+							dp = cci_daemonize::daemon_proc::dp_error;
+							break;
+						    case  0 :
+							dp = cci_daemonize::daemon_proc::dp_make_session_leader;
+							break;
+						    default:
+							_exit( EXIT_SUCCESS );
+						}
+						break;
+					    }
+					    case cci_daemonize::daemon_proc::dp_make_session_leader :
+					    {
+						//become leader of new session
+						setsid() == -1 ? dp = cci_daemonize::daemon_proc::dp_error :
+                                                                dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader;
+						break;
+					    }
+					    case cci_daemonize::daemon_proc::dp_fork_no_session_leader :
+					    {
+						//ensure we are not session leader
+						switch( fork() )
+						{
+						    case -1 :
+							dp = cci_daemonize::daemon_proc::dp_error;
+							break;
+						    case  0 :
+							dp = cci_daemonize::daemon_proc::dp_daemonized;						break;
+						    default:
+							_exit( EXIT_SUCCESS );
+						}
+						break;
+					    }
+					}
+					if ( dp == cci_daemonize::daemon_proc::dp_daemonized ) { break; }
+				}						
 			}
 
 
