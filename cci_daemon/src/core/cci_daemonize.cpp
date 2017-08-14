@@ -127,6 +127,29 @@ int daemonize_( const unsigned long flags )
 daemon_proc make_session_leader()
 {
 	 //become leader of new session
-         return setsid() == -1 ? daemon_proc::dp_error : daemon_proc::dp_success;	
+         return setsid() == -1 ? daemon_proc::dp_error  : daemon_proc::dp_success;
 }
+
+//--------------------------------------------------------------------------------------
+daemon_proc make_into_background()
+{
+	  daemon_proc dp = daemon_proc::dp_error;
+
+	  //become background process
+	  switch( fork() )
+  	  {
+	    case -1 :
+		dp = daemon_proc::dp_error;
+		break;
+	    case  0 :
+		dp = daemon_proc::dp_make_session_leader;
+		break;
+	    default:
+		_exit( EXIT_SUCCESS );
+	  } 
+
+
+          return dp;
+}
+
 

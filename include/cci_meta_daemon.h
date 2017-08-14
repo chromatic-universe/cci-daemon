@@ -103,18 +103,52 @@ namespace cci_policy
 			{
 				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
 
-				
-				//logging
-				this->configure_logging_context();
-				//descriptors and streams
-				this->configure_descriptors();
-				//environment and directory root context
-				this->configure_environment();
-				//systen init and signals
-				this->configure_init();
-				//
-				//procedure
-				this->proc_init();				
+				cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_fork_background_proc;
+				while( dp != cci_daemonize::daemon_proc::dp_error )
+				{
+					switch( dp )
+					{
+						case cci_daemonize::daemon_proc::dp_fork_background_proc :
+						{
+							
+							//fork inot background;terminaal session config
+							//continues on success to session leader
+							dp = this->configure_init();
+							break;
+						}
+						case cci_daemonize::daemon_proc::dp_make_session_leader :
+						{
+							//become leader of new session
+							dp = make_session_leader();
+							// go tothe next state || signal dameonized || exit on error
+							if( dp == cci_daemonize::daemon_proc::dp_success ) 
+					                { dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader; }
+							      
+							break;
+						}
+
+						default :
+							break;
+					}
+							/*if( dp == cci_daemonize::daemon_proc::dp_success  )
+							{
+								//logging
+								this->configure_logging_context();
+								//descriptors and streams
+								this->configure_descriptors();
+								//environment and directory root context
+								this->configure_environment();
+								//procedure
+								this->proc_init();
+							}
+					      }
+					}*/
+					if ( dp == cci_daemonize::daemon_proc::dp_daemonized ) { break; }
+
+								
+				}
+
+		 
 			}
 			//-----------------------------------------------------------------------------
 			virtual void cli()

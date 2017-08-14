@@ -67,4 +67,6 @@ extern "C"
 	//-------------------------------------------------------
 	//seesion console leader
 	cci_daemonize::daemon_proc make_session_leader();
+	//fork daemon fork
+	cci_daemonize::daemon_proc make_into_background();
 }
