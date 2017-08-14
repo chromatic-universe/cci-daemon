@@ -72,13 +72,9 @@ namespace cci_policy
 				dp =  make_into_background();
  				if( dp == cci_daemonize::daemon_proc::dp_error )
 				{ 
-					ACE_DEBUG(( LM_ERROR , "%D (%P) ...could not make session as leader.....\n" ) ); 
+					ACE_DEBUG(( LM_ERROR , "%D (%P) ...could not fork into background.....\n" ) ); 
 				}
-				else if( dp ==  cci_daemonize::daemon_proc::dp_success  )
-				{ 
-					ACE_DEBUG(( LM_INFO , "%D (%P) ...made session as leader.....\n" ) ); 
-				}
-			
+						
 				_t()->clear_color();
 
 				return dp;

@@ -56,6 +56,7 @@ namespace cci_policy
 	//cci_daemon_dispatcher host
 	//
 	template<
+		  typename T ,
 		  template <class> class descriptor_policy ,
 		  template <class> class environment_policy,
 		  template <class> class logging_policy ,
@@ -63,19 +64,19 @@ namespace cci_policy
 		  template <class> class daemon_proc_policy ,
 		  template <class> class command_line_policy 
 		>
-	class cci_daemon_dispatcher : public descriptor_policy<placeholder> ,
-	                              public environment_policy<placeholder> ,
-				      public logging_policy<placeholder> ,
-				      public init_policy<placeholder> ,
-				      public daemon_proc_policy<placeholder> ,
-				      public command_line_policy<placeholder>
+	class cci_daemon_dispatcher : public descriptor_policy<T> ,
+	                              public environment_policy<T> ,
+				      public logging_policy<T> ,
+				      public init_policy<T> ,
+				      public daemon_proc_policy<T> ,
+				      public command_line_policy<T>
 	{
 
 		public :
 
 
 			//ctors
-			explicit cci_daemon_dispatcher()  
+			cci_daemon_dispatcher( T meta )  : m_meta( meta )
 			{
 			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
 			}  
@@ -92,8 +93,7 @@ namespace cci_policy
 
 		private :
 
-			//
-
+			T 	m_meta;
 
 		public :
 			
@@ -126,7 +126,11 @@ namespace cci_policy
 							      
 							break;
 						}
-
+					        case cci_daemonize::daemon_proc::dp_daemonized :
+						case cci_daemonize::daemon_proc::dp_error :
+						{
+							//
+						}
 						default :
 							break;
 					}
@@ -159,7 +163,8 @@ namespace cci_policy
 
 
 	};
-	using default_daemon_dispatcher = cci_daemon_dispatcher<close_all_descriptors ,
+	using default_daemon_dispatcher = cci_daemon_dispatcher<placeholder* , 
+							        close_all_descriptors ,
 	                                                        default_environment_context ,
 								ace_framework_logging_context ,
 								runtime_sys_init ,
