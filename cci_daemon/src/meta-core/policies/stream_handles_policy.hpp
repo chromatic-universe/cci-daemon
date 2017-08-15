@@ -22,14 +22,14 @@ namespace cci_policy
 		//stream handle policies
 		//
 		template<typename T>
-		class close_and_open_with_ace
+		class ace_stream_context
 		{
 			
 
 			public :
 
 				//ctor
-				close_and_open_with_ace( int flags ) : m_flags{ 0 } ,
+				ace_stream_context( int flags ) : m_flags{ 0 } ,
 					m_str_arg( "cci-meta-daemon-dispatcher" ) ,
 					m_ostr( std::make_unique<std::ofstream>( "cci_meta_daemon.log" ) )
 				{}
@@ -44,7 +44,7 @@ namespace cci_policy
 			protected :
 
 				//dtor
-				~close_and_open_with_ace()
+				~ace_stream_context()
 				{}
 
 			public :
@@ -55,7 +55,7 @@ namespace cci_policy
 
 					int flags { 0 };
 
-					ACE_TRACE ("close_and_open_with_ace:::configure_streams");
+					ACE_TRACE ("ace_stream_context:::configure_streams");
 
 					cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_error;
 					

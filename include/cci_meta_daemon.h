@@ -130,7 +130,7 @@ namespace cci_policy
 
 	};
 	using default_daemon_dispatcher = cci_daemon_dispatcher<placeholder* , 
-							        close_and_open_with_ace ,
+							        ace_stream_context ,
 	                                                        default_environment_context ,
 								runtime_sys_init ,
 								default_daemon_procedure ,
@@ -155,40 +155,12 @@ namespace cci_policy
  	{
 				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
 				
-				//our decomposition is not 'pure' here.
-				//the template template classes are
-				//supposed to be orthogonal,i.e,discrete
-				//and not dependent. There is a tangential
-				//dependency here betweent the logging context
-				//and sys init. without passing a flag	
-				//telling sys init to not redirect all
-				//open stream descriptros to /dev/nu&ll
-				//the initial logging setup will be nulled.
-				//if the longging context is not called
-				//first on the other hand , you won't
-                                //get any debug or syslog /output from 
-                                //the policies called previously.
-				//this can be worked around , for I believe
-				//the logging setup definitely is a policy.
-				//also it may objected that the actual
-				//daemon proc is not 'orthogonal'-you have to
-				//call it after all the other policies.this is
-				//inaccuate. You can call any of the policies
-				//in any order you want:you're results will 
-				//just be surprisingg in the sense what you are
-				//doing is trying to start up a daemon in good 
-				//order(you can call proc_init() and it will start
-				//and run the procedure-but in the foreground).
-				//I think this implementation fulfills
-				//most of the spirit of the design pattern
-				//of template tenplate policies with a few burrs
-				// that have to filed off manually.
 				this->configure_streams();
 				//forks and terminsal seesion
 				this->configure_init();
 				//signals and working directory
 				this->configure_environment();
-				//daemon pric perform
+				//daemon proc perform
 				this->proc_init();
 
 							
