@@ -57,6 +57,7 @@ namespace cci_policy
 			//attributes
 			std::string 			m_str_arg;
 			std::unique_ptr<std::ostream> 	m_ostr;
+			T 				m_meta;
 
 	
 

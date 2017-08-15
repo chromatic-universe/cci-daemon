@@ -34,7 +34,8 @@ namespace cci_policy
 		public :
 
 			//ctor
-			runtime_sys_init() : m_tutils( std::make_unique<time_utils>()  )
+			runtime_sys_init( T meta ) : m_tutils( std::make_unique<time_utils>() ) ,
+						     m_meta( meta )
 			{}
 
 
@@ -43,6 +44,7 @@ namespace cci_policy
 			//attributes
 			std::unique_ptr<std::string> 	m_runtime_data;
 			std::unique_ptr<cpp_real_stream::time_utils> 	m_tutils;
+			T 				m_meta;
 
 
 		protected :

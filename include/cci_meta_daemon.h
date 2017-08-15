@@ -45,12 +45,28 @@ namespace cci_policy
 	//services
 	//
 	class placeholder
-	{
+	{	
+				
 		public :
 
 			//ctor
-			placeholder()
+			placeholder() : m_cur_proc { cci_daemonize::daemon_proc::dp_error }
 			{}
+
+		private :
+			
+			cci_daemonize::daemon_proc m_cur_proc;
+
+		public :
+
+			//accessors-inspectors
+			cci_daemonize::daemon_proc state() const noexcept
+			{ return m_cur_proc; }
+			//mutators
+			void state( cci_daemonize::daemon_proc proc )
+			{ m_cur_proc = proc; }
+
+			
 	};
 	//
 	//cci_daemon_dispatcher host
@@ -76,7 +92,9 @@ namespace cci_policy
 
 
 			//ctors
-			cci_daemon_dispatcher( T meta )  : m_meta( meta )
+			cci_daemon_dispatcher( T meta )  : init_policy<T>( meta ) ,
+                                                           m_meta( meta ) 
+
 			{
 			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
 			}  
