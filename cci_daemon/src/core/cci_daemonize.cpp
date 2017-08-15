@@ -194,17 +194,19 @@ daemon_proc close_all_open_files( const int flags )
 
 	int maxfd , fd;
 	daemon_proc dp = daemon_proc::dp_error;
+	
+	if( flags & bd_no_close_files ) 
+	{ return daemon_proc::dp_success; }
 
-        if( !( flags & bd_no_close_files ) )
-	{
-	     maxfd = sysconf( _SC_OPEN_MAX );
+	
+       	     maxfd = sysconf( _SC_OPEN_MAX );
 	     //if limit is indeterminate , guess
 	     if( maxfd == -1 ) { maxfd = bd_max_handles; }
 	     for( fd = 0; fd < maxfd; fd++ ) { close( fd ); }
 
 	     dp = daemon_proc::dp_success;
 	     
-	}
+	
 
 	return dp;
 

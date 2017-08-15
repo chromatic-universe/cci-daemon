@@ -72,14 +72,13 @@ namespace
 					
 				default :
 					_t()->clear_color();
-					return 0;
+					exit( 0 );
 			    }					    			    
 		  }
 
 	};
-	daemon_signal_handler h1(SIGTERM);
-	daemon_signal_handler h2(SIGINT);
-
+	
+	
 				
 }
 
@@ -94,12 +93,16 @@ namespace cci_policy
 	{
 
 	
+		public :
+	
+			
+			default_environment_context() : m_tutils( std::make_unique<time_utils>() ) 
+			{
+			}
 	
 		protected :
 			
-			//attributes
-			ACE_Sig_Handlers handler;
-			//daemon_signal_handler h1(SIGTERM);
+					//daemon_signal_handler h1(SIGTERM);
 
 			std::unique_ptr<cpp_real_stream::time_utils> 	m_tutils;
 			
@@ -109,24 +112,15 @@ namespace cci_policy
 		
 		public :
 	
-				//accessors-inspectors
+			//accessors-inspectors
 			cpp_real_stream::time_utils_ptr _t() { return m_tutils.get(); }
 	
-			default_environment_context() : m_tutils( std::make_unique<time_utils>()  )
-			{
-			}
-
 			cci_daemonize::daemon_proc configure_environment()
 			{
 			    ACE_TRACE("default_environment_context::configure_environment_context");
-			    //signals
-			    ACE_DEBUG( ( LM_INFO , "%D (%P) ...registering signals....\n" ) );
-
-			    int flags { 0 };
-
-			    handler.register_handler (SIGTERM, &h1);
-			    handler.register_handler (SIGINT,  &h2);
 			    
+			    int flags { 0 };
+			   			    
 			    ACE_DEBUG( ( LM_INFO , "%D (%P) ...changing directory to root dir....\n" ) );
 
 			    return cd_to_root( flags );

@@ -17,7 +17,6 @@
 #include <stream_handles_policy.hpp>
 #include <creator_policy.hpp>
 #include <environment_policy.hpp>
-#include <logging_policy.hpp>
 #include <sys_init_policy.hpp>
 #include <daemon_procedure_policy.hpp>
 #include <command_line_policy.hpp>
@@ -75,14 +74,12 @@ namespace cci_policy
 		  typename T ,
 		  template <class> class descriptor_policy ,
 		  template <class> class environment_policy,
-		  template <class> class logging_policy ,
 		  template <class> class init_policy ,
 		  template <class> class daemon_proc_policy ,
 		  template <class> class command_line_policy 
 		>
 	class cci_daemon_dispatcher : public descriptor_policy<T> ,
 	                              public environment_policy<T> ,
-				      public logging_policy<T> ,
 				      public init_policy<T> ,
 				      public daemon_proc_policy<T> ,
 				      public command_line_policy<T>
@@ -95,10 +92,10 @@ namespace cci_policy
 			//we explicitly iniitlaize the policies 
 			//as opposed to using packing template params
 			//which are unnecesary here.
-			cci_daemon_dispatcher( T meta )  : init_policy<T>( meta ) ,
-                                                           m_meta( meta ) 
-
-			{
+			cci_daemon_dispatcher( T meta )  : m_meta{ meta } ,
+						  descriptor_policy<T>( 0 ) ,
+						  init_policy<T>( meta )					 
+                        {
 			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
 			}  
 
@@ -133,9 +130,8 @@ namespace cci_policy
 
 	};
 	using default_daemon_dispatcher = cci_daemon_dispatcher<placeholder* , 
-							        close_all_descriptors ,
+							        close_and_open_with_ace ,
 	                                                        default_environment_context ,
-								ace_framework_logging_context ,
 								runtime_sys_init ,
 								default_daemon_procedure ,
 								default_command_line>;
@@ -145,7 +141,6 @@ namespace cci_policy
 		  typename T ,
 		  template <class> class descriptor_policy ,
 		  template <class> class environment_policy,
-		  template <class> class logging_policy ,
 		  template <class> class init_policy ,
 		  template <class> class daemon_proc_policy ,
 		  template <class> class command_line_policy 
@@ -153,7 +148,6 @@ namespace cci_policy
 	void cci_daemon_dispatcher<T ,
 				    descriptor_policy ,
 				    environment_policy,
-				    logging_policy ,
 				    init_policy ,
 				    daemon_proc_policy ,
 				    command_line_policy>::daemonize()
@@ -168,7 +162,7 @@ namespace cci_policy
 				//dependency here betweent the logging context
 				//and sys init. without passing a flag	
 				//telling sys init to not redirect all
-				//open stream descriptros to /dev/null
+				//open stream descriptros to /dev/nu&ll
 				//the initial logging setup will be nulled.
 				//if the longging context is not called
 				//first on the other hand , you won't
@@ -189,11 +183,9 @@ namespace cci_policy
 				//most of the spirit of the design pattern
 				//of template tenplate policies with a few burrs
 				// that have to filed off manually.
-				this->configure_logging_context();
+				this->configure_streams();
 				//forks and terminsal seesion
 				this->configure_init();
-				//streans and descriptors
-			        this->configure_descriptors();
 				//signals and working directory
 				this->configure_environment();
 				//daemon pric perform

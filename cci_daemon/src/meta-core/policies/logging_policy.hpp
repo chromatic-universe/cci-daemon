@@ -24,7 +24,7 @@ namespace cci_policy
 			
 			//dtor
 			~sysroot_logging_context()
-			{}
+			{ ACE_LOG_MSG->clr_flags (ACE_Log_Msg::OSTREAM); }
 
 
 	};
@@ -44,7 +44,8 @@ namespace cci_policy
 			{
 
 				ACE_TRACE ("ace_framework_logging_context::configure_logging_context");
-				//ACE_LOG_MSG->open ( m_str_arg.c_str() , ACE_Log_Msg::SYSLOG , "chromatic unvierse");
+				ACE_LOG_MSG->open ( m_str_arg.c_str() , ACE_Log_Msg::SYSLOG , "chromatic universe");
+				//ACE_LOG_MSG->set_flags (ACE_Log_Msg::STDERR);
 				//output to default destination (stderr)
 				ACE_LOG_MSG->set_flags (ACE_Log_Msg::STDERR);				
 				
