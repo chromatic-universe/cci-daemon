@@ -59,9 +59,20 @@ namespace cci_policy
 			{
 				ACE_TRACE ("default_daemon_procedure::perform");
 				
-				
+				daemon_signal_handler h1(SIGTERM);
+				daemon_signal_handler h2(SIGINT);
+				//attributes
+				ACE_Sig_Handlers handler;
+				//signals
+				ACE_DEBUG( ( LM_INFO , "%D (%P) ...registering signals....\n" ) );
+				handler.register_handler (SIGTERM, &h1);
+				handler.register_handler (SIGINT,  &h2);
+	
+
 				for( ;; )
 				{
+									
+
 					std::this_thread::sleep_for( std::chrono::seconds( 5 ) );
 
 					_t()->color( stamp_color::green );

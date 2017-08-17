@@ -92,9 +92,10 @@ namespace cci_policy
 			//we explicitly iniitlaize the policies 
 			//as opposed to using packing template params
 			//which are unnecesary here.
-			cci_daemon_dispatcher( T meta )  : m_meta{ meta } ,
+			cci_daemon_dispatcher( T meta )  :
 						  descriptor_policy<T>( 0 ) ,
-						  init_policy<T>( meta )					 
+						  init_policy<T>( meta ) ,					 
+						  m_meta{ meta } 
                         {
 			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");
 			}  
