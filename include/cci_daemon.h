@@ -108,7 +108,7 @@ namespace cci_daemon_impl
                                              int whence ,
                                              int start ,
                                              int len );
-                    void map_kernel();
+                    virtual void map_kernel();
                     void  _bt() { if ( backtrace() ) {  print_stacktrace( m_log_fp ); } }
                     void  _btw() { if ( backtrace() ) {  print_walk_backtrace( m_log_fp ); } }
                     lib_handle_t load_lib( const std::string& lib );
