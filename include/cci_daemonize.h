@@ -55,16 +55,22 @@ namespace cci_daemonize
                	static const unsigned bd_no_umask_0 = 010;
                	///< maximum file descriptors to close if sysconf is indeterminate
                	static const unsigned bd_max_handles = 8192;
+		/// buffer size
+		static const unsigned buffer_size = 1024;
+		///close exec
+                static const unsigned cpf_cloexec = 1;
+		///pid path
+		static const std::string path_pid { "/var/run/cci-daemon.pid" };
+
+
 
 
 }
 //-----------------------------------------------------------------------------------------
 extern "C"
 {
-	//-------------------------------------------------------
 	//daemonize
 	int daemonize_( const unsigned long flags );
-	//-------------------------------------------------------
 	//seesion console leader
 	cci_daemonize::daemon_proc make_session_leader();
 	//fork daemon 
@@ -79,7 +85,19 @@ extern "C"
 	cci_daemonize::daemon_proc reopen_streams_to_dev_null( const int flags );
 	//change to rott directory
 	cci_daemonize::daemon_proc cd_to_root( const int flags );
-	
+	//lock region
+	int lock_region( int fd ,
+			 int type ,
+			 int whence ,
+			 int start ,
+			 int len );
+	//write pid
+	bool write_pid( const std::string& pid_file ,
+					   std::ostream& ostr ,
+					   int flags  );
+	//remove pd
+	bool remove_pid( const std::string& pid_file );
+
 	
 }
 

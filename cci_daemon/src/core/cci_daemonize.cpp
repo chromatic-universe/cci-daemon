@@ -251,3 +251,98 @@ daemon_proc cd_to_root( const int flags )
 	
 }
 
+
+//---------------------------------------------------------------------------------------------------
+int lock_region( int fd ,
+		 int type ,
+		 int whence ,
+		 int start ,
+		 int len )
+{
+        struct flock fl;
+
+        fl.l_type = type;
+        fl.l_whence = whence;
+        fl.l_start = start;
+        fl.l_len = len;
+
+        return fcntl( fd , F_SETLK , &fl );
+
+}
+
+
+//---------------------------------------------------------------------------------------------------
+bool write_pid( const std::string& pid_file ,
+   	              std::ostream& ostr ,
+                      int flags  )
+{
+        int fd;
+        char buffer[cci_daemonize::buffer_size];
+        bool b_ret { false };
+	struct stat sb;
+	
+	//file exists
+	if( stat( pid_file.c_str() , &sb ) != -1 )	
+	{
+		ostr << "...pid file exists...aborting...\n";
+		return false;	
+	}
+
+        fd = open( (char*) pid_file.c_str() , O_RDWR | O_CREAT , S_IRUSR | S_IWUSR );
+        if( fd == -1 )
+        {  ostr << "could not write pid file....\n";  return false; }
+
+        if ( flags & cpf_cloexec )
+        {
+
+            //close-on-exec file descriptor flag
+            flags = fcntl( fd , F_GETFD );
+            //fetch flags
+            if( flags == -1 )
+            { ostr << "could not get flags for pid file\n"; return false; }
+
+            flags |= FD_CLOEXEC;
+            //turn on FD_CLOEXEC
+             if ( fcntl( fd , F_SETFD , flags ) == -1 )
+             {  ostr << "could not set flags for pid file\n"; return false; }
+        }
+
+        if ( lock_region( fd , F_WRLCK , SEEK_SET , 0 , 0 ) == -1 )
+        {
+
+            if ( errno == EAGAIN || errno == EACCES )
+            {  ostr << "pid file is locked; probably daemon is already running\n"; }
+            else { ostr << "unable to lock pid file\n";  }
+        }
+        else
+        {
+            if ( ftruncate( fd , 0 ) == -1 ) {  ostr << "could not truncate pid file\n"; }
+            else  { b_ret = true; }
+        }
+
+        //write pid
+        if( b_ret )
+        {
+            ostr << "writing pid file....\n";
+            snprintf( buffer ,
+                      cci_daemonize::buffer_size ,
+                      "%ld\n" ,
+                      (long) getpid() );
+            if ( write( fd , buffer , strlen( buffer ) ) != strlen( buffer ) )
+            {
+                ostr << "writing to pid file failed\n";
+                b_ret = false;
+            }
+        }
+
+        
+        return b_ret;
+}
+
+//---------------------------------------------------------------------------------------------------
+bool remove_pid( const std::string& pid_file )
+{
+        return std::remove( pid_file.c_str() ) ? true : false;
+}
+
+

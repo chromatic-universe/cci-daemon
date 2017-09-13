@@ -100,7 +100,7 @@ bool cci_daemon_facade::log_message( const std::string& msg )
 
 //---------------------------------------------------------------------------------------------------
 bool cci_daemon_facade::open_log()
-    {
+{
         mode_t m;
         bool b_ret { true };
 

@@ -31,7 +31,7 @@ namespace cci_policy
 				//ctor
 				ace_stream_context( int flags ) : m_flags{ 0 } ,
 					m_str_arg( "cci-meta-daemon-dispatcher" ) ,
-					m_ostr( std::make_unique<std::ofstream>( "cci_meta_daemon.log" ) )
+					m_ostr( std::make_unique<std::ofstream>( "/var/log/chromatic/cci_meta_daemon.log" ) )
 				{}
 
 			private :
@@ -66,16 +66,17 @@ namespace cci_policy
 					{
 				
 						ACE_LOG_MSG->open ( m_str_arg.c_str() , ACE_Log_Msg::SYSLOG , "chromatic universe");
-						ACE_LOG_MSG->set_flags (ACE_Log_Msg::STDERR);
+						//ACE_LOG_MSG->set_flags (ACE_Log_Msg::STDERR);
 						ACE_LOG_MSG->msg_ostream ( m_ostr.get() , 0 );
 						ACE_LOG_MSG->set_flags (ACE_Log_Msg::OSTREAM);
-						ACE_DEBUG(( LM_ERROR , "%D (%P) ...opened streams to contextl....\n" ) );
+						ACE_DEBUG(( LM_ERROR , "%D (%P) ...opened streams to context....\n" ) );
 					}
 
 					
 
 					return dp; 
 				}			
+
 
 		};
 		//
