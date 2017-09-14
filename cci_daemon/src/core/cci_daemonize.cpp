@@ -342,7 +342,7 @@ bool write_pid( const std::string& pid_file ,
 //---------------------------------------------------------------------------------------------------
 bool remove_pid( const std::string& pid_file )
 {
-        return std::remove( pid_file.c_str() ) ? true : false;
+        return std::remove( pid_file.c_str() ) ? false : true;
 }
 
 

@@ -14,7 +14,15 @@ using namespace cpp_real_stream;
 
 namespace
 {
+	void handle_pid()
+	{
+		
+		if( ! remove_pid( cci_daemonize::path_pid ) ) 
+		{ ACE_DEBUG(( LM_ERROR , "%D (%P) ....remove pid failed...s\n"  ) ); }
+		else{ ACE_DEBUG(( LM_INFO , "%D (%P) ....removed pid file...\n"  ) ); }
 
+	}
+	
 	class daemon_signal_handler : public ACE_Event_Handler
 	{
 
@@ -60,6 +68,9 @@ namespace
 			
 			    		ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigterm occurred....shutting down server\n" )  ) );
 					_t()->clear_color();
+					
+					handle_pid();
+					
 
 					exit( 1 );
 
@@ -68,12 +79,16 @@ namespace
 					ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigint occurred...shutting down server..\n" )  ) );
 					_t()->clear_color();
 
+					
+					handle_pid();
+
 					exit( 0 );
 					
 				default :
 					_t()->clear_color();
-					exit( 0 );
-			    }					    			    
+
+					return 0;
+			  }					    			    
 		  }
 
 	};
