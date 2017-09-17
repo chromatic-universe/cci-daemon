@@ -46,8 +46,6 @@ namespace cci_daemon_impl
                 cci_handle_t                          lib_ref;
                 int ( *make_kernel ) ( kernel_context* context_ptr );
                 int ( *unmake_kernel ) ( kernel_context* context_ptr );
-                int ( *mount_memory_cache ) ( kernel_context* context_ptr );
-                int ( *unmount_memory_cache ) ( kernel_context* context_ptr );
 
 
            } kernel_context;
@@ -55,6 +53,7 @@ namespace cci_daemon_impl
            //types
            typedef int call_kernel_function(  kernel_context_ptr context_ptr ) ;
 
+	
           //we call this a 'kernel' for the reason it acts like a
           //minimal one. By using function and address indirection
           //like a real kernel  , it operates at the top
@@ -168,11 +167,8 @@ namespace cci_daemon_impl
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
 
-                    int mount_memory_cache();
-                    int unmount_memory_cache();
-
-
            };
+
 
 
 
@@ -180,11 +176,6 @@ namespace cci_daemon_impl
            extern "C" int make_kernel( kernel_context_ptr context_ptr );
            //------------------------------------------------------------------------------------
            extern "C" int unmake_kernel( kernel_context_ptr context_ptr );
-           //-----------------------------------------------------------------------------
-           extern "C" int mount_memory_cache( kernel_context_ptr context_ptr );
-             //-----------------------------------------------------------------------------
-           extern "C" int unmount_memory_cache( kernel_context_ptr context_ptr );
-               //-----------------------------------------------------------------------------
 
 
 

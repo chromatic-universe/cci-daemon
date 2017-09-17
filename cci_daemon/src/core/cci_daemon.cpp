@@ -31,8 +31,8 @@ cci_daemon_facade::cci_daemon_facade( int argc , char* argv[] ) : m_dw_flags { 0
                                                                   m_backtrace { false } ,
                                                                   m_argc{ argc } ,
                                                                   m_argv { argv } ,
-                                                                  m_ptr_kernel_context( new kernel_context ) ,
-                                                                  m_chroot_dir { "/" }
+                                                                  m_chroot_dir { "/" } ,
+                                                                  m_ptr_kernel_context( new kernel_context ) 
 {
       //
 }
@@ -499,17 +499,9 @@ void cci_daemon_facade::map_kernel()
 
                 //map rest of stack
                 context()->pm.clear();
-                context()->mount_memory_cache = get_function_pointer<call_kernel_function>
-                              ( context()->lib_ref , "mount_memory_cache" );
-                k_( context()->mount_memory_cache );
-                context()->pm.clear();
                 context()->unmake_kernel = get_function_pointer<call_kernel_function>
                               ( context()->lib_ref , "unmake_kernel" );
                 k_( context()->unmake_kernel );
-                context()->pm.clear();
-                context()->unmount_memory_cache = get_function_pointer<call_kernel_function>
-                              ( context()->lib_ref , "unmount_memory_cache" );
-                k_( context()->unmount_memory_cache );
 
 
           }

@@ -10,7 +10,7 @@ using json = nlohmann::json;
 
 //static initializations
 supported_dictionary cci_daemon_kernel::m_dict_supported = { { "publish_subscribe" ,
-    "{ \"moniker\" : \"publish_and_subscibe\"" } };
+    "{ \"moniker\" : \"publish_and_subscribe\"" } };
 
 cci_daemon_kernel_ptr cci_daemon_kernel::m_instance;
 std::mutex cci_daemon_kernel::m_mutex;
@@ -70,21 +70,6 @@ void cci_daemon_kernel::unload_plugin( const std::string& config )
             }
 }
 
-//--------------------------------------------------------------------------
-int cci_daemon_kernel::mount_memory_cache()
-{
-
-           return 0;
-
-}
-
-//--------------------------------------------------------------------------
-int cci_daemon_kernel::unmount_memory_cache()
-{
-
-           return 0;
-
-}
 
 
 //----------------------------------------------------------------------------
@@ -98,19 +83,3 @@ extern "C" int unmake_kernel( kernel_context_ptr context_ptr  )
   { context_ptr->kernel_ref->dispose_instance(); }
   return 0;
 }
-//-----------------------------------------------------------------------------
-extern "C" int mount_memory_cache( kernel_context_ptr context_ptr  )
-{ if( context_ptr->kernel_ref )
-  { return context_ptr->kernel_ref->mount_memory_cache(); }
-  return -1;
-}
-//-----------------------------------------------------------------------------
-extern "C" int unmount_memory_cache( kernel_context_ptr context_ptr  )
-{ if( context_ptr->kernel_ref )
-  { return context_ptr->kernel_ref->unmount_memory_cache(); }
-  return -1;
-}
-
-
-
-
