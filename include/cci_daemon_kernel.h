@@ -32,23 +32,26 @@ namespace cci_daemon_impl
           using param_map = std::map<std::string,std::string>;
 
           //kernel structure - home brew kernel process struct
-          typedef struct kernel_context
-          {
-                //atttributes
-                //
-                //commmand line
-                param_map   pm;
+	  extern "C"
+	  {
+		  typedef struct kernel_context
+		  {
+			//atttributes
+			//
+			//commmand line
+			param_map   pm;
 
 
-                //services
-                //
-                cci_daemon_impl::cci_daemon_kernel*   kernel_ref;
-                cci_handle_t                          lib_ref;
-                int ( *make_kernel ) ( kernel_context* context_ptr );
-                int ( *unmake_kernel ) ( kernel_context* context_ptr );
+			//services
+			//
+			cci_daemon_impl::cci_daemon_kernel*   kernel_ref;
+			cci_handle_t                          lib_ref;
+			int ( *make_kernel ) ( kernel_context* context_ptr );
+			int ( *unmake_kernel ) ( kernel_context* context_ptr );
 
 
-           } kernel_context;
+		   } kernel_context;
+	   }
            typedef kernel_context* kernel_context_ptr;
            //types
            typedef int call_kernel_function(  kernel_context_ptr context_ptr ) ;
