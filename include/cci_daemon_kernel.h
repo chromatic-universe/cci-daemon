@@ -56,7 +56,19 @@ namespace cci_daemon_impl
            //types
            typedef int call_kernel_function(  kernel_context_ptr context_ptr ) ;
 
-	
+
+	  //abstract
+	  class base_kernel
+	  {
+		public :
+
+			virtual void load_plugin( const std::string &config ) = 0;
+                    	virtual void unload_plugin( const std::string& config ) = 0;
+			virtual void destroy_contexts() = 0;
+
+			virtual ~base_kernel();
+
+	  };
           //we call this a 'kernel' for the reason it acts like a
           //minimal one. By using function and address indirection
           //like a real kernel  , it operates at the top
@@ -69,7 +81,7 @@ namespace cci_daemon_impl
           //also controls the containers of servers that downcall
           //into the typed shared library by composition.
 
-          class cci_daemon_kernel
+          class cci_daemon_kernel : public base_kernel
           {
 
 
@@ -133,7 +145,7 @@ namespace cci_daemon_impl
                     //helpers
                     //
                     //invalidate any pb entities
-                    //existing after a plugin
+                   //existing after a plugin
                     //has been removed
                     void invalidate_progeny( const std::string& config )
                     {
@@ -141,7 +153,7 @@ namespace cci_daemon_impl
                     }
 
                     //release local contexts
-                    virtual void destroy_contexts()
+                    virtual void destroy_contexts() override
                     {
                          std::cerr << "...destroying plugin contexts....\n";
 
@@ -164,8 +176,8 @@ namespace cci_daemon_impl
                     //
                     bool supported_service( const std::string& key )
                     { return m_dict_supported.find( key ) != m_dict_supported.end(); }
-                    virtual void load_plugin( const std::string &config );
-                    virtual void unload_plugin( const std::string& config );
+                    virtual void load_plugin( const std::string &config ) override;
+                    virtual void unload_plugin( const std::string& config ) override;
                     size_t plugin_count() { return m_loaded_plugins->size(); }
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
