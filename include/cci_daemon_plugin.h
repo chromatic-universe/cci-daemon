@@ -13,6 +13,7 @@ namespace cci_daemon_impl
 
           //forward decalrations
           class cci_daemon_kernel;
+          class cci_daemon_base_kernel;
 
           //aliases
           using size_ptr_t = size_t*;
@@ -40,8 +41,8 @@ namespace cci_daemon_impl
 
                   //prototypes
                   typedef int   get_engine_version_function();
-                  typedef void  register_plugin_function( cci_daemon_kernel& cdk );
-                  typedef void  clear_context_function( cci_daemon_kernel& cdk );
+                  typedef void  register_plugin_function( cci_daemon_base_kernel& cdk );
+                  typedef void  clear_context_function( cci_daemon_base_kernel& cdk );
                   //helpers
                   get_engine_version_function* get_engine_version_address;
                   register_plugin_function*    register_plugin_address;
@@ -53,9 +54,9 @@ namespace cci_daemon_impl
                   int get_engine_version() const noexcept
                   { return get_engine_version_address(); }
                   //services
-                  void register_plugin( cci_daemon_kernel& kernel )
+                  void register_plugin( cci_daemon_base_kernel& kernel )
                   { register_plugin_address( kernel ); }
-                  void clear_context( cci_daemon_kernel& kernel )
+                  void clear_context( cci_daemon_base_kernel& kernel )
                   { clear_context_address( kernel ); }
 
 

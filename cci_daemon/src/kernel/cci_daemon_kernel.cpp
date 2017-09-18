@@ -1,4 +1,4 @@
-//cci_daemon_kernel.cpp    william k. johnson 2017
+//cci_daemon_base_kernel.cpp    william k. johnson 2017
 //
 
 #include <iostream>
@@ -9,7 +9,7 @@ using namespace cci_daemon_impl;
 using json = nlohmann::json;
 
 //static initializations
-supported_dictionary cci_daemon_kernel::m_dict_supported = { { "publish_subscribe" ,
+supported_dictionary cci_daemon_base_kernel::m_dict_supported = { { "publish_subscribe" ,
     "{ \"moniker\" : \"publish_and_subscribe\"" } };
 
 cci_daemon_kernel_ptr cci_daemon_kernel::m_instance;
@@ -17,18 +17,13 @@ std::mutex cci_daemon_kernel::m_mutex;
 
 
 //------------------------------------------------------------------------
-base_kernel::~base_kernel()
-{
-}
-
-//------------------------------------------------------------------------
-cci_daemon_kernel::~cci_daemon_kernel()
+cci_daemon_base_kernel::~cci_daemon_base_kernel()
 {
             //
 }
 
 //------------------------------------------------------------------------
-void cci_daemon_kernel::load_plugin( const std::string &config )
+void cci_daemon_base_kernel::load_plugin( const std::string &config )
 {
 
               if( m_loaded_plugins->find( config ) == m_loaded_plugins->end() )
@@ -57,7 +52,7 @@ void cci_daemon_kernel::load_plugin( const std::string &config )
 }
 
 //--------------------------------------------------------------------------
-void cci_daemon_kernel::unload_plugin( const std::string& config )
+void cci_daemon_base_kernel::unload_plugin( const std::string& config )
 {
             //deregister
             if( m_loaded_plugins->find( config ) != m_loaded_plugins->end() )

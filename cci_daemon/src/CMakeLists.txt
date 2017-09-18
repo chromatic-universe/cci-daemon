@@ -14,6 +14,7 @@ add_subdirectory(kernel)
 add_subdirectory(ccifs)
 add_subdirectory(tornado)
 add_subdirectory(meta-core)
+add_subdirectory(dispatcher)
 
 
 
