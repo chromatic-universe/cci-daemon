@@ -60,7 +60,7 @@ class bootstrap_signal_handler : public ACE_Event_Handler
                     {
                         case SIGSEGV :
                             {
-                                  ACE_DEBUG(( LM_INFO , "...cci-daemon-dispatcher protocol stack..sigsegv received..\n" ) );
+                                  ACE_DEBUG(( LM_INFO , "...cci-stream-mta protocol stack..sigsegv received..\n" ) );
 
                                   _exit( 1  );
                             }
@@ -153,7 +153,7 @@ extern "C" int bootstrap_default_coordinator( int argc , char* argv[] , void* pt
                   ACE_DEBUG( ( LM_INFO , "%D (%t) changed directory to working directory....\n" ) );
 
                   //bring up the stack
-                  dw = ACE_Service_Config::open( argc , argv );
+		  dw = ACE_Service_Config::open( argc , argv );
                   if( dw != 0 )
                   {
                       ACE_DEBUG ((LM_ERROR , "(%P|%t) ...unraveling protocol stack error..%d.\n" , dw )  );
