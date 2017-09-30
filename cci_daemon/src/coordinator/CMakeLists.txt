@@ -7,8 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -fPIC -Wall -O3  -rdynamic -Qunu
 include_directories(../../../include
                     $ENV{DEV}/include
                     ./include
-q                    $ENV{DEV}/include/cci
-                    $ENV{ACE_ROOT})
+                    /usr/include)
 link_directories(${CCIDAEMON_SOURCE_DIR}
                  $ENV{DEV}/lib
                  $ENV{DEV}/lib/cci)
@@ -27,7 +26,7 @@ if(WITH_ACE_COORDINATOR)
     target_link_libraries(HA_proc_ace_acceptor -lstdc++ 
                                                -lpthread 
                                                -ldl
-                                               -lproc_ace_acceptor
+                                               proc_ace_acceptor
                                                -lACE)
 
 
