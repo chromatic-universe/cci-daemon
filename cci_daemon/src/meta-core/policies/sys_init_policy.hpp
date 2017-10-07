@@ -80,6 +80,7 @@ namespace cci_policy
 					    case cci_daemonize::daemon_proc::dp_fork_background_proc :
 					    {
 
+
 						//become background process
 						switch( fork() )
 						{

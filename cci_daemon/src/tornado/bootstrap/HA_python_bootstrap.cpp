@@ -114,14 +114,6 @@ int HA_python_bootstrap::init ( int argc , ACE_TCHAR *argv[] )
                                    ACE_TEXT (" does not exist\n") ) ,
                                   -1 );
               prv( cci_private.c_str() );
-              //cci private_python
-              if (config.get_string_value (  dispatcher_section,
-                                             ACE_TEXT ( "cci_private_python" ) ,
-                                             cci_private ) == -1 )
-              ACE_ERROR_RETURN ((LM_ERROR,
-                                   ACE_TEXT ("HA_python_bootstrap cci private_python")
-                                   ACE_TEXT (" does not exist\n") ) ,
-                                  -1 );
               home( cci_private.c_str() );
 
 

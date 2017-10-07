@@ -18,6 +18,7 @@
 #include <creator_policy.hpp>
 #include <environment_policy.hpp>
 #include <sys_init_policy.hpp>
+#include <sys_deinit_policy.hpp>
 #include <daemon_procedure_policy.hpp>
 #include <command_line_policy.hpp>
 
@@ -27,7 +28,9 @@
 
 namespace cci_policy
 {
-		
+	
+	static std::string shared_memory_moniker { "cci-stream-mta-mmc" };
+	
 	//forward declarations
 	
 
@@ -101,7 +104,11 @@ namespace cci_policy
 			}  
 
 			//dtor
-			~cci_daemon_dispatcher() = default;	
+			~cci_daemon_dispatcher() 
+			{
+			  	ACE_TRACE ("cci_daemon_dispatcher::~cci_daemon_dispatcher");
+			}  
+
 			//daemons are not copied or assigned
 			//c++ has no problem but initd and systemd
 			//may object
