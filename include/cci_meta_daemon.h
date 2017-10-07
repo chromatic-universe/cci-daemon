@@ -1,5 +1,8 @@
 //cci_meta_daemon   chromatic universe  2017 william k. johnson   
 
+#pragma once
+
+
 //c++ standard
 #include <iostream>
 #include <string>
@@ -25,12 +28,12 @@
 //cci
 #include <cci_daemonize.h>
 
+extern std::string shared_memory_moniker;
 
 namespace cci_policy
 {
 	
-	static std::string shared_memory_moniker { "cci-stream-mta-mmc" };
-	
+		
 	//forward declarations
 	
 
@@ -79,13 +82,15 @@ namespace cci_policy
 		  template <class> class environment_policy,
 		  template <class> class init_policy ,
 		  template <class> class daemon_proc_policy ,
-		  template <class> class command_line_policy 
+		  template <class> class command_line_policy ,
+		  template <class> class deinit_policy 
 		>
 	class cci_daemon_dispatcher : public descriptor_policy<T> ,
 	                              public environment_policy<T> ,
 				      public init_policy<T> ,
 				      public daemon_proc_policy<T> ,
-				      public command_line_policy<T>
+				      public command_line_policy<T> ,
+				      public deinit_policy<T>
 	{
 
 		public :
@@ -107,6 +112,8 @@ namespace cci_policy
 			~cci_daemon_dispatcher() 
 			{
 			  	ACE_TRACE ("cci_daemon_dispatcher::~cci_daemon_dispatcher");
+				
+				this->configure_deinit();	
 			}  
 
 			//daemons are not copied or assigned
@@ -142,7 +149,8 @@ namespace cci_policy
 	                                                        default_environment_context ,
 								runtime_sys_init ,
 								default_daemon_procedure ,
-								default_command_line>;
+								default_command_line ,
+								runtime_sys_deinit>;
 
 	//-----------------------------------------------------------------------------------------------
 	template<
@@ -151,14 +159,16 @@ namespace cci_policy
 		  template <class> class environment_policy,
 		  template <class> class init_policy ,
 		  template <class> class daemon_proc_policy ,
-		  template <class> class command_line_policy 
+		  template <class> class command_line_policy ,
+		  template <class> class deinit_policy 
 		>
 	void cci_daemon_dispatcher<T ,
 				    descriptor_policy ,
 				    environment_policy,
 				    init_policy ,
 				    daemon_proc_policy ,
-				    command_line_policy>::daemonize()
+				    command_line_policy ,
+				    deinit_policy>::daemonize()
  
  	{
 				ACE_TRACE ("cci_daemon_dispatcher::daemonize");
