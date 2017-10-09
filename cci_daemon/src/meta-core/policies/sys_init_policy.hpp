@@ -64,7 +64,7 @@ namespace cci_policy
 
 
 			//services
-			void configure_init()
+			void configure_init ( T meta )
 			{
 				
 				

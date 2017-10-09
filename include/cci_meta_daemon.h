@@ -29,6 +29,8 @@
 #include <cci_daemonize.h>
 
 extern std::string shared_memory_moniker;
+extern std::string shared_memory_semaphore_moniker;
+extern size_t shared_memory_size;
 
 namespace cci_policy
 {
@@ -110,10 +112,10 @@ namespace cci_policy
 
 			//dtor
 			~cci_daemon_dispatcher() 
-			{
+			{ 
 			  	ACE_TRACE ("cci_daemon_dispatcher::~cci_daemon_dispatcher");
 				
-				this->configure_deinit();	
+				this->configure_deinit( this->m_meta );	
 			}  
 
 			//daemons are not copied or assigned
@@ -131,7 +133,8 @@ namespace cci_policy
 			T 	m_meta;
 
 		public :
-			
+		
+				
 			//services
 			//-------------------------------------------------------------------------------
 			virtual void daemonize();
@@ -175,7 +178,7 @@ namespace cci_policy
 				
 				this->configure_streams();
 				//forks and terminsal seesion
-				this->configure_init();
+				this->configure_init( this->m_meta );
 				//signals and working directory
 				this->configure_environment();
 				//daemon proc perform
