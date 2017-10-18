@@ -139,11 +139,8 @@ namespace cci_policy
 			//-------------------------------------------------------------------------------
 			virtual void daemonize();
 			//-----------------------------------------------------------------------------
-			virtual void cli()
-			{
-				ACE_TRACE ("cci_daemon_dispatcher::cli");
-			}
-
+			virtual void cli();
+		
 
 
 	};
@@ -185,6 +182,34 @@ namespace cci_policy
 				this->proc_init();
 
 							
+	}
+	
+	//-----------------------------------------------------------------------------------------------
+	template<
+		  typename T ,
+		  template <class> class descriptor_policy ,
+		  template <class> class environment_policy,
+		  template <class> class init_policy ,
+		  template <class> class daemon_proc_policy ,
+		  template <class> class command_line_policy ,
+		  template <class> class deinit_policy 
+		>
+	void cci_daemon_dispatcher<T ,
+				    descriptor_policy ,
+				    environment_policy,
+				    init_policy ,
+				    daemon_proc_policy ,
+				    command_line_policy ,
+				    deinit_policy>::cli()
+ 
+ 	{
+				ACE_TRACE ("cci_daemon_dispatcher::cli");
+				
+				//this->configure_streams();
+				//signals and working directory
+				//this->configure_environment();
+				//daemon proc perform
+				this->proc_init();						
 	}
 
 	//
