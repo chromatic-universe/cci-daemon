@@ -205,9 +205,6 @@ namespace cci_policy
  	{
 				ACE_TRACE ("cci_daemon_dispatcher::cli");
 				
-				//this->configure_streams();
-				//signals and working directory
-				//this->configure_environment();
 				//daemon proc perform
 				this->proc_init();						
 	}
