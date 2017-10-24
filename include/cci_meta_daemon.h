@@ -134,7 +134,7 @@ namespace cci_policy
 
 		public :
 		
-				
+			T meta() { return m_meta; }	
 			//services
 			//-------------------------------------------------------------------------------
 			virtual void daemonize();
