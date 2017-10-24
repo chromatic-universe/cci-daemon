@@ -83,6 +83,17 @@ namespace
 					handle_pid();
 
 					exit( 0 );
+
+				case SIGSEGV :
+						
+					ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigsev occurred...shutting down server..\n" )  ) );
+					_t()->clear_color();
+
+					
+					handle_pid();
+
+					exit( 0 );
+
 					
 				default :
 					_t()->clear_color();
