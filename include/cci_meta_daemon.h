@@ -114,8 +114,8 @@ namespace cci_policy
 			~cci_daemon_dispatcher() 
 			{ 
 			  	ACE_TRACE ("cci_daemon_dispatcher::~cci_daemon_dispatcher");
-				
-				this->configure_deinit( this->m_meta );	
+					
+				this->configure_deinit( this->m_meta ); 	
 			}  
 
 			//daemons are not copied or assigned
@@ -204,7 +204,10 @@ namespace cci_policy
  
  	{
 				ACE_TRACE ("cci_daemon_dispatcher::cli");
-				
+			
+				//signals and working directory
+				this->configure_environment();
+	
 				//daemon proc perform
 				this->proc_init();						
 	}
