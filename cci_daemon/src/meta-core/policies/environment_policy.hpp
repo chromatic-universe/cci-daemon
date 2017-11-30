@@ -29,8 +29,7 @@ namespace
 
 		public :
 			
-			  daemon_signal_handler ( int signum ) : signum_( signum ) ,
-								 m_tutils( std::make_unique<time_utils>()  )
+			  daemon_signal_handler ( int signum ) : signum_( signum ) 
 
 			  {}
 
@@ -42,12 +41,10 @@ namespace
 		private :
 			
 		  	int 						signum_;
-			std::unique_ptr<cpp_real_stream::time_utils> 	m_tutils;
 
 		public:
 
 		  //accessors-inspectors
-		  cpp_real_stream::time_utils_ptr _t() { return m_tutils.get(); }
 
 		  //services
 		  virtual int handle_signal( int signum ,
@@ -56,20 +53,16 @@ namespace
 		  {
 			    ACE_TRACE ( "daemon_signal_handler::handle_signal" );
 
-			    _t()->color( stamp_color::red );
-	 		    _t()->null_stamp();
 
 
-			    ACE_ASSERT( signum == this->signum_ );
 				
 			    switch( signum_ ) 
 			    {
 			     	case SIGTERM :
 			
 			    		ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigterm occurred....shutting down server\n" )  ) );
-					_t()->clear_color();
 					
-					handle_pid();
+					//handle_pid();
 					
 
 					exit( 1 );
@@ -77,26 +70,23 @@ namespace
 				case SIGINT :
 						
 					ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigint occurred...shutting down server..\n" )  ) );
-					_t()->clear_color();
 
 					
-					handle_pid();
+					//handle_pid();
 
 					exit( 0 );
 
 				case SIGSEGV :
 						
 					ACE_DEBUG ( ( LM_DEBUG, ACE_TEXT ( "%D %P sigsev occurred...shutting down server..\n" )  ) );
-					_t()->clear_color();
 
 					
-					handle_pid();
+					//handle_pid();
 
 					exit( 0 );
 
 					
 				default :
-					_t()->clear_color();
 
 					return 0;
 			  }					    			    
