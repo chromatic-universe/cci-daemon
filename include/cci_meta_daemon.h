@@ -105,7 +105,7 @@ namespace cci_policy
 			cci_daemon_dispatcher( T meta )  :
 						  descriptor_policy<T>( 0 ) ,
 						  init_policy<T>( meta ) ,
-						  daemon_proc_policy<T>() ,					 
+						  daemon_proc_policy<T>( meta ) ,					 
 						  m_meta{ meta } 
                         {
 			  	ACE_TRACE ("cci_daemon_dispatcher::cci_daemon_dispatcher");

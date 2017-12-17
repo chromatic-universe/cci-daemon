@@ -25,10 +25,11 @@ namespace cci_policy
 	
 		public :
 
-			default_daemon_procedure() : m_tutils( std::make_unique<time_utils>()  )
+			default_daemon_procedure( T meta = nullptr ) : m_tutils( std::make_unique<time_utils>()  ) ,
+								       m_meta { meta }
 			{
 				_t()->color( stamp_color::green );
-	 			_t()->null_stamp();
+	 			_t()->null_stamp(); 
 
 				ACE_TRACE ("default_daemon_procedure::default_daemon_procedure");
 
@@ -38,6 +39,7 @@ namespace cci_policy
 		private :
 
 			std::unique_ptr<cpp_real_stream::time_utils> 	m_tutils;
+			T  						m_meta;
 
 		public :
 
