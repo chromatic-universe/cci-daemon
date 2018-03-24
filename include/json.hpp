@@ -9908,7 +9908,7 @@ class basic_json
                    and not std::is_same<ValueType, std::initializer_list<typename string_t::value_type>>::value
 #endif
 #if (defined(__cplusplus) && __cplusplus >= 201703L) || (defined(_MSC_VER) && _MSC_VER >1900 && defined(_HAS_CXX17) && _HAS_CXX17 == 1) // fix for issue #464
-                   and not std::is_same<ValueType, typename std::string_view>::value
+                   //and not std::is_same<ValueType, typename std::string_view>::value
 #endif
                    , int >::type = 0 >
     operator ValueType() const
