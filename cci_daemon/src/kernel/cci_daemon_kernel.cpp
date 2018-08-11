@@ -16,6 +16,10 @@ cci_daemon_kernel_ptr cci_daemon_kernel::m_instance;
 std::mutex cci_daemon_kernel::m_mutex;
 
 
+publish_and_subscribe_intf::~publish_and_subscribe_intf()
+{}
+
+
 //------------------------------------------------------------------------
 cci_daemon_base_kernel::~cci_daemon_base_kernel()
 {

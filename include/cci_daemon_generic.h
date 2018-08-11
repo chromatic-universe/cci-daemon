@@ -25,10 +25,11 @@ namespace cci_daemon_impl
             public :
                 virtual bool connect( const std::string& connect_string ) = 0;
                 virtual std::string moniker() const noexcept = 0;
+                virtual ~publish_and_subscribe_intf();
         };
 
 
-	//generic
+	    //generic
         //looks up a function exported by the sharedd object
         ///handle of the shared object in which the function will be looked up
         ///returns casted pointer to the specified function
