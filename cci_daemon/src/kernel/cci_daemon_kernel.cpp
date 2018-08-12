@@ -59,13 +59,14 @@ void cci_daemon_base_kernel::load_plugin( const std::string &config )
 void cci_daemon_base_kernel::unload_plugin( const std::string& config )
 {
             //deregister
-            if( m_loaded_plugins->find( config ) != m_loaded_plugins->end() )
+            auto iter = m_loaded_plugins->find( config );
+            if( iter != m_loaded_plugins->end() )
             {
                 std::cerr << "...deregistering plugin..."
                           << config
                           << "\n";
                 std::cerr << "...releasing local contexts..\n";
-                destroy_contexts();
+                iter->second.clear_context( *this );
                 m_loaded_plugins->erase( config );
             }
             else
