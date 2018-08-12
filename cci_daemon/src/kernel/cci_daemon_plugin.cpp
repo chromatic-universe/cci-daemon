@@ -41,7 +41,7 @@ cci_daemon_plugin::cci_daemon_plugin( const std::string& filename ) :  m_shared_
 
                 std::cerr << "exception in plugin load....\n";
 
-                throw;
+                throw std::runtime_error( "..could not load plugin..." );
             }
 
 }
