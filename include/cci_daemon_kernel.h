@@ -89,7 +89,7 @@ namespace cci_daemon_impl
                     const cci_daemon_base_kernel& operator=( const cci_daemon_base_kernel&  ) = delete;
 
 
-		protected :
+		        protected :
 
                     //attributes
                     //
@@ -113,18 +113,6 @@ namespace cci_daemon_impl
                         //todo
                     }
 
-                    //release local contexts
-                    virtual void destroy_contexts()
-                    {
-                         std::cerr << "...destroying plugin contexts....\n";
-
-                         //publish and subscribe context
-                         for( auto& elem : *m_loaded_plugins )
-                         {
-                                //inform library components to clear theircontexts
-                                elem.second.clear_context( *this ) ;
-                         }
-                    }
 
 
                 public :
@@ -142,6 +130,20 @@ namespace cci_daemon_impl
                     size_t plugin_count() { return m_loaded_plugins->size(); }
                     virtual bool registered( const std::string& config )
                     { return  m_loaded_plugins->find( config ) != m_loaded_plugins->end();   }
+
+                    //release local contexts
+                    virtual void destroy_contexts()
+                    {
+                         std::cerr << "...destroying plugin contexts....\n";
+
+                         //publish and subscribe context
+                         for( auto& elem : *m_loaded_plugins )
+                         {
+                                //inform library components to clear theircontexts
+                                elem.second.clear_context( *this ) ;
+                         }
+                    }
+
 
            };
 	   //cci_daemon_kernel
@@ -166,8 +168,8 @@ namespace cci_daemon_impl
 			    //dispose instance
 			    static void dispose_instance()
 			    {
-				delete m_instance;
-				m_instance = nullptr;
+                    delete m_instance;
+                    m_instance = nullptr;
 			    }
 
 			    //dtor
@@ -189,7 +191,7 @@ namespace cci_daemon_impl
 		  protected :
 
 			   static cci_daemon_kernel_ptr       m_instance;
-                    	   static std::mutex                  m_mutex;
+               static std::mutex                  m_mutex;
 
 
 
