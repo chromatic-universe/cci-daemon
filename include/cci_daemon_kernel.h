@@ -59,7 +59,7 @@ namespace cci_daemon_impl
            typedef int call_kernel_function(  kernel_context_ptr context_ptr ) ;
 
 
-	  //base	  	
+	  //base
 	  //
           //we call this a 'kernel' for the reason it acts like a
           //minimal one. By using function and address indirection
@@ -72,15 +72,14 @@ namespace cci_daemon_impl
           //mainpulating their contexts and it
           //also controls the containers of servers that downcall
           //into the typed shared library by composition.
-          class cci_daemon_base_kernel 
+          class cci_daemon_base_kernel
           {
 
 
                 public :
 
-		    //ctor
-                    cci_daemon_base_kernel()
-                    {}                    
+		            //ctor
+                    cci_daemon_base_kernel();
 
                     //dtor
                     virtual ~cci_daemon_base_kernel();
@@ -91,7 +90,7 @@ namespace cci_daemon_impl
 
 
 		protected :
-                
+
                     //attributes
                     //
                     //map of plugins
@@ -103,7 +102,7 @@ namespace cci_daemon_impl
                     //supported
                     static supported_dictionary             m_dict_supported;
 
-                                  
+
                     //helpers
                     //
                     //invalidate any pb entities
@@ -151,7 +150,7 @@ namespace cci_daemon_impl
 		   public :
 
 			    //instance - kernel singleton
-			    static cci_daemon_kernel_ptr  instance() 
+			    static cci_daemon_kernel_ptr  instance()
 			    {
 				//double checked lock
 				if( ! m_instance )
@@ -198,7 +197,7 @@ namespace cci_daemon_impl
 
 
 
-	   //facade	
+	   //facade
 	   //
            //-----------------------------------------------------------------------------------
            extern "C" int make_kernel( kernel_context_ptr context_ptr );

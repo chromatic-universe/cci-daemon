@@ -19,7 +19,11 @@ std::mutex cci_daemon_kernel::m_mutex;
 publish_and_subscribe_intf::~publish_and_subscribe_intf()
 {}
 
-
+//------------------------------------------------------------------------
+cci_daemon_base_kernel::cci_daemon_base_kernel() : m_loaded_plugins( std::make_unique<plugin_dictionary>() )
+{
+    //
+}
 //------------------------------------------------------------------------
 cci_daemon_base_kernel::~cci_daemon_base_kernel()
 {
