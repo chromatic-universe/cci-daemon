@@ -21,15 +21,15 @@ namespace cci_daemon_impl
 
                 ///
                 //chain of responsibility
-                class publish_and_subscribe_consumer
+                class publish_and_subscribe_duplexer
                 {
 
                   public :
 
                       //ctor
-                      publish_and_subscribe_consumer() = default;
+                      publish_and_subscribe_duplexer() = default;
                       //dtor
-                      virtual ~publish_and_subscribe_consumer()
+                      virtual ~publish_and_subscribe_duplexer()
                       {}
 
                  private :
@@ -37,7 +37,7 @@ namespace cci_daemon_impl
                       //attributes
                       std::string   m_str_moniker;
 
-                  /// consumer can open a broker
+                  /// duplexer can open a broker
                   public :
 
                       //services
@@ -46,9 +46,9 @@ namespace cci_daemon_impl
 
                };
                ///
-               typedef std::list<publish_and_subscribe_consumer*> consumer_list;
+               typedef std::list<publish_and_subscribe_duplexer*> duplexer_list;
                //ctor
-               publish_and_subscribe_server() : m_consumers( new consumer_list )
+               publish_and_subscribe_server() : m_duplexers( new duplexer_list )
                {}
                //dtor
                virtual ~publish_and_subscribe_server()
@@ -57,27 +57,27 @@ namespace cci_daemon_impl
 
             private :
 
-                      std::unique_ptr<consumer_list> m_consumers;
+                      std::unique_ptr<duplexer_list> m_duplexers;
 
             public:
 
                 //accessors-inspectors
-                consumer_list* consumers() { return  m_consumers.get(); }
+                duplexer_list* duplexers() { return  m_duplexers.get(); }
 
                 //services
-                void add_publish_subscribe_consumer( publish_and_subscribe_consumer* consumer )
+                void add_publish_subscribe_duplexer( publish_and_subscribe_duplexer* duplexer )
                 {
-                    m_consumers->push_back( consumer );
+                    m_duplexers->push_back( duplexer );
                 }
 
                 std::unique_ptr<publish_and_subscribe_intf> open_broker( const std::string &config )
                 {
-                  for( auto& elem : *m_consumers )
+                  for( auto& elem : *m_duplexers )
                   {
                     if(  elem->can_open_broker( config ) )
                     {   return elem->open_broker( config ); }
                   }
-                  throw std::runtime_error( "invalid or unsupported consumer type" );
+                  throw std::runtime_error( "invalid or unsupported duplexer type" );
 
                }
 
