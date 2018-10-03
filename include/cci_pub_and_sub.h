@@ -1,7 +1,7 @@
 
 //cci_pub_and_sub.h      william k. johnson 2018
 
-
+#pragma once
 
 #include <list>
 #include <string>
