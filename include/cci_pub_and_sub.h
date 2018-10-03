@@ -1,5 +1,5 @@
 
-//cci_pub_and_sub.h      william k. johnson 2016
+//cci_pub_and_sub.h      william k. johnson 2018
 
 
 
