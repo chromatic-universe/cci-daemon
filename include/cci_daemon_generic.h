@@ -1,4 +1,4 @@
-//cci_daemon_generic.h    william k. johnson 2017
+//cci_daemon_generic.h    william k. johnson 2018
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -23,7 +23,7 @@ namespace cci_daemon_impl
         class publish_and_subscribe_intf
         {
             public :
-                virtual bool connect( const std::string& connect_string ) = 0;
+                virtual bool broker_spec( const std::string& connect_string ) = 0;
                 virtual std::string moniker() const noexcept = 0;
                 virtual ~publish_and_subscribe_intf();
         };
