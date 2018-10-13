@@ -23,8 +23,9 @@ namespace cci_daemon_impl
         class publish_and_subscribe_intf
         {
             public :
-                virtual bool broker_spec( const std::string& connect_string ) = 0;
+                virtual std::string broker_spec() = 0;
                 virtual std::string moniker() const noexcept = 0;
+                virtual bool gen_endpoint( std::string& endpoint_prefix ) = 0;
                 virtual ~publish_and_subscribe_intf();
         };
 
