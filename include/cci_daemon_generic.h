@@ -9,6 +9,7 @@
 //c++ standard
 #include <cassert>
 #include <string>
+#include <vector>
 #include <dlfcn.h>
 #include <sys/stat.h>
 
