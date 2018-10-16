@@ -22,6 +22,7 @@ cci_handle_t cci_shared_lib::load( const std::string& lib )
                                                    RTLD_NOW) ;
             if( shared_object == nullptr )
             {
+                std::string err{ ::dlerror() };
                 throw std::runtime_error( std::string( "could not load '")
                                           + path_with_extension + "'");
             }
