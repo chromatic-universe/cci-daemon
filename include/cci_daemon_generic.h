@@ -27,6 +27,7 @@ namespace cci_daemon_impl
                 virtual std::string broker_spec() = 0;
                 virtual std::string moniker() const noexcept = 0;
                 virtual bool gen_endpoint( std::string& endpoint_prefix ) = 0;
+                virtual bool degen_endpoint( const std::string& endpoint_prefix ) = 0;
                 virtual bool enumerate_endpoints( std::vector<std::string>& endpoints ) = 0;
                 virtual ~publish_and_subscribe_intf();
         };
