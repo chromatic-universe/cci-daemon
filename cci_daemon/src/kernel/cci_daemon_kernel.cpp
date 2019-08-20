@@ -1,4 +1,4 @@
-//cci_daemon_base_kernel.cpp    william k. johnson 2017
+//cci_daemon_base_kernel.cpp    william k. johnson 2019
 //
 
 #include <iostream>
