@@ -1,4 +1,4 @@
-//cci_daaemon_kernel.h      chromatic universe william k. johnson 2017
+//cci_daaemon_kernel.h      chromatic universe william k. johnson 2019
 
 #pragma once
 
@@ -19,21 +19,19 @@
 namespace cci_daemon_impl
 {
 
-          //forward
+      //forward
 	  class cci_daemon_base_kernel;
-          class cci_daemon_kernel;
+      class cci_daemon_kernel;
 
+      //aliases
+      using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
+      using plugins_ptr = plugin_dictionary*;
+      using supported_dictionary = std::map<std::string,std::string>;
+      using cci_daemon_kernel_ptr = cci_daemon_kernel*;
+      using cci_daemon_base_kernel_ptr = cci_daemon_base_kernel*;
+      using param_map = std::map<std::string,std::string>;
 
-
-          //aliases
-          using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
-          using plugins_ptr = plugin_dictionary*;
-          using supported_dictionary = std::map<std::string,std::string>;
-          using cci_daemon_kernel_ptr = cci_daemon_kernel*;
-	  using cci_daemon_base_kernel_ptr = cci_daemon_base_kernel*;
-          using param_map = std::map<std::string,std::string>;
-
-          //kernel structure - home brew kernel process struct
+      //kernel structure - home brew kernel process struct
 	  extern "C"
 	  {
 		  typedef struct kernel_context
