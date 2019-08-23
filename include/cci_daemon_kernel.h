@@ -122,8 +122,9 @@ namespace cci_daemon_impl
 
                     //services
                     //
-                    bool supported_service( const std::string& key )
-                    { return m_dict_supported.find( key ) != m_dict_supported.end(); }
+                    virtual bool supported_service( const std::string& key )
+                    { return cci_daemon_base_kernel::m_dict_supported.find( key )
+                        != cci_daemon_base_kernel::m_dict_supported.end(); }
                     virtual void load_plugin( const std::string &config );
                     virtual void unload_plugin( const std::string& config );
                     size_t plugin_count() { return m_loaded_plugins->size(); }
