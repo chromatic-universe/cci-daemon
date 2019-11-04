@@ -42,13 +42,22 @@ int main( int argc , char* argv[] )
 
             try
             {
-                std::string plug( "ps_kafka_facade" );
+                
+            	if( argc < 2 )
+            	{
+                	std::cerr << "...please specify library moniker...'\n";
+                	_exit( 1 );
+            	}
+            	std::string moniker { argv[1] };
+
+
+                std::string plug( moniker );
                 auto cci_kernel = cci_daemon_kernel::instance();
                 cci_kernel->load_plugin( plug );
                 std::cerr << "...loaded plugin...."
                           << plug
                           << "\n";
-                try_open_server( cci_kernel->get_pb_server() );
+                //try_open_server( cci_kernel->get_pb_server() );
                 cci_kernel->unload_plugin( plug );
 
             }

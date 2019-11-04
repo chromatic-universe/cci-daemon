@@ -19,39 +19,40 @@
 namespace cci_daemon_impl
 {
 
-      //forward
-	  class cci_daemon_base_kernel;
-      class cci_daemon_kernel;
+          //forward
+          class cci_daemon_base_kernel;
+          class cci_daemon_kernel;
 
-      //aliases
-      using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
-      using plugins_ptr = plugin_dictionary*;
-      using supported_dictionary = std::map<std::string,std::string>;
-      using cci_daemon_kernel_ptr = cci_daemon_kernel*;
-      using cci_daemon_base_kernel_ptr = cci_daemon_base_kernel*;
-      using param_map = std::map<std::string,std::string>;
+          //aliases
+          using plugin_dictionary = std::map<std::string , cci_daemon_plugin>;
+          using plugins_ptr = plugin_dictionary*;
+          using supported_dictionary = std::map<std::string,std::string>;
+          using cci_daemon_kernel_ptr = cci_daemon_kernel*;
+          using cci_daemon_base_kernel_ptr = cci_daemon_base_kernel*;
+          using param_map = std::map<std::string,std::string>;
 
-      //kernel structure - home brew kernel process struct
-	  extern "C"
-	  {
-		  typedef struct kernel_context
-		  {
-			//atttributes
-			//
-			//commmand line
-			param_map   pm;
-
-
-			//services
-			//
-			cci_daemon_impl::cci_daemon_kernel*   kernel_ref;
-			cci_handle_t                          lib_ref;
-			int ( *make_kernel ) ( kernel_context* context_ptr );
-			int ( *unmake_kernel ) ( kernel_context* context_ptr );
+          //kernel structure - home brew kernel process struct
+          extern "C"
+          {
+              typedef struct kernel_context
+              {
+                //atttributes
+                //
+                //commmand line
+                param_map   pm;
 
 
-		   } kernel_context;
-	   }
+                //services
+                //
+                cci_daemon_impl::cci_daemon_kernel*   kernel_ref;
+                cci_handle_t                          lib_ref;
+                int ( *make_kernel ) ( kernel_context* context_ptr );
+                int ( *unmake_kernel ) ( kernel_context* context_ptr );
+
+
+               } kernel_context;
+           }
+
            typedef kernel_context* kernel_context_ptr;
            //types
            typedef int call_kernel_function(  kernel_context_ptr context_ptr ) ;
@@ -121,7 +122,7 @@ namespace cci_daemon_impl
                     virtual supported_dictionary supported() { return cci_daemon_base_kernel::m_dict_supported; }
 
                     //services
-                    //
+                    //=
                     virtual bool supported_service( const std::string& key )
                     { return cci_daemon_base_kernel::m_dict_supported.find( key )
                         != cci_daemon_base_kernel::m_dict_supported.end(); }
@@ -193,6 +194,10 @@ namespace cci_daemon_impl
 			   static cci_daemon_kernel_ptr       m_instance;
                static std::mutex                  m_mutex;
 
+          public :
+
+               virtual supported_dictionary supported() { return cci_daemon_base_kernel::m_dict_supported; }
+               virtual bool supported_service( const std::string& key )   { return false; }
 
 
 	   };
