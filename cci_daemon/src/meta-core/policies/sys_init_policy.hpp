@@ -1,6 +1,4 @@
-//sys_init_policy.hpp    william k. johnon    2017
-
-#pragma clang diagnostic ignored "-Wswitch"
+//sys_init_policy.hpp    william k. johnon    2020
 
 
 #include <memory>
