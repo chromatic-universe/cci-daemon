@@ -39,7 +39,7 @@ namespace cci_daemon_utils
                 non_blocking = 1
             };
 
-
+            /*
             extern "C"
             {
                 //---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ namespace cci_daemon_utils
                                                      reading r ,
                                                      int& pid_ );
 
-            }
+            }*/
 
 
 }
