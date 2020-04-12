@@ -5,7 +5,7 @@
 using namespace cci_daemon_utils;
 
 
-static void blocking_read( int cp_fd[] , std::ostream& ostr );
+//static void blocking_read( int cp_fd[] , std::ostream& ostr );
 
 
 //-------------------- )--------------------------------------------------------------
@@ -60,13 +60,12 @@ void buffer_stream_from_open( const std::string& params ,
 }
 
 //-------------------------------------------------------------------------------------
-void blocking_read( int cp_fd[] ,  std::ostream& ostr )
+/*void blocking_read( int cp_fd[] ,  std::ostream& ostr )
 {
 
           std::string    data_read_from_child;
           char           buffer[ buffer_size + 1 ];
           ssize_t        read_result;
-          int            status;
 
 
           while ( true )
@@ -75,7 +74,7 @@ void blocking_read( int cp_fd[] ,  std::ostream& ostr )
                                          buffer ,
                                          buffer_size ) )
             {
-              /*
+
                   case 0: //End-of-File, or non-blocking read.
                     cout << "End of file reached..."         << endl
                          << "Data received was ("
@@ -101,7 +100,7 @@ void blocking_read( int cp_fd[] ,  std::ostream& ostr )
                     {
                       FAIL( "read() failed" );
                       exit(-1);
-                    }*/
+                    }
 
                   default:
                     //dataReadFromChild . append( buffer, readResult );
@@ -112,6 +111,6 @@ void blocking_read( int cp_fd[] ,  std::ostream& ostr )
 
 
 
-}
+}*/
 
 
