@@ -59,6 +59,6 @@ cci_daemon_plugin::cci_daemon_plugin( const cci_daemon_plugin& cdp )
 cci_daemon_plugin::~cci_daemon_plugin()
 {
 
-    //cci_shared_lib::unload( m_shared_lib );
+    //if( m_shared_lib ) { cci_shared_lib::unload( m_shared_lib ); }
 
 }
