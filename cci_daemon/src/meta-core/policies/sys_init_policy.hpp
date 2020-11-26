@@ -1,4 +1,4 @@
-//sys_init_policy.hpp    william k. johnon    2020
+//sys_init_policy.hpp    chromatic universe 2017-2020  william k. johnson
 
 
 #include <memory>
@@ -20,8 +20,8 @@ using namespace cpp_real_stream;
 
 namespace cci_policy
 {
-		
-				
+
+
         //
 	//system init policies
 	//
@@ -46,7 +46,7 @@ namespace cci_policy
 
 
 		protected :
-			
+
 			//dtor
 			~runtime_sys_init()
 			{}
@@ -57,67 +57,68 @@ namespace cci_policy
 			std::string runtime_data() const noexcept { return *m_runtime_data.get(); }
 			cpp_real_stream::time_utils_ptr _t() { return m_tutils.get(); }
 			//mutators
-			void runtime_data( std::unique_ptr<std::string>& data ) 
+			void runtime_data( std::unique_ptr<std::string>& data )
 			{ m_runtime_data = std::move( data ); }
 
 
 			//services
 			void configure_init ( T meta )
 			{
-				
-				
+
+
 				cci_daemonize::daemon_proc dp = cci_daemonize::daemon_proc::dp_fork_background_proc;
 
-				ACE_TRACE ("runtime_sys_init::configure_init");	
-				
+				ACE_TRACE ("runtime_sys_init::configure_init");
+
 				while( dp != cci_daemonize::daemon_proc::dp_error )
 				{
 					switch( dp  )
 					{
-	  
+
 					    case cci_daemonize::daemon_proc::dp_fork_background_proc :
 					    {
 
-
-						//become background process
-						switch( fork() )
-						{
-						    case -1 :
-							dp = cci_daemonize::daemon_proc::dp_error;
-							break;
-						    case  0 :
-							dp = cci_daemonize::daemon_proc::dp_make_session_leader;
-							break;
-						    default:
-							_exit( EXIT_SUCCESS );
-						}
-						break;
+                            //become background process
+                            switch( fork() )
+                            {
+                                case -1 :
+                                dp = cci_daemonize::daemon_proc::dp_error;
+                                break;
+                                case  0 :
+                                dp = cci_daemonize::daemon_proc::dp_make_session_leader;
+                                break;
+                                default:
+                                _exit( EXIT_SUCCESS );
+                            }
+                            break;
 					    }
 					    case cci_daemonize::daemon_proc::dp_make_session_leader :
 					    {
-						//become leader of new session
-						setsid() == -1 ? dp = cci_daemonize::daemon_proc::dp_error :
-                                                                dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader;
-						break;
+                            //become leader of new session
+                            setsid() == -1 ? dp = cci_daemonize::daemon_proc::dp_error :
+                                                                    dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader;
+                            break;
 					    }
 					    case cci_daemonize::daemon_proc::dp_fork_no_session_leader :
 					    {
-						//ensure we are not session leader
-						switch( fork() )
-						{
-						    case -1 :
-							dp = cci_daemonize::daemon_proc::dp_error;
-							break;
-						    case  0 :
-							dp = cci_daemonize::daemon_proc::dp_daemonized;						break;
-						    default:
-							_exit( EXIT_SUCCESS );
-						}
-						break;
+                            //ensure we are not session leader
+                            switch( fork() )
+                            {
+                                case -1 :
+                                dp = cci_daemonize::daemon_proc::dp_error;
+                                break;
+                                case  0 :
+                                dp = cci_daemonize::daemon_proc::dp_daemonized;						break;
+                                default:
+                                _exit( EXIT_SUCCESS );
+                            }
+                            break;
 					    }
+                        default :
+                            break;
 					}
 					if ( dp == cci_daemonize::daemon_proc::dp_daemonized ) { break; }
-				}						
+				}
 			}
 
 
@@ -132,7 +133,7 @@ namespace cci_policy
 			std::unique_ptr<std::string> 	m_runtime_data;
 
 		protected :
-			
+
 			//dtor
 			~custom_sys_init()
 			{}
@@ -141,7 +142,7 @@ namespace cci_policy
 
 			//accessors-inspctiors
 			std::string runtime_data() const noexcept { return *m_runtime_data.get(); }
-			
+
 			//services
 			void configure_init()
 			{
@@ -151,5 +152,5 @@ namespace cci_policy
 
 
 
-	
+
 }

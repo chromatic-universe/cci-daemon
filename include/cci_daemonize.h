@@ -41,26 +41,26 @@ namespace cci_daemonize
                 	dp_reopen_streams_dev_null ,
                 	dp_daemonized ,
                 	dp_error ,
-			dp_success
+			        dp_success
             	};
-		
 
-		//immutable
-		static const unsigned bd_no_chdir = 01;
-               	///< don't close all open files
-               	static const unsigned bd_no_close_files = 02;
-         	///< don;t reopen stdin , stderr and std:out to to /dev_null
-               	static const unsigned bd_no_reopen_std_fds = 04;
-               	///< don't do a umask( 0 )
-               	static const unsigned bd_no_umask_0 = 010;
-               	///< maximum file descriptors to close if sysconf is indeterminate
-               	static const unsigned bd_max_handles = 8192;
-		/// buffer size
-		static const unsigned buffer_size = 1024;
-		///close exec
-                static const unsigned cpf_cloexec = 1;
-		///pid path
-		static const std::string path_pid { "/var/run/cci-daemon.pid" };
+
+	   //immutable
+	   static const unsigned bd_no_chdir = 01;
+       ///< don't close all open files
+       static const unsigned bd_no_close_files = 02;
+       ///< don;t reopen stdin , stderr and std:out to to /dev_null
+       static const unsigned bd_no_reopen_std_fds = 04;
+       ///< don't do a umask( 0 )
+       static const unsigned bd_no_umask_0 = 010;
+       ///< maximum file descriptors to close if sysconf is indeterminate
+       static const unsigned bd_max_handles = 8192;
+	   /// buffer size
+	   static const unsigned buffer_size = 1024;
+	   ///close exec
+       static const unsigned cpf_cloexec = 1;
+	   ///pid path
+	   static const std::string path_pid { "/var/run/cci-daemon.pid" };
 
 
 
@@ -73,7 +73,7 @@ extern "C"
 	int daemonize_( const unsigned long flags );
 	//seesion console leader
 	cci_daemonize::daemon_proc make_session_leader();
-	//fork daemon 
+	//fork daemon
 	cci_daemonize::daemon_proc make_into_background();
 	//fork session leader
 	cci_daemonize::daemon_proc make_fork_no_session_leader();
@@ -98,6 +98,6 @@ extern "C"
 	//remove pd
 	bool remove_pid( const std::string& pid_file );
 
-	
+
 }
 
