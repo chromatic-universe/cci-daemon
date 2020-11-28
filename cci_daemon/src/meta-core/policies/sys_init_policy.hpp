@@ -1,4 +1,4 @@
-//sys_init_policy.hpp    chromatic universe 2017-2020  william k. johnson
+//sys_init_policy.hpp    william k. johnon    2020
 
 
 #include <memory>
@@ -78,44 +78,43 @@ namespace cci_policy
 					    case cci_daemonize::daemon_proc::dp_fork_background_proc :
 					    {
 
-                            //become background process
-                            switch( fork() )
-                            {
-                                case -1 :
-                                dp = cci_daemonize::daemon_proc::dp_error;
-                                break;
-                                case  0 :
-                                dp = cci_daemonize::daemon_proc::dp_make_session_leader;
-                                break;
-                                default:
-                                _exit( EXIT_SUCCESS );
-                            }
-                            break;
+
+						//become background process
+						switch( fork() )
+						{
+						    case -1 :
+							dp = cci_daemonize::daemon_proc::dp_error;
+							break;
+						    case  0 :
+							dp = cci_daemonize::daemon_proc::dp_make_session_leader;
+							break;
+						    default:
+							_exit( EXIT_SUCCESS );
+						}
+						break;
 					    }
 					    case cci_daemonize::daemon_proc::dp_make_session_leader :
 					    {
-                            //become leader of new session
-                            setsid() == -1 ? dp = cci_daemonize::daemon_proc::dp_error :
-                                                                    dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader;
-                            break;
+						//become leader of new session
+						setsid() == -1 ? dp = cci_daemonize::daemon_proc::dp_error :
+                                                                dp = cci_daemonize::daemon_proc::dp_fork_no_session_leader;
+						break;
 					    }
 					    case cci_daemonize::daemon_proc::dp_fork_no_session_leader :
 					    {
-                            //ensure we are not session leader
-                            switch( fork() )
-                            {
-                                case -1 :
-                                dp = cci_daemonize::daemon_proc::dp_error;
-                                break;
-                                case  0 :
-                                dp = cci_daemonize::daemon_proc::dp_daemonized;						break;
-                                default:
-                                _exit( EXIT_SUCCESS );
-                            }
-                            break;
+						//ensure we are not session leader
+						switch( fork() )
+						{
+						    case -1 :
+							dp = cci_daemonize::daemon_proc::dp_error;
+							break;
+						    case  0 :
+							dp = cci_daemonize::daemon_proc::dp_daemonized;						break;
+						    default:
+							_exit( EXIT_SUCCESS );
+						}
+						break;
 					    }
-                        default :
-                            break;
 					}
 					if ( dp == cci_daemonize::daemon_proc::dp_daemonized ) { break; }
 				}
