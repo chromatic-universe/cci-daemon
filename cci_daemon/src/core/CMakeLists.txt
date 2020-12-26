@@ -1,4 +1,4 @@
-#cmake cci_daemon  william k. johnson 2017
+#cmake cci_daemon  william k. johnson 2020
 
 #version
 cmake_minimum_required(VERSION 3.2)
@@ -8,7 +8,7 @@ project(CCIDAEMON)
 
 #cpp flags
 set(CMAKE_CXX_FLAGS_DEBUG "-fPIC -Wall -g -O0  -rdynamic -Qunused-arguments  -DDEBUG -std=c++1z")
-set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -rdynamic -Qunused-arguments  -DNDEBUG -std=c++1z")
+set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -Wall -O3  -Qunused-arguments  -DNDEBUG -std=c++1z")
 
 #includes
 include_directories(../../../include
