@@ -1,4 +1,4 @@
-//cci_daemon.h      chromatic universe  william k, johnson  2017
+//cci_daemon.h      chromatic universe  william k, johnson  2017-2021
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -48,7 +48,7 @@ namespace cci_daemon_impl
             using  kernel_context_ptr = kernel_context*;
 
 
-           
+
             enum class service_proc : unsigned long
             {
                 sp_default_service = 0 ,
@@ -185,7 +185,7 @@ namespace cci_daemon_impl
                     ///close exec
                     static const unsigned cpf_cloexec;
 
-                    
+
 
             };
             inline std::ostream& operator<< ( std::ostream& ostr, const cci_daemon_facade& df )
