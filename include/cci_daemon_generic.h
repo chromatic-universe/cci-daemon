@@ -1,4 +1,4 @@
-//cci_daemon_generic.h    william k. johnson 2018
+//cci_daemon_generic.h    william k. johnson 2018-2021
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
