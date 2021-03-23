@@ -1,4 +1,7 @@
+//cci_daeomon_main.cpp   wchromatic universe 2016-3032     william k. johnson
+
 #pragma GCC diagnostic ignored "-Wunused-function"
+
 
 #include <cci_daemon.h>
 #include <execinfo.h>
