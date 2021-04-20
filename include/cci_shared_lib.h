@@ -1,4 +1,4 @@
-//cci_shared_lib.h      william k. johnson 2017
+//cci_shared_lib.h      chromatic universe 2017-2021 william k. johnson 201a-
 
 
 #pragma once
