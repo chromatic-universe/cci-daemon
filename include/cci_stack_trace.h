@@ -1,4 +1,4 @@
-//cci_stack_trace.h    william k. johnson 2016
+//cci_stack_trace.h    william k. johnson 2016-2021
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wformat"
