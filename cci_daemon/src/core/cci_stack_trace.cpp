@@ -1,4 +1,4 @@
-//cci_stack_trace.cpp     william k. johnson 2016
+//cci_stack_trace.cpp     william k. johnson 2016-2021 chromatic universe 
 
 
 #include <cci_stack_trace.h>
