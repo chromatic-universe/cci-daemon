@@ -1,4 +1,4 @@
-//cci_daemonize.h     william k. johnson  2017
+//cci_daemonize.h     william k. johnson  2017-2021
 
 #pragma once
 #pragma GCC diagnostic ignored "-Wunused-parameter"
